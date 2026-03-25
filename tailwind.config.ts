@@ -49,9 +49,10 @@ const config: Config = {
         },
       },
       fontFamily: {
-        serif:   ["var(--font-playfair)",   "Georgia",   "serif"      ],
-        sans:    ["var(--font-inter)",      "system-ui", "sans-serif" ],
-        display: ["var(--font-montserrat)", "system-ui", "sans-serif" ],
+        serif:      ["var(--font-playfair)",   "Georgia",   "serif"      ],
+        sans:       ["var(--font-inter)",      "system-ui", "sans-serif" ],
+        display:    ["var(--font-montserrat)", "system-ui", "sans-serif" ],
+        "dm-serif": ["var(--font-dm-serif)",   "Georgia",   "serif"      ],
       },
       borderRadius: {
         lg: "var(--radius)",

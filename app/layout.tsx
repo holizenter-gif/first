@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { Playfair_Display } from "next/font/google";
 import { Montserrat } from "next/font/google";
+import { DM_Serif_Display } from "next/font/google";
 import "./globals.css";
 
 const inter = Inter({
@@ -22,6 +23,14 @@ const montserrat = Montserrat({
   variable: "--font-montserrat",
   display: "swap",
   weight: ["300", "400", "500", "600", "700", "800"],
+});
+
+const dmSerif = DM_Serif_Display({
+  subsets:  ["latin"],
+  variable: "--font-dm-serif",
+  display:  "swap",
+  weight:   "400",
+  style:    ["normal", "italic"],
 });
 
 export const metadata: Metadata = {
@@ -52,7 +61,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="es"
-      className={`${inter.variable} ${playfair.variable} ${montserrat.variable}`}
+      className={`${inter.variable} ${playfair.variable} ${montserrat.variable} ${dmSerif.variable}`}
     >
       <body className={inter.className}>{children}</body>
     </html>

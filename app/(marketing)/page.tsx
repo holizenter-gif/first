@@ -1,28 +1,46 @@
 import type { Metadata } from "next";
-import HeroSection from "@/components/sections/HeroSection";
-import StatsBar from "@/components/sections/StatsBar";
-import ServicesGrid from "@/components/sections/ServicesGrid";
-import TresPilares from "@/components/sections/TresPilares";
-import QuizCTABanner from "@/components/sections/QuizCTABanner";
-import TestimonialsCarousel from "@/components/sections/TestimonialsCarousel";
-import Nom035Banner from "@/components/sections/Nom035Banner";
+import HeroGeneral         from "@/components/landing/HeroGeneral";
+import Manifiesto          from "@/components/landing/Manifiesto";
+import TresCaminos         from "@/components/landing/TresCaminos";
+import MetodologiaMBSR     from "@/components/landing/MetodologiaMBSR";
+import EquipoEspecialistas from "@/components/landing/EquipoEspecialistas";
+import PodcastSection      from "@/components/landing/PodcastSection";
+import TresPilaresGeneral  from "@/components/landing/TresPilaresGeneral";
+import PruebaSocial        from "@/components/landing/PruebaSocial";
+import CTAFinal            from "@/components/landing/CTAFinal";
 
 export const metadata: Metadata = {
-  title: "Holizenter — El Poder de tu Bienestar | Bienestar Holístico para Empresas",
+  title: "Holizenter — El Poder de tu Bienestar | Bienestar Holístico Real",
   description:
-    "Diagnóstico laboral gratuito, talleres de bienestar, integración de equipos y sensibilización de alta dirección para empresas en México. NOM-035 Cumplimiento Garantizado.",
+    "Tu punto de encuentro para el bienestar real. Físico, emocional y espiritual. Para personas y empresas. Programa MBSR avalado por Brown University. Ciudad de México.",
+  keywords: [
+    "bienestar holístico México",
+    "programa MBSR México",
+    "terapia holística CDMX",
+    "bienestar empresarial México",
+    "mindfulness empresas",
+    "Holizenter",
+  ],
+  openGraph: {
+    title:       "Holizenter — Tu punto de encuentro para el bienestar real",
+    description: "Físico, emocional y espiritual. Para personas y empresas. MBSR · Terapia holística · Bienestar organizacional.",
+    url:         "https://holizenter.mx",
+    images:      [{ url: "/og-image.jpg", width: 1200, height: 630 }],
+  },
 };
 
 export default function HomePage() {
   return (
     <>
-      <HeroSection />
-      <StatsBar />
-      <ServicesGrid />
-      <TresPilares />
-      <QuizCTABanner />
-      <TestimonialsCarousel />
-      <Nom035Banner />
+      <HeroGeneral />
+      <Manifiesto />
+      <TresCaminos />
+      <MetodologiaMBSR />
+      <EquipoEspecialistas />
+      <PodcastSection />
+      <TresPilaresGeneral />
+      <PruebaSocial />
+      <CTAFinal />
     </>
   );
 }

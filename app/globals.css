@@ -187,3 +187,18 @@
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
+
+/* ═══════════════════════════════════════════
+   HOLIZENTER — Landing General · Paleta
+   Orgánica, cálida, humana. No corporativa.
+═══════════════════════════════════════════ */
+:root {
+  --hl-green:        #2D5A3D;
+  --hl-green-dark:   #1C3A2A;
+  --hl-green-pale:   #EDF4EE;
+  --hl-beige:        #F5F0E8;
+  --hl-beige-alt:    #EAE4D8;
+  --hl-divider:      #D4C9B5;
+  --hl-text:         #1A2B1F;
+  --hl-text-muted:   #4A5E4E;
+}
