@@ -1,7 +1,18 @@
 import { Profesional } from "../supabase/types";
 
+function mock(overrides: Omit<Profesional, "bio_corta" | "certificaciones" | "filosofia" | "orden" | "slug"> & Partial<Pick<Profesional, "bio_corta" | "certificaciones" | "filosofia" | "orden" | "slug">>): Profesional {
+  return {
+    bio_corta:      null,
+    certificaciones: [],
+    filosofia:      null,
+    orden:          99,
+    slug:           overrides.nombre.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+    ...overrides,
+  };
+}
+
 export const PROFESIONALES_MOCK: Profesional[] = [
-  {
+  mock({
     id: "1",
     nombre: "Dra. Ana González Reyes",
     especialidad: "Psicología Organizacional",
@@ -15,12 +26,12 @@ export const PROFESIONALES_MOCK: Profesional[] = [
     tags: ["burnout", "NOM-035", "liderazgo", "equipos"],
     experiencia_anos: 12,
     created_at: "2024-01-15T00:00:00Z",
-  },
-  {
+  }),
+  mock({
     id: "2",
     nombre: "Lic. Carlos Mendoza Vega",
     especialidad: "Yoga Terapéutico y Mindfulness",
-    bio: "Instructor certificado en yoga terapéutico y MBSR (Mindfulness-Based Stress Reduction). Ha trabajado con más de 200 empresas en CDMX.",
+    bio: "Instructor certificado en yoga terapéutico y MBSR. Ha trabajado con más de 200 empresas en CDMX.",
     foto_url: "/images/profesionales/carlos-mendoza.jpg",
     modalidad: "presencial",
     precio_base: 2800,
@@ -30,12 +41,12 @@ export const PROFESIONALES_MOCK: Profesional[] = [
     tags: ["yoga", "mindfulness", "respiración", "meditación"],
     experiencia_anos: 8,
     created_at: "2024-01-15T00:00:00Z",
-  },
-  {
+  }),
+  mock({
     id: "3",
     nombre: "Dra. Sofía Herrera Luna",
     especialidad: "Nutrición Funcional",
-    bio: "Nutrióloga especializada en nutrición para el rendimiento laboral. Experta en el vínculo entre alimentación, energía y productividad.",
+    bio: "Nutrióloga especializada en nutrición para el rendimiento laboral.",
     foto_url: "/images/profesionales/sofia-herrera.jpg",
     modalidad: "online",
     precio_base: 2200,
@@ -45,12 +56,12 @@ export const PROFESIONALES_MOCK: Profesional[] = [
     tags: ["nutrición", "energía", "rendimiento", "hábitos"],
     experiencia_anos: 6,
     created_at: "2024-01-15T00:00:00Z",
-  },
-  {
+  }),
+  mock({
     id: "4",
     nombre: "Mtro. Roberto Castillo",
     especialidad: "Coaching Ejecutivo",
-    bio: "Coach certificado ICF nivel PCC. Especialista en liderazgo consciente, gestión del cambio y desarrollo de equipos de alto rendimiento.",
+    bio: "Coach certificado ICF nivel PCC. Especialista en liderazgo consciente y desarrollo de equipos.",
     foto_url: "/images/profesionales/roberto-castillo.jpg",
     modalidad: "hibrido",
     precio_base: 4500,
@@ -60,12 +71,12 @@ export const PROFESIONALES_MOCK: Profesional[] = [
     tags: ["coaching", "liderazgo", "cambio", "alto rendimiento"],
     experiencia_anos: 15,
     created_at: "2024-01-15T00:00:00Z",
-  },
-  {
+  }),
+  mock({
     id: "5",
     nombre: "Dra. Valentina Ruiz",
     especialidad: "Medicina Integrativa",
-    bio: "Médica con especialidad en medicina integrativa y funcional. Aborda el bienestar desde una perspectiva holística cuerpo-mente-espíritu.",
+    bio: "Médica con especialidad en medicina integrativa y funcional.",
     foto_url: "/images/profesionales/valentina-ruiz.jpg",
     modalidad: "presencial",
     precio_base: 3800,
@@ -75,12 +86,12 @@ export const PROFESIONALES_MOCK: Profesional[] = [
     tags: ["medicina integrativa", "holístico", "prevención", "salud"],
     experiencia_anos: 10,
     created_at: "2024-01-15T00:00:00Z",
-  },
-  {
+  }),
+  mock({
     id: "6",
     nombre: "Lic. Miguel Torres",
     especialidad: "Facilitación y Dinámicas Grupales",
-    bio: "Facilitador experto en dinámicas de integración, comunicación efectiva y resolución de conflictos para equipos corporativos.",
+    bio: "Facilitador experto en dinámicas de integración y comunicación efectiva.",
     foto_url: "/images/profesionales/miguel-torres.jpg",
     modalidad: "presencial",
     precio_base: 3200,
@@ -90,12 +101,12 @@ export const PROFESIONALES_MOCK: Profesional[] = [
     tags: ["facilitación", "equipos", "comunicación", "integración"],
     experiencia_anos: 9,
     created_at: "2024-01-15T00:00:00Z",
-  },
-  {
+  }),
+  mock({
     id: "7",
     nombre: "Dra. Patricia Morales",
     especialidad: "Neurociencias Aplicadas",
-    bio: "Investigadora y consultora en neurociencias aplicadas al bienestar laboral. Experta en neuroplasticidad y hábitos de alto rendimiento.",
+    bio: "Investigadora y consultora en neurociencias aplicadas al bienestar laboral.",
     foto_url: "/images/profesionales/patricia-morales.jpg",
     modalidad: "online",
     precio_base: 4200,
@@ -105,12 +116,12 @@ export const PROFESIONALES_MOCK: Profesional[] = [
     tags: ["neurociencias", "hábitos", "rendimiento", "neuroplasticidad"],
     experiencia_anos: 11,
     created_at: "2024-01-15T00:00:00Z",
-  },
-  {
+  }),
+  mock({
     id: "8",
     nombre: "Lic. Andrés Fuentes",
     especialidad: "Arte Terapia y Expresión Creativa",
-    bio: "Arteterapeuta con certificación internacional. Utiliza el arte como herramienta para reducir el estrés y fortalecer la cohesión de equipos.",
+    bio: "Arteterapeuta con certificación internacional.",
     foto_url: "/images/profesionales/andres-fuentes.jpg",
     modalidad: "presencial",
     precio_base: 2500,
@@ -120,12 +131,12 @@ export const PROFESIONALES_MOCK: Profesional[] = [
     tags: ["arte terapia", "creatividad", "estrés", "cohesión"],
     experiencia_anos: 7,
     created_at: "2024-01-15T00:00:00Z",
-  },
-  {
+  }),
+  mock({
     id: "9",
     nombre: "Mtra. Lucía Vargas",
     especialidad: "Bienestar Financiero",
-    bio: "Especialista en bienestar financiero personal. Ayuda a los colaboradores a reducir el estrés económico que impacta su desempeño laboral.",
+    bio: "Especialista en bienestar financiero personal.",
     foto_url: "/images/profesionales/lucia-vargas.jpg",
     modalidad: "hibrido",
     precio_base: 2800,
@@ -135,12 +146,12 @@ export const PROFESIONALES_MOCK: Profesional[] = [
     tags: ["finanzas personales", "bienestar financiero", "estrés económico"],
     experiencia_anos: 8,
     created_at: "2024-01-15T00:00:00Z",
-  },
-  {
+  }),
+  mock({
     id: "10",
     nombre: "Dr. Fernando Jiménez",
     especialidad: "Fisioterapia Laboral y Ergonomía",
-    bio: "Fisioterapeuta especializado en patologías laborales y ergonomía. Previene lesiones musculoesqueléticas derivadas de malas posturas y trabajo sedentario.",
+    bio: "Fisioterapeuta especializado en patologías laborales y ergonomía.",
     foto_url: "/images/profesionales/fernando-jimenez.jpg",
     modalidad: "presencial",
     precio_base: 2600,
@@ -150,5 +161,5 @@ export const PROFESIONALES_MOCK: Profesional[] = [
     tags: ["fisioterapia", "ergonomía", "postura", "lesiones laborales"],
     experiencia_anos: 10,
     created_at: "2024-01-15T00:00:00Z",
-  },
+  }),
 ];

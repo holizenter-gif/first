@@ -25,19 +25,24 @@ export type QuizResponse = {
 };
 
 export type Profesional = {
-  id: string;
-  nombre: string;
-  especialidad: string;
-  bio: string;
-  foto_url: string;
-  modalidad: "presencial" | "online" | "hibrido";
-  precio_base: number;
-  comision_pct: number;
-  activo: boolean;
-  cal_username: string | null;
-  tags: string[];
+  id:               string;
+  nombre:           string;
+  slug:             string;
+  especialidad:     string;
+  bio:              string | null;
+  bio_corta:        string | null;
+  foto_url:         string | null;
+  modalidad:        "presencial" | "online" | "hibrido";
+  precio_base:      number;
+  comision_pct:     number;
+  activo:           boolean;
+  cal_username:     string | null;
+  tags:             string[];
   experiencia_anos: number;
-  created_at: string;
+  certificaciones:  string[];
+  filosofia:        string | null;
+  orden:            number;
+  created_at:       string;
 };
 
 export type Cita = {
