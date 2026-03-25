@@ -50,6 +50,26 @@ export type Cita = {
   status: "pendiente" | "confirmada" | "completada" | "cancelada";
   cal_event_id: string | null;
   pago_id: string | null;
+  nombre_cliente: string | null;
+  empresa_nombre: string | null;
+  email_cliente: string | null;
+  whatsapp_cliente: string | null;
+  created_at: string;
+};
+
+export type Pago = {
+  id: string;
+  lead_id: string | null;
+  servicio: string;
+  monto: number;
+  anticipo: number;
+  estado: "pendiente" | "aprobado" | "rechazado" | "reembolsado";
+  mp_preference_id: string | null;
+  mp_payment_id: string | null;
+  nombre: string;
+  empresa: string | null;
+  email: string;
+  whatsapp: string | null;
   created_at: string;
 };
 

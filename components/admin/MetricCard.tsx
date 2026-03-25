@@ -1,16 +1,35 @@
 interface MetricCardProps {
-  title: string;
+  label: string;
   value: string | number;
-  change?: string;
-  icon?: string;
+  sub?: string;
+  accent?: boolean;
 }
 
-export default function MetricCard({ title, value, change, icon }: MetricCardProps) {
+export default function MetricCard({ label, value, sub, accent = false }: MetricCardProps) {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-6">
-      <p className="text-sm text-gray-500">{title}</p>
-      <p className="text-3xl font-bold text-brand-green mt-1">{value}</p>
-      {change && <p className="text-sm text-green-600 mt-1">{change}</p>}
+    <div
+      className="p-5"
+      style={{
+        background: "#fff",
+        borderRadius: "8px",
+        boxShadow: "0 2px 16px rgba(0,0,0,0.06)",
+        borderTop: accent ? "3px solid var(--hl-green)" : "3px solid var(--hl-divider)",
+      }}
+    >
+      <p className="font-sans" style={{ fontSize: "12px", color: "var(--hl-text-muted)", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase" }}>
+        {label}
+      </p>
+      <p
+        className="font-sans font-bold mt-1"
+        style={{ fontSize: "32px", color: accent ? "var(--hl-green)" : "var(--hl-text)", lineHeight: 1.1 }}
+      >
+        {value}
+      </p>
+      {sub && (
+        <p className="font-sans mt-1" style={{ fontSize: "12px", color: "var(--hl-text-muted)" }}>
+          {sub}
+        </p>
+      )}
     </div>
   );
 }
