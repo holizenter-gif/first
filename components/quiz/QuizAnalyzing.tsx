@@ -22,21 +22,21 @@ export default function QuizAnalyzing({ nombre }: QuizAnalyzingProps) {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#1B4332] flex flex-col items-center justify-center px-4">
+    <div className="min-h-screen bg-brand-dark flex flex-col items-center justify-center px-4">
       <div className="max-w-md w-full text-center">
         <div className="relative w-32 h-32 mx-auto mb-8">
           <div className="absolute inset-0 rounded-full border-4 border-white/20" />
-          <div className="absolute inset-0 rounded-full border-4 border-[#D4A017] border-t-transparent animate-spin" style={{ animationDuration: "1s" }} />
+          <div className="absolute inset-0 rounded-full border-4 border-brand-teal border-t-transparent animate-spin" style={{ animationDuration: "1s" }} />
           <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-white font-bold text-2xl">{progreso}%</span>
+            <span className="text-white font-display font-bold text-2xl">{progreso}%</span>
           </div>
         </div>
-        <h2 className="font-serif text-2xl text-white font-bold mb-3">
+        <h2 className="font-display text-2xl text-white font-bold mb-3">
           Analizando resultados{nombre ? `, ${nombre.split(" ")[0]}` : ""}...
         </h2>
         <p className="text-white/70 text-sm mb-8 min-h-[20px]">{MENSAJES[mensajeIdx]}</p>
         <div className="w-full bg-white/20 rounded-full h-2 overflow-hidden">
-          <div className="h-full bg-[#D4A017] rounded-full transition-all duration-100" style={{ width: `${progreso}%` }} />
+          <div className="h-full bg-brand-teal rounded-full transition-all duration-100" style={{ width: `${progreso}%` }} />
         </div>
       </div>
     </div>

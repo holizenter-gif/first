@@ -13,7 +13,7 @@ export default function StatsBar() {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 md:gap-8">
           {STATS.map((stat, i) => (
             <div key={i} className="text-center group">
-              <p className="font-serif text-3xl font-bold text-[#1B4332] group-hover:text-[#D4A017] transition-colors">
+              <p className="font-serif text-3xl font-bold text-brand-teal group-hover:text-[#D4A017] transition-colors">
                 {stat.value}
               </p>
               <p className="mt-1.5 text-xs text-gray-500 leading-snug">{stat.label}</p>

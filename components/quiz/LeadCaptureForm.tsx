@@ -35,10 +35,10 @@ export default function LeadCaptureForm({ partialScore, onSubmit, isLoading }: L
     <div className="min-h-screen bg-[#F5F0E8] flex items-center justify-center px-4 py-16">
       <div className="max-w-lg w-full">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 bg-[#1B4332] text-white text-sm font-medium px-4 py-2 rounded-full mb-4">
+          <div className="inline-flex items-center gap-2 bg-brand-dark text-white text-sm font-display font-medium px-4 py-2 rounded-full mb-4">
             <span className="text-lg">🎯</span> Tu diagnóstico está listo
           </div>
-          <h2 className="font-serif text-3xl font-bold text-[#1B4332] mb-3">¿Dónde enviamos<br />tu reporte?</h2>
+          <h2 className="font-display text-3xl font-bold text-brand-dark mb-3">¿Dónde enviamos<br />tu reporte?</h2>
           <p className="text-gray-600">Completa tus datos para ver el resultado completo y recibir tu reporte personalizado al instante.</p>
         </div>
         <div className="bg-white rounded-2xl p-4 mb-6 shadow-sm flex items-center gap-4">
@@ -75,14 +75,14 @@ export default function LeadCaptureForm({ partialScore, onSubmit, isLoading }: L
             {errors.whatsapp && <p className="text-red-500 text-xs mt-1">{errors.whatsapp.message}</p>}
           </div>
           <div className="flex items-start gap-3">
-            <input type="checkbox" id="privacidad" {...register("acepta_privacidad")} className="mt-1 w-4 h-4 accent-[#1B4332]" />
+            <input type="checkbox" id="privacidad" {...register("acepta_privacidad")} className="mt-1 w-4 h-4 accent-brand-teal" />
             <label htmlFor="privacidad" className="text-xs text-gray-500 leading-relaxed">
               Acepto el <a href="/privacidad" target="_blank" className="text-[#1B4332] underline">aviso de privacidad</a> y autorizo el uso de mis datos para recibir información de Holizenter.
             </label>
           </div>
           {errors.acepta_privacidad && <p className="text-red-500 text-xs">{errors.acepta_privacidad.message}</p>}
           {serverError && <p className="text-red-500 text-sm text-center">{serverError}</p>}
-          <Button type="submit" disabled={loading} className="w-full bg-[#D4A017] hover:bg-[#A67C0F] text-white font-semibold py-6 rounded-xl text-base">
+          <Button type="submit" disabled={loading} className="w-full bg-brand-teal hover:bg-brand-teal-dark text-white font-display font-semibold py-6 rounded-xl text-base">
             {loading ? <span className="flex items-center gap-2"><Loader2 className="w-4 h-4 animate-spin" />Analizando tus respuestas...</span> : "Ver mi resultado completo →"}
           </Button>
           <p className="text-center text-xs text-gray-400">🔒 Tus datos están protegidos · No spam · LFPDPPP</p>

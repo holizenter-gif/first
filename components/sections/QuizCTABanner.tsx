@@ -2,15 +2,15 @@ import Link from "next/link";
 
 export default function QuizCTABanner() {
   return (
-    <section className="py-24 px-6 bg-[#1B4332] relative overflow-hidden">
+    <section className="py-24 px-6 bg-brand-dark relative overflow-hidden">
       {/* Decorative blobs */}
       <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-0 left-1/4 w-96 h-96 rounded-full bg-[#D4A017] blur-3xl" />
+        <div className="absolute top-0 left-1/4 w-96 h-96 rounded-full bg-brand-teal blur-3xl" />
         <div className="absolute bottom-0 right-1/4 w-80 h-80 rounded-full bg-white blur-3xl" />
       </div>
 
       <div className="relative max-w-4xl mx-auto text-center text-white">
-        <span className="inline-block px-4 py-1.5 bg-[#D4A017]/20 text-[#D4A017] text-xs font-semibold rounded-full tracking-wider uppercase mb-6">
+        <span className="inline-block px-4 py-1.5 bg-brand-teal/20 text-brand-teal text-xs font-semibold rounded-full tracking-wider uppercase mb-6">
           Diagnóstico Gratuito
         </span>
         <h2 className="font-serif text-4xl md:text-5xl font-bold leading-tight">
@@ -23,7 +23,7 @@ export default function QuizCTABanner() {
         <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-5">
           <Link
             href="/quiz/burnout"
-            className="px-10 py-4 bg-[#D4A017] text-white font-bold rounded-xl hover:bg-[#A67C0F] transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 text-base"
+            className="px-10 py-4 bg-brand-teal text-white font-bold rounded-xl hover:bg-[#A67C0F] transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 text-base"
           >
             Hacer el Diagnóstico Gratis →
           </Link>

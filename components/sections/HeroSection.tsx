@@ -1,93 +1,120 @@
+"use client";
 import Link from "next/link";
+import { ArrowRight, Play, CheckCircle } from "lucide-react";
+
+const PUNTOS = [
+  "Diagnóstico gratuito de 60 minutos",
+  "Resultados medibles desde el primer taller",
+  "Cumplimiento NOM-035 garantizado",
+];
 
 export default function HeroSection() {
   return (
-    <section className="relative min-h-[90vh] bg-[#1B4332] flex items-center overflow-hidden">
-      {/* Background pattern */}
-      <div className="absolute inset-0 opacity-5">
-        <div className="absolute top-20 left-10 w-96 h-96 rounded-full bg-white blur-3xl" />
-        <div className="absolute bottom-20 right-10 w-80 h-80 rounded-full bg-[#D4A017] blur-3xl" />
+    <section className="relative min-h-[90vh] bg-brand-dark flex items-center overflow-hidden">
+      {/* Decoración inspirada en el logomark circular */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-32 -right-32 w-[500px] h-[500px] rounded-full bg-brand-teal opacity-5" />
+        <div className="absolute -bottom-32 -left-32 w-[400px] h-[400px] rounded-full bg-brand-olive opacity-5" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full border border-brand-teal opacity-[0.03]" />
       </div>
 
-      <div className="relative max-w-7xl mx-auto px-6 py-20 w-full">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-          {/* Left: copy */}
-          <div>
-            <span className="inline-block px-4 py-1.5 bg-[#D4A017]/20 text-[#D4A017] text-xs font-semibold rounded-full tracking-wider uppercase mb-6">
-              Bienestar Holístico Empresarial
-            </span>
-            <h1 className="font-serif text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-tight">
-              El Poder de <br />
-              <span className="text-[#D4A017]">tu Bienestar</span>
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 w-full">
+        <div className="grid lg:grid-cols-2 gap-16 items-center">
+
+          {/* Columna izquierda */}
+          <div className="animate-fade-in">
+            {/* Badge */}
+            <div className="inline-flex items-center gap-2 border border-brand-teal/30 bg-brand-teal/10 text-brand-teal text-xs font-display font-medium px-4 py-2 rounded-full mb-8 tracking-wide">
+              <span className="w-1.5 h-1.5 bg-brand-teal rounded-full animate-pulse" />
+              Bienestar Holístico para Empresas · Ciudad de México
+            </div>
+
+            {/* Headline */}
+            <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-[1.1] mb-6">
+              Transforma el bienestar{" "}
+              <span className="text-gradient-brand">de tu empresa</span>{" "}
+              desde adentro
             </h1>
-            <p className="mt-6 text-lg text-white/70 max-w-xl leading-relaxed">
-              Diagnóstico laboral gratuito, talleres vivenciales y sensibilización de alta dirección. Transformamos el bienestar de tu empresa desde Cuerpo, Mente y Espíritu.
+
+            {/* Subheadline */}
+            <p className="text-white/60 text-lg md:text-xl leading-relaxed mb-8 max-w-xl font-light">
+              Reducimos el burnout, mejoramos el rendimiento y
+              fortalecemos la cultura. Cuerpo · Mente · Espíritu
+              en equilibrio organizacional.
             </p>
 
-            <div className="mt-10 flex flex-col sm:flex-row gap-4">
+            {/* Checklist */}
+            <ul className="space-y-3 mb-10">
+              {PUNTOS.map((p) => (
+                <li key={p} className="flex items-center gap-3">
+                  <CheckCircle className="w-4 h-4 text-brand-teal flex-shrink-0" />
+                  <span className="text-white/70 text-sm font-display">{p}</span>
+                </li>
+              ))}
+            </ul>
+
+            {/* CTAs */}
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Link
+                href="/agendar"
+                className="inline-flex items-center justify-center gap-2 bg-brand-teal hover:bg-brand-teal-dark text-white font-display font-semibold text-base px-8 py-4 rounded-full shadow-lg shadow-brand-teal/20 hover:shadow-brand-teal/30 transition-all duration-300 hover:scale-105"
+              >
+                Agenda diagnóstico gratis
+                <ArrowRight className="w-5 h-5" />
+              </Link>
               <Link
                 href="/quiz/burnout"
-                className="px-8 py-4 bg-[#D4A017] text-white font-bold rounded-xl hover:bg-[#A67C0F] transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 text-center"
+                className="inline-flex items-center justify-center gap-2 border border-white/20 text-white hover:bg-white/5 hover:border-white/40 font-display font-medium text-base px-8 py-4 rounded-full transition-all duration-200"
               >
-                Diagnóstico Gratis →
-              </Link>
-              <Link
-                href="/servicios"
-                className="px-8 py-4 border-2 border-white/30 text-white font-semibold rounded-xl hover:border-white hover:bg-white/10 transition-all text-center"
-              >
-                Ver Servicios
+                <Play className="w-4 h-4" />
+                Test de burnout gratis
               </Link>
             </div>
+          </div>
 
-            <div className="mt-10 flex items-center gap-6">
-              <div className="flex -space-x-3">
-                {["bg-[#2D6A4F]", "bg-[#D4A017]", "bg-[#1B4332]", "bg-[#A67C0F]"].map((c, i) => (
-                  <div key={i} className={`w-9 h-9 rounded-full ${c} border-2 border-[#1B4332] flex items-center justify-center text-white text-xs font-bold`}>
-                    {["AR", "JM", "CL", "+"][i]}
-                  </div>
-                ))}
-              </div>
-              <p className="text-white/60 text-sm">
-                <span className="text-white font-semibold">+500 empresas</span> ya confían en Holizenter
+          {/* Columna derecha — card stats */}
+          <div className="hidden lg:block animate-slide-up">
+            <div className="border border-white/10 bg-white/5 backdrop-blur-sm rounded-3xl p-8">
+              <p className="text-white/40 text-xs font-display tracking-widest uppercase mb-6">
+                ¿Cómo está el bienestar de tu equipo?
               </p>
-            </div>
-          </div>
 
-          {/* Right: stats card */}
-          <div className="flex justify-center lg:justify-end">
-            <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8 w-full max-w-sm shadow-2xl">
-              <h3 className="font-serif text-lg font-semibold text-white mb-6">Diagnóstico Rápido</h3>
-              <div className="space-y-5">
+              <div className="grid grid-cols-2 gap-3 mb-6">
                 {[
-                  { icon: "🔥", label: "Nivel de burnout en tu empresa", value: "¿Sabes cuál es?" },
-                  { icon: "📊", label: "Cumplimiento NOM-035", value: "¿Estás al día?" },
-                  { icon: "💡", label: "Plan de acción personalizado", value: "En 4 minutos" },
-                ].map((item) => (
-                  <div key={item.label} className="flex items-start gap-4">
-                    <span className="text-2xl">{item.icon}</span>
-                    <div>
-                      <p className="text-white/60 text-xs">{item.label}</p>
-                      <p className="text-white font-semibold text-sm mt-0.5">{item.value}</p>
-                    </div>
+                  { valor: "75%",     label: "de trabajadores MX sufre estrés",     fuente: "IMSS"       },
+                  { valor: "30-70%",  label: "del salario cuesta reemplazar a uno",  fuente: "SHRM"       },
+                  { valor: "NOM-035", label: "obliga a prevenir riesgo psicosocial", fuente: "STPS"       },
+                  { valor: "+500",    label: "colaboradores atendidos",              fuente: "Holizenter" },
+                ].map((s) => (
+                  <div key={s.valor} className="bg-white/5 border border-white/10 rounded-2xl p-4">
+                    <div className="font-display font-bold text-brand-teal text-xl mb-1">{s.valor}</div>
+                    <p className="text-white/50 text-xs leading-snug">{s.label}</p>
+                    <p className="text-white/25 text-xs mt-1">— {s.fuente}</p>
                   </div>
                 ))}
               </div>
+
+              {/* Mini quiz CTA */}
               <Link
                 href="/quiz/burnout"
-                className="mt-8 block w-full text-center py-3.5 bg-[#D4A017] text-white font-bold rounded-xl hover:bg-[#A67C0F] transition-colors text-sm"
+                className="flex items-center justify-between bg-brand-teal/10 hover:bg-brand-teal/20 border border-brand-teal/30 rounded-2xl p-4 transition-all duration-200 group"
               >
-                Comenzar Diagnóstico Gratis
+                <div>
+                  <p className="text-white font-display font-semibold text-sm">Test de burnout gratuito</p>
+                  <p className="text-white/40 text-xs">10 preguntas · 4 minutos · Resultado inmediato</p>
+                </div>
+                <ArrowRight className="w-5 h-5 text-brand-teal group-hover:translate-x-1 transition-transform" />
               </Link>
-              <p className="text-center text-white/40 text-xs mt-3">100% gratuito · Sin registros previos</p>
             </div>
           </div>
+
         </div>
       </div>
 
-      {/* Wave SVG bottom */}
+      {/* Wave */}
       <div className="absolute bottom-0 left-0 right-0">
-        <svg viewBox="0 0 1440 80" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" className="w-full h-16">
-          <path d="M0,40 C360,80 1080,0 1440,40 L1440,80 L0,80 Z" fill="#F5F0E8"/>
+        <svg viewBox="0 0 1440 60" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" className="w-full h-14">
+          <path d="M0 60L1440 60L1440 30C1200 60 960 0 720 15C480 30 240 0 0 30L0 60Z" fill="#F5F2EC" />
         </svg>
       </div>
     </section>

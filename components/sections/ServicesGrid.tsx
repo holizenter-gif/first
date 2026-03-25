@@ -44,10 +44,10 @@ export default function ServicesGrid() {
     <section className="py-24 px-6 bg-[#F5F0E8]">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-14">
-          <span className="inline-block px-4 py-1.5 bg-[#D4A017]/15 text-[#D4A017] text-xs font-semibold rounded-full tracking-wider uppercase mb-4">
+          <span className="inline-block px-4 py-1.5 bg-brand-teal/15 text-brand-teal text-xs font-semibold rounded-full tracking-wider uppercase mb-4">
             Nuestros Servicios
           </span>
-          <h2 className="font-serif text-4xl md:text-5xl font-bold text-[#1B4332]">
+          <h2 className="font-serif text-4xl md:text-5xl font-bold text-brand-dark">
             Soluciones integrales para tu empresa
           </h2>
           <p className="mt-4 text-gray-600 max-w-2xl mx-auto text-lg">
@@ -60,28 +60,28 @@ export default function ServicesGrid() {
             <Link
               key={s.href}
               href={s.href}
-              className="relative bg-white rounded-2xl p-6 border border-gray-100 hover:border-[#D4A017] hover:shadow-xl transition-all duration-300 group flex flex-col"
+              className="relative bg-white rounded-2xl p-6 border border-gray-100 hover:border-brand-teal hover:shadow-xl transition-all duration-300 group flex flex-col"
             >
               {s.badge && (
-                <span className="absolute -top-3 left-6 px-3 py-1 bg-[#D4A017] text-white text-xs font-bold rounded-full shadow-md">
+                <span className="absolute -top-3 left-6 px-3 py-1 bg-brand-teal text-white text-xs font-bold rounded-full shadow-md">
                   {s.badge}
                 </span>
               )}
               <div className="text-4xl mb-4">{s.icon}</div>
-              <h3 className="font-serif text-xl font-bold text-[#1B4332] group-hover:text-[#D4A017] transition-colors mb-2">
+              <h3 className="font-serif text-xl font-bold text-brand-dark group-hover:text-brand-teal transition-colors mb-2">
                 {s.title}
               </h3>
               <p className="text-sm text-gray-600 leading-relaxed flex-1">{s.description}</p>
               <ul className="mt-4 space-y-1.5">
                 {s.features.map((f) => (
                   <li key={f} className="flex items-center gap-2 text-xs text-gray-500">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#D4A017] shrink-0" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-brand-teal shrink-0" />
                     {f}
                   </li>
                 ))}
               </ul>
-              <p className="mt-5 text-[#D4A017] font-bold text-sm">{s.price}</p>
-              <span className="mt-3 text-[#1B4332] text-xs font-semibold group-hover:text-[#D4A017] transition-colors">
+              <p className="mt-5 text-brand-teal font-bold text-sm">{s.price}</p>
+              <span className="mt-3 text-brand-dark text-xs font-semibold group-hover:text-brand-teal transition-colors">
                 Ver más →
               </span>
             </Link>
@@ -91,7 +91,7 @@ export default function ServicesGrid() {
         <div className="text-center mt-10">
           <Link
             href="/servicios"
-            className="inline-block px-8 py-3.5 border-2 border-[#1B4332] text-[#1B4332] font-semibold rounded-xl hover:bg-[#1B4332] hover:text-white transition-all text-sm"
+            className="inline-block px-8 py-3.5 border-2 border-brand-dark text-brand-dark font-semibold rounded-xl hover:bg-brand-dark hover:text-white transition-all text-sm"
           >
             Ver todos los servicios
           </Link>

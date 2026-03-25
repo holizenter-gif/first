@@ -17,8 +17,8 @@ export default function ServiceSelector({ selected, onChange }: ServiceSelectorP
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
       {SERVICIOS_COTIZADOR.map((s) => (
-        <button key={s.id} onClick={() => onChange(s.id)} className={`p-4 text-left rounded-xl border-2 transition-colors ${selected === s.id ? "border-brand-gold bg-brand-gold/5" : "border-gray-200 hover:border-brand-gold/50"}`}>
-          <p className="font-semibold text-brand-green">{s.label}</p>
+        <button key={s.id} onClick={() => onChange(s.id)} className={`p-4 text-left rounded-xl border-2 transition-colors ${selected === s.id ? "border-brand-teal bg-brand-teal/5" : "border-gray-200 hover:border-brand-teal/50"}`}>
+          <p className="font-semibold text-brand-dark">{s.label}</p>
           <p className="text-sm text-gray-500 mt-1">Desde ${s.precio_base.toLocaleString()} MXN</p>
         </button>
       ))}
