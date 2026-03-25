@@ -10,7 +10,7 @@ const PUNTOS = [
 
 export default function HeroSection() {
   return (
-    <section className="relative min-h-[90vh] bg-brand-dark flex items-center overflow-hidden">
+    <section className="relative min-h-[90vh] bg-brand-dark flex items-center overflow-hidden -mt-16 pt-16">
       {/* Decoración inspirada en el logomark circular */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-32 -right-32 w-[500px] h-[500px] rounded-full bg-brand-teal opacity-5" />
