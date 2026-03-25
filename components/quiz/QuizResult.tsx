@@ -59,7 +59,10 @@ export default function QuizResult({ score, nivel, descripcion, servicio_recomen
         </div>
 
         <div className="space-y-3">
-          <a href="/agendar" className="w-full flex items-center justify-center gap-2 py-4 bg-[#D4A017] hover:bg-[#A67C0F] text-white font-semibold rounded-xl text-base transition-colors">
+          <a
+            href={`/agendar?nombre=${encodeURIComponent(nombre)}&empresa=${encodeURIComponent(empresa)}`}
+            className="w-full flex items-center justify-center gap-2 py-4 bg-brand-teal hover:bg-brand-teal-dark text-white font-semibold rounded-xl text-base transition-colors"
+          >
             <Calendar className="w-5 h-5" />{cfg.ctaLabel}<ArrowRight className="w-5 h-5" />
           </a>
           <a href="/cotizador" className="w-full flex items-center justify-center py-4 border-2 border-[#1B4332] text-[#1B4332] font-semibold rounded-xl text-base hover:bg-[#1B4332] hover:text-white transition-colors">
