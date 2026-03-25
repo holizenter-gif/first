@@ -1,7 +1,7 @@
 import type { Metadata }          from "next";
 import { notFound }               from "next/navigation";
-import Image                      from "next/image";
 import Link                       from "next/link";
+import ProfessionalAvatar         from "@/components/directorio/ProfessionalAvatar";
 import { MapPin, Clock, CheckCircle, ArrowLeft, Building2 } from "lucide-react";
 import { getProfesionalBySlug } from "@/lib/data/profesionales-helpers";
 import { getModalidadLabel, formatPrecioSesion } from "@/lib/data/profesionales-utils";
@@ -28,7 +28,6 @@ export default async function ProfesionalPage({ params }: Props) {
 
   const calUsername = process.env.NEXT_PUBLIC_CAL_USERNAME ?? "holizenter";
   const calSlug     = p.cal_username ?? (process.env.NEXT_PUBLIC_CAL_EVENT_DIAGNOSTICO ?? "diagnostico");
-  const initials    = p.nombre.split(" ").map((n) => n[0]).join("").slice(0, 2);
 
   return (
     <div className="min-h-screen" style={{ background: "#F5F2EC" }}>
@@ -57,24 +56,13 @@ export default async function ProfesionalPage({ params }: Props) {
 
               {/* Foto */}
               <div className="relative h-64" style={{ background: "#EBF8F2" }}>
-                {p.foto_url ? (
-                  <Image
-                    src={p.foto_url}
-                    alt={p.nombre}
-                    fill
-                    className="object-cover object-top"
-                    priority
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <div
-                      className="w-24 h-24 rounded-full flex items-center justify-center text-white font-sans font-bold text-3xl"
-                      style={{ background: "#5CB996" }}
-                    >
-                      {initials}
-                    </div>
-                  </div>
-                )}
+                <ProfessionalAvatar
+                  src={p.foto_url}
+                  nombre={p.nombre}
+                  fill
+                  priority
+                  className="object-cover object-top"
+                />
               </div>
 
               {/* Info */}

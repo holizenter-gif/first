@@ -1,15 +1,14 @@
-import Image  from "next/image";
 import Link   from "next/link";
 import { MapPin, Clock } from "lucide-react";
 import type { Profesional } from "@/lib/supabase/types";
 import { getModalidadLabel } from "@/lib/data/profesionales-utils";
+import ProfessionalAvatar from "./ProfessionalAvatar";
 
 interface ProfessionalCardProps {
   profesional: Profesional;
 }
 
 export default function ProfessionalCard({ profesional: p }: ProfessionalCardProps) {
-  const initials = p.nombre.split(" ").map((n) => n[0]).join("").slice(0, 2);
 
   return (
     <Link
@@ -17,25 +16,14 @@ export default function ProfessionalCard({ profesional: p }: ProfessionalCardPro
       className="group bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 flex flex-col"
     >
       {/* Foto */}
-      <div className="relative h-52 bg-teal-50 overflow-hidden flex-shrink-0">
-        {p.foto_url ? (
-          <Image
-            src={p.foto_url}
-            alt={p.nombre}
-            fill
-            className="object-cover object-top group-hover:scale-105 transition-transform duration-500"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <div
-              className="w-20 h-20 rounded-full flex items-center justify-center text-white font-bold text-2xl"
-              style={{ background: "#5CB996" }}
-            >
-              {initials}
-            </div>
-          </div>
-        )}
+      <div className="relative h-52 overflow-hidden flex-shrink-0" style={{ background: "#EBF8F2" }}>
+        <ProfessionalAvatar
+          src={p.foto_url}
+          nombre={p.nombre}
+          fill
+          className="object-cover object-top group-hover:scale-105 transition-transform duration-500"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+        />
         <div className="absolute top-3 right-3">
           <span className="bg-white/90 backdrop-blur-sm text-xs font-semibold px-2.5 py-1 rounded-full flex items-center gap-1" style={{ color: "#0D1A0F" }}>
             <MapPin className="w-3 h-3" style={{ color: "#5CB996" }} />

@@ -1,8 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect }     from "next/navigation";
-import Image            from "next/image";
 import Link             from "next/link";
 import { CheckCircle, XCircle } from "lucide-react";
+import ProfessionalAvatar from "@/components/directorio/ProfessionalAvatar";
 
 export const dynamic = "force-dynamic";
 
@@ -44,23 +44,12 @@ export default async function AdminDirectorioPage() {
             >
               {/* Foto */}
               <div className="relative h-40" style={{ background: "#EBF8F2" }}>
-                {p.foto_url ? (
-                  <Image
-                    src={p.foto_url}
-                    alt={p.nombre}
-                    fill
-                    className="object-cover object-top"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <div
-                      className="w-14 h-14 rounded-full flex items-center justify-center text-white font-sans font-bold text-xl"
-                      style={{ background: "#5CB996" }}
-                    >
-                      {initials}
-                    </div>
-                  </div>
-                )}
+                <ProfessionalAvatar
+                  src={p.foto_url}
+                  nombre={p.nombre}
+                  fill
+                  className="object-cover object-top"
+                />
                 <div className="absolute top-2 right-2">
                   {p.activo ? (
                     <span
