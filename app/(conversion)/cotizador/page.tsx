@@ -137,7 +137,7 @@ export default function CotizadorPage() {
               <p className="text-gray-500 text-sm mb-6">
                 {cfg.label} · {personas} personas · {modalidad}
               </p>
-              <PriceDisplay result={result} modalidad={modalidad} />
+              <PriceDisplay result={result} modalidad={modalidad} servicio={servicio} personas={personas} />
               <p className="text-gray-400 text-xs text-center mt-4">
                 * Precio referencial. La cotización formal puede variar según
                 personalización, ubicación y fecha.

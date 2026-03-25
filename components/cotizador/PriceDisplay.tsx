@@ -2,11 +2,13 @@ import { CheckCircle } from "lucide-react";
 import { type CotizacionResult, formatMXN } from "@/lib/cotizador";
 
 interface PriceDisplayProps {
-  result: CotizacionResult;
+  result:    CotizacionResult;
   modalidad: string;
+  servicio?: string;
+  personas?: number;
 }
 
-export default function PriceDisplay({ result, modalidad }: PriceDisplayProps) {
+export default function PriceDisplay({ result, modalidad, servicio = "taller", personas = 20 }: PriceDisplayProps) {
   return (
     <div className="bg-brand-dark rounded-2xl p-6 text-white">
       <p className="text-white/60 text-xs font-display uppercase tracking-widest mb-1 text-center">
@@ -36,9 +38,16 @@ export default function PriceDisplay({ result, modalidad }: PriceDisplayProps) {
 
       <a
         href="/agendar"
-        className="block text-center py-3 bg-brand-teal hover:bg-brand-teal-dark text-white font-display font-semibold rounded-full transition-colors"
+        className="block text-center py-3 bg-brand-teal hover:bg-brand-teal-dark text-white font-display font-semibold rounded-full transition-colors mb-3"
       >
         Solicitar cotización formal →
+      </a>
+
+      <a
+        href={`/pagar/nuevo?servicio=${encodeURIComponent(servicio)}&personas=${personas}&modalidad=${encodeURIComponent(modalidad)}&monto=${result.precio_estimado}`}
+        className="block text-center py-3 border border-white/20 text-white hover:bg-white/10 font-display font-medium rounded-full transition-colors text-sm"
+      >
+        Reservar con anticipo del 30% ({formatMXN(result.anticipo_30)})
       </a>
     </div>
   );

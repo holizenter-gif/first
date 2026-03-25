@@ -159,3 +159,77 @@ export async function sendCitaConfirmacion(params: {
     htmlContent: html,
   });
 }
+
+export async function sendPagoConfirmacion(params: {
+  email:    string;
+  nombre:   string;
+  empresa:  string;
+  monto:    number;
+  concepto: string;
+}): Promise<void> {
+  const montoFormateado = new Intl.NumberFormat("es-MX", {
+    style: "currency", currency: "MXN", minimumFractionDigits: 0,
+  }).format(params.monto);
+
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://holizenter.mx";
+
+  const html = `
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#F5F2EC;font-family:Inter,Arial,sans-serif">
+<table width="100%" cellpadding="0" cellspacing="0" style="padding:32px 16px">
+  <tr><td align="center">
+  <table width="600" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:16px;overflow:hidden;max-width:600px">
+    <tr><td style="background:#0D1A0F;padding:28px;text-align:center">
+      <h1 style="margin:0;color:#5CB996;font-size:20px;font-weight:700;letter-spacing:2px">HOLIZENTER</h1>
+      <p style="margin:4px 0 0;color:rgba(255,255,255,0.45);font-size:12px">El Poder de tu Bienestar</p>
+    </td></tr>
+    <tr><td style="padding:28px">
+      <h2 style="margin:0 0 8px;color:#111;font-size:20px;font-weight:600">¡Pago confirmado! 💳</h2>
+      <p style="color:#6B7280;font-size:14px;margin:0 0 20px;line-height:1.6">
+        Hola <strong style="color:#111">${params.nombre}</strong>,
+        recibimos tu pago exitosamente.
+      </p>
+      <div style="background:#EBF7F2;border-radius:12px;padding:20px;border-left:4px solid #5CB996">
+        <p style="margin:0 0 4px;color:#6B7280;font-size:12px;text-transform:uppercase;letter-spacing:.05em">Resumen del pago</p>
+        <p style="margin:6px 0;color:#111;font-size:15px"><strong>${params.concepto}</strong></p>
+        <p style="margin:6px 0;color:#374151;font-size:14px">🏢 ${params.empresa}</p>
+        <p style="margin:6px 0;color:#5CB996;font-size:22px;font-weight:700">${montoFormateado} MXN</p>
+        <p style="margin:4px 0;color:#6B7280;font-size:12px">Anticipo del 30% — Pago confirmado</p>
+      </div>
+    </td></tr>
+    <tr><td style="padding:0 28px 20px">
+      <div style="background:#F0F4E8;border-radius:12px;padding:16px">
+        <p style="margin:0 0 8px;color:#4A5C22;font-size:13px;font-weight:600">¿Qué sigue?</p>
+        <ul style="margin:0;padding-left:18px;color:#6B7280;font-size:13px;line-height:1.8">
+          <li>Nuestro equipo te contactará en las próximas 24 horas</li>
+          <li>Coordinaremos fecha, horario y logística del taller</li>
+          <li>El saldo restante se liquida antes del evento</li>
+        </ul>
+      </div>
+    </td></tr>
+    <tr><td style="padding:0 28px 28px;text-align:center">
+      <a href="${appUrl}"
+         style="display:inline-block;background:#5CB996;color:#fff;font-size:14px;font-weight:600;padding:12px 28px;border-radius:99px;text-decoration:none">
+        Volver a Holizenter →
+      </a>
+    </td></tr>
+    <tr><td style="background:#F5F2EC;padding:16px 28px;text-align:center;border-top:1px solid #E5E7EB">
+      <p style="margin:0;color:#9CA3AF;font-size:11px">
+        Holizenter · Ciudad de México ·
+        <a href="${appUrl}/privacidad" style="color:#5CB996">Aviso de privacidad</a>
+      </p>
+    </td></tr>
+  </table>
+  </td></tr>
+</table>
+</body>
+</html>`;
+
+  await sendEmail({
+    to: [{ email: params.email, name: params.nombre }],
+    subject: `💳 Pago confirmado — ${params.concepto} | Holizenter`,
+    htmlContent: html,
+  });
+}
