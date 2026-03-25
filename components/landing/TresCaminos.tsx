@@ -83,12 +83,17 @@ export default function TresCaminos() {
           {CAMINOS.map((c, i) => (
             <FadeIn key={c.tag} delay={i * 0.12}>
               <div
-                className="rounded-2xl p-6 flex flex-col h-full border"
-                style={{ background: c.bg, borderColor: c.border }}
+                className="p-6 flex flex-col h-full relative"
+                style={{
+                  background:   "#FFFFFF",
+                  borderLeft:   "3px solid var(--hl-green)",
+                  borderRadius: "0 8px 8px 0",
+                  boxShadow:    "0 2px 16px rgba(0,0,0,0.06)",
+                }}
               >
                 <span
-                  className="inline-block text-xs font-sans font-semibold px-3 py-1 rounded-full mb-4 self-start"
-                  style={{ background: c.tagBg, color: c.tagColor }}
+                  className="inline-block text-xs font-sans font-semibold px-3 py-1 mb-4 self-start"
+                  style={{ background: c.tagBg, color: c.tagColor, borderRadius: "4px", letterSpacing: "0.08em" }}
                 >
                   {c.tag}
                 </span>

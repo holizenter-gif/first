@@ -82,8 +82,13 @@ export default function MetodologiaMBSR() {
             {PILARES.map((p, i) => (
               <FadeIn key={p.num} delay={i * 0.1} direction="right">
                 <div
-                  className="rounded-xl p-5 border"
-                  style={{ background: "var(--hl-beige)", borderColor: "var(--hl-divider)" }}
+                  className="p-5"
+                  style={{
+                    background:   "#FFFFFF",
+                    borderLeft:   "3px solid var(--hl-green)",
+                    borderRadius: "0 8px 8px 0",
+                    boxShadow:    "0 2px 16px rgba(0,0,0,0.06)",
+                  }}
                 >
                   <div className="flex items-start gap-4">
                     <span

@@ -70,12 +70,14 @@ export default function HeroGeneral() {
             <div className="flex flex-col sm:flex-row gap-4">
               <Link
                 href="/para-ti"
-                className="inline-flex items-center justify-center gap-2 font-sans font-semibold px-8 py-4 rounded-full transition-all duration-200 hover:scale-105"
+                className="inline-flex items-center justify-center gap-2 font-sans font-semibold px-8 py-4 transition-all duration-200 hover:opacity-90"
                 style={{
-                  background: "var(--hl-green)",
-                  color:      "#fff",
-                  fontSize:   "15px",
-                  boxShadow:  "0 4px 24px rgba(45,90,61,0.25)",
+                  background:   "var(--hl-green)",
+                  color:        "#fff",
+                  fontSize:     "15px",
+                  letterSpacing: "0.04em",
+                  borderRadius: "4px",
+                  boxShadow:    "0 4px 24px rgba(45,90,61,0.25)",
                 }}
               >
                 Quiero empezar por mí
@@ -84,12 +86,15 @@ export default function HeroGeneral() {
 
               <Link
                 href="/empresas"
-                className="inline-flex items-center justify-center gap-2 font-sans font-semibold px-8 py-4 rounded-full border-2 transition-all duration-200 hover:bg-[#2D5A3D] hover:text-white"
+                className="inline-flex items-center justify-center gap-2 font-sans font-semibold px-8 py-4 transition-all duration-200 hover:bg-[#2D5A3D] hover:text-white"
                 style={{
-                  borderColor: "var(--hl-green)",
-                  color:       "var(--hl-green)",
-                  fontSize:    "15px",
-                  background:  "transparent",
+                  borderColor:  "var(--hl-green)",
+                  border:       "1.5px solid var(--hl-green)",
+                  color:        "var(--hl-green)",
+                  fontSize:     "15px",
+                  letterSpacing: "0.04em",
+                  borderRadius: "4px",
+                  background:   "transparent",
                 }}
               >
                 Es para mi empresa

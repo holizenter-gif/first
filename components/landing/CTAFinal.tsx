@@ -30,30 +30,42 @@ export default function CTAFinal() {
           {/* B2C */}
           <FadeIn delay={0.1} direction="left">
             <div
-              className="rounded-2xl p-7 border flex flex-col h-full"
-              style={{ background: "var(--hl-green-pale)", borderColor: "rgba(45,90,61,0.2)" }}
+              className="p-7 flex flex-col h-full"
+              style={{
+                background:   "#FFFFFF",
+                borderLeft:   "3px solid var(--hl-green)",
+                borderRadius: "0 8px 8px 0",
+                boxShadow:    "0 2px 16px rgba(0,0,0,0.06)",
+              }}
             >
               <span
-                className="inline-block text-xs font-sans font-semibold px-3 py-1 rounded-full mb-5 self-start"
-                style={{ background: "var(--hl-green)", color: "#fff" }}
+                className="inline-block text-xs font-sans font-semibold px-3 py-1 mb-5 self-start"
+                style={{
+                  background:    "var(--hl-green)",
+                  color:         "#fff",
+                  borderRadius:  "4px",
+                  letterSpacing: "0.08em",
+                }}
               >
                 Soy una persona
               </span>
               <h3 className="font-sans font-bold mb-2" style={{ fontSize: "20px", color: "var(--hl-text)" }}>
                 Primera sesión de orientación gratuita
               </h3>
-              <p className="font-sans leading-relaxed mb-6 flex-1" style={{ fontSize: "14px", color: "var(--hl-text-muted)" }}>
+              <p className="font-sans leading-relaxed mb-6 flex-1" style={{ fontSize: "14px", color: "var(--hl-text-muted)", lineHeight: "1.8" }}>
                 Te escuchamos sin compromiso y encontramos juntos qué camino
                 tiene más sentido para ti.
               </p>
               <Link
                 href="/agendar?tipo=orientacion"
-                className="inline-flex items-center justify-center gap-2 font-sans font-semibold px-6 py-3.5 rounded-full transition-all hover:scale-105"
+                className="inline-flex items-center justify-center gap-2 font-sans font-semibold px-6 py-3.5 transition-all hover:opacity-90"
                 style={{
-                  background: "var(--hl-green)",
-                  color:      "#fff",
-                  fontSize:   "14px",
-                  boxShadow:  "0 4px 16px rgba(45,90,61,0.2)",
+                  background:    "var(--hl-green)",
+                  color:         "#fff",
+                  fontSize:      "14px",
+                  letterSpacing: "0.04em",
+                  borderRadius:  "4px",
+                  boxShadow:     "0 4px 16px rgba(45,90,61,0.2)",
                 }}
               >
                 Quiero mi sesión de orientación →
@@ -64,29 +76,42 @@ export default function CTAFinal() {
           {/* B2B */}
           <FadeIn delay={0.15} direction="right">
             <div
-              className="rounded-2xl p-7 border flex flex-col h-full"
-              style={{ background: "#fff", borderColor: "var(--hl-divider)" }}
+              className="p-7 flex flex-col h-full"
+              style={{
+                background:   "#FFFFFF",
+                border:       "1px solid var(--hl-divider)",
+                borderRadius: "8px",
+                boxShadow:    "0 2px 16px rgba(0,0,0,0.06)",
+              }}
             >
               <span
-                className="inline-block text-xs font-sans font-semibold px-3 py-1 rounded-full mb-5 self-start"
-                style={{ background: "var(--hl-text)", color: "#fff" }}
+                className="inline-block text-xs font-sans font-semibold px-3 py-1 mb-5 self-start"
+                style={{
+                  background:    "var(--hl-text)",
+                  color:         "#fff",
+                  borderRadius:  "4px",
+                  letterSpacing: "0.08em",
+                }}
               >
                 Represento a una empresa
               </span>
               <h3 className="font-sans font-bold mb-2" style={{ fontSize: "20px", color: "var(--hl-text)" }}>
                 Diagnóstico gratuito de 60 minutos
               </h3>
-              <p className="font-sans leading-relaxed mb-6 flex-1" style={{ fontSize: "14px", color: "var(--hl-text-muted)" }}>
+              <p className="font-sans leading-relaxed mb-6 flex-1" style={{ fontSize: "14px", color: "var(--hl-text-muted)", lineHeight: "1.8" }}>
                 Analizamos el estado actual de bienestar en tu empresa
                 y te decimos qué necesita tu equipo.
               </p>
               <Link
                 href="/agendar"
-                className="inline-flex items-center justify-center gap-2 font-sans font-semibold px-6 py-3.5 rounded-full border-2 transition-all hover:bg-[#2D5A3D] hover:text-white"
+                className="inline-flex items-center justify-center gap-2 font-sans font-semibold px-6 py-3.5 transition-all hover:bg-[#2D5A3D] hover:text-white"
                 style={{
-                  borderColor: "var(--hl-green)",
-                  color:       "var(--hl-green)",
-                  fontSize:    "14px",
+                  border:        "1.5px solid var(--hl-green)",
+                  color:         "var(--hl-green)",
+                  fontSize:      "14px",
+                  letterSpacing: "0.04em",
+                  borderRadius:  "4px",
+                  background:    "transparent",
                 }}
               >
                 Agendar diagnóstico gratuito →

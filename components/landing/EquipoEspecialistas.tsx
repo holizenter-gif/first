@@ -55,8 +55,13 @@ export default function EquipoEspecialistas() {
           {EQUIPO.map((e, i) => (
             <FadeIn key={e.nombre} delay={i * 0.12}>
               <div
-                className="rounded-2xl p-6 border flex flex-col"
-                style={{ background: "#fff", borderColor: "var(--hl-divider)" }}
+                className="p-6 flex flex-col"
+                style={{
+                  background:   "#FFFFFF",
+                  borderRadius: "8px",
+                  boxShadow:    "0 2px 16px rgba(0,0,0,0.06)",
+                  borderTop:    "3px solid var(--hl-green)",
+                }}
               >
                 <div
                   className="w-16 h-16 rounded-full flex items-center justify-center font-sans font-bold text-lg text-white mb-4"

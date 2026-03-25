@@ -75,8 +75,8 @@ export default function PodcastSection() {
                   href={p.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 text-xs font-sans font-semibold px-4 py-2 rounded-full transition-opacity hover:opacity-80"
-                  style={{ background: p.bg, color: p.color }}
+                  className="inline-flex items-center gap-1.5 text-xs font-sans font-semibold px-4 py-2 transition-opacity hover:opacity-80"
+                  style={{ background: p.bg, color: p.color, borderRadius: "4px" }}
                 >
                   {p.nombre}
                 </Link>

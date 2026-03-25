@@ -55,16 +55,21 @@ export default function PruebaSocial() {
           {STATS.map((s, i) => (
             <FadeIn key={s.valor} delay={i * 0.08}>
               <div
-                className="rounded-2xl p-5 border text-center"
-                style={{ background: "var(--hl-beige)", borderColor: "var(--hl-divider)" }}
+                className="p-5 text-center"
+                style={{
+                  background:   "#FFFFFF",
+                  borderRadius: "8px",
+                  boxShadow:    "0 2px 16px rgba(0,0,0,0.06)",
+                  borderBottom: "2px solid var(--hl-divider)",
+                }}
               >
                 <div
                   className="font-sans font-bold mb-1"
-                  style={{ fontSize: "clamp(22px,3vw,32px)", color: "var(--hl-green)" }}
+                  style={{ fontSize: "48px", color: "var(--hl-green)", lineHeight: "1.1" }}
                 >
                   {s.valor}
                 </div>
-                <p className="font-sans mb-1" style={{ fontSize: "12px", color: "var(--hl-text-muted)" }}>
+                <p className="font-sans mb-1" style={{ fontSize: "13px", color: "var(--hl-text-muted)" }}>
                   {s.label}
                 </p>
                 <p className="font-sans" style={{ fontSize: "11px", color: "var(--hl-text-muted)", opacity: 0.6 }}>
@@ -80,17 +85,21 @@ export default function PruebaSocial() {
           {TESTIMONIOS.map((t, i) => (
             <FadeIn key={t.nombre} delay={i * 0.1}>
               <div
-                className="rounded-2xl p-6 border flex flex-col h-full"
+                className="p-6 flex flex-col h-full"
                 style={{
-                  background:  t.b2c ? "var(--hl-green-pale)" : "var(--hl-beige)",
-                  borderColor: t.b2c ? "rgba(45,90,61,0.2)"   : "var(--hl-divider)",
+                  background:   "#FFFFFF",
+                  borderLeft:   "3px solid var(--hl-green)",
+                  borderRadius: "0 8px 8px 0",
+                  boxShadow:    "0 2px 16px rgba(0,0,0,0.06)",
                 }}
               >
                 <span
-                  className="inline-block text-xs font-sans font-medium px-2.5 py-1 rounded-full mb-4 self-start"
+                  className="inline-block text-xs font-sans font-medium px-2.5 py-1 mb-4 self-start"
                   style={{
-                    background: t.b2c ? "rgba(45,90,61,0.1)" : "rgba(28,58,42,0.08)",
-                    color:      "var(--hl-green)",
+                    background:    t.b2c ? "rgba(45,90,61,0.1)" : "rgba(28,58,42,0.08)",
+                    color:         "var(--hl-green)",
+                    borderRadius:  "4px",
+                    letterSpacing: "0.08em",
                   }}
                 >
                   {t.b2c ? "Persona" : "Empresa"}
