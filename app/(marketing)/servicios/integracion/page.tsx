@@ -1,3 +1,15 @@
+import { notFound } from "next/navigation";
+import { getServicioBySlug } from "@/lib/data/servicios";
+import ServicioPageTemplate from "@/components/servicios/ServicioPageTemplate";
+
+export const metadata = {
+  title: "Integración de Equipos | Holizenter",
+  description:
+    "Team building holístico de medio día o día completo. Fortalece cohesión, confianza y comunicación con resultados medibles.",
+};
+
 export default function IntegracionPage() {
-  return <div className="min-h-screen p-8"><h1>Integración de Equipos</h1></div>;
+  const servicio = getServicioBySlug("integracion");
+  if (!servicio) notFound();
+  return <ServicioPageTemplate servicio={servicio} />;
 }
