@@ -1,6 +1,5 @@
 "use client";
 import { useState, useMemo } from "react";
-import type { Metadata } from "next";
 import { Search } from "lucide-react";
 import ProductoCard from "@/components/tienda/ProductoCard";
 import { PRODUCTOS_MOCK, CATEGORIAS } from "@/lib/data/productos-mock";
