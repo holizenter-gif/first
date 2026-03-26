@@ -1,7 +1,7 @@
 "use client";
-import { useState, useEffect, useCallback, useMemo } from "react";
-import { PREGUNTAS_BURNOUT } from "@/lib/data/preguntas-burnout";
-import { getScoreResult }    from "@/lib/quiz-scoring";
+import { useState, useEffect, useCallback } from "react";
+import { PREGUNTAS_CLIMA }      from "@/lib/data/preguntas-clima";
+import { getScoreResultClima, nivelClimaToDb } from "@/lib/quiz-scoring-clima";
 import QuizWelcome     from "./QuizWelcome";
 import QuizQuestion    from "./QuizQuestion";
 import QuizProgress    from "./QuizProgress";
@@ -9,8 +9,9 @@ import LeadCaptureForm from "./LeadCaptureForm";
 import QuizAnalyzing   from "./QuizAnalyzing";
 import QuizResult      from "./QuizResult";
 import AbandonPopup    from "./AbandonPopup";
+import type { PreguntaQuiz } from "@/lib/data/preguntas-burnout";
 
-export type QuizState = "welcome" | "question" | "capture" | "analyzing" | "result";
+type QuizState = "welcome" | "question" | "capture" | "analyzing" | "result";
 
 interface LeadFormData {
   nombre:            string;
@@ -20,28 +21,20 @@ interface LeadFormData {
   acepta_privacidad: boolean;
 }
 
-export default function QuizEngine() {
+export default function QuizEngineClima() {
   const [estado,         setEstado]     = useState<QuizState>("welcome");
   const [indicePregunta, setIndice]     = useState(0);
   const [respuestas,     setRespuestas] = useState<Record<string, number>>({});
   const [leadData,       setLeadData]   = useState<LeadFormData | null>(null);
   const [showAbandon,    setShowAbandon]= useState(false);
   const [isSubmitting,   setSubmitting] = useState(false);
+  const [resultadoFinal, setResultado]  = useState<ReturnType<typeof getScoreResultClima> | null>(null);
 
-  const preguntas      = PREGUNTAS_BURNOUT;
+  // Cast seguro: PreguntaClima es compatible con PreguntaQuiz en el shape que usa QuizQuestion
+  const preguntas      = PREGUNTAS_CLIMA as unknown as PreguntaQuiz[];
   const totalPregs     = preguntas.length;
   const preguntaActual = preguntas[indicePregunta];
 
-  // Calcular score en tiempo real con la fórmula de 3 ejes
-  const scoreData = useMemo(
-    () => (Object.keys(respuestas).length > 0 ? getScoreResult(respuestas) : null),
-    [respuestas]
-  );
-
-  // Resultado final (se fija al terminar todas las preguntas)
-  const [resultadoFinal, setResultadoFinal] = useState<ReturnType<typeof getScoreResult> | null>(null);
-
-  // beforeunload
   useEffect(() => {
     if (estado === "welcome" || estado === "result") return;
     const fn = (e: BeforeUnloadEvent) => { e.preventDefault(); e.returnValue = ""; };
@@ -49,9 +42,8 @@ export default function QuizEngine() {
     return () => window.removeEventListener("beforeunload", fn);
   }, [estado]);
 
-  // Abandon popup al mover el cursor fuera de la pantalla
   useEffect(() => {
-    if (estado !== "question" || indicePregunta < 4) return;
+    if (estado !== "question" || indicePregunta < 5) return;
     let timer: ReturnType<typeof setTimeout>;
     const fn = (e: MouseEvent) => {
       if (e.clientY <= 0) timer = setTimeout(() => setShowAbandon(true), 500);
@@ -70,9 +62,8 @@ export default function QuizEngine() {
     if (indicePregunta < totalPregs - 1) {
       setIndice((i) => i + 1);
     } else {
-      // Última pregunta — calcular resultado y mostrar capture con preview borrosa
-      const resultado = getScoreResult(nr);
-      setResultadoFinal(resultado);
+      const resultado = getScoreResultClima(nr);
+      setResultado(resultado);
       setEstado("capture");
     }
   }, [respuestas, preguntaActual, indicePregunta, totalPregs]);
@@ -88,21 +79,16 @@ export default function QuizEngine() {
         headers: { "Content-Type": "application/json" },
         body:    JSON.stringify({
           ...data,
-          quiz_type:  "burnout",
+          quiz_type:  "clima",
           respuestas,
+          // Pasar nivel mapeado para que el API lo guarde en Supabase
+          nivel_override: resultadoFinal ? nivelClimaToDb(resultadoFinal.nivel) : undefined,
         }),
       });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.error);
-
-      // Pequeña pausa para el efecto de análisis
+      await res.json();
       await new Promise((r) => setTimeout(r, 2200));
-
-      // Actualizar con lo que devuelve el servidor (incluye lead_id real)
-      if (json.ejes) setResultadoFinal({ ...resultadoFinal!, ...json });
       setEstado("result");
     } catch {
-      // Fallback: mostrar el resultado calculado localmente
       await new Promise((r) => setTimeout(r, 1500));
       setEstado("result");
     } finally {
@@ -118,22 +104,34 @@ export default function QuizEngine() {
         isOpen={showAbandon}
         onClose={() => setShowAbandon(false)}
         currentStep={indicePregunta + 1}
-        quizType="burnout"
+        quizType="clima"
       />
 
       {/* WELCOME */}
       {estado === "welcome" && (
         <QuizWelcome
           onStart={handleStart}
-          badge="Holizenter · Diagnóstico de Burnout Laboral"
-          titulo={<>¿Cuál es el nivel real de <em className="not-italic" style={{ color: "#5CB996" }}>burnout</em> en tu equipo?</>}
-          subtitulo="Responde 10 preguntas basadas en el modelo Maslach y recibe un diagnóstico con 3 dimensiones y recomendaciones específicas para tu empresa."
-          bullets={[
-            "Score global de burnout con 3 ejes desglosados",
-            "Termómetro visual de riesgo con barras por dimensión",
-            "Perfil: Equilibrio activo / Riesgo moderado / Burnout activo",
-            "Recomendación específica de intervención para tu empresa",
+          badge="Holizenter · Diagnóstico NOM-035 Gratuito"
+          titulo={
+            <>
+              ¿Cuál es el{" "}
+              <em className="not-italic" style={{ color: "#5CB996" }}>clima organizacional</em>{" "}
+              real de tu empresa?
+            </>
+          }
+          subtitulo="15 preguntas basadas en los dominios NOM-035 STPS. Recibe un diagnóstico de 5 factores de riesgo psicosocial con recomendaciones accionables."
+          stats={[
+            { value: "6 min",  label: "para completar"     },
+            { value: "100%",   label: "gratuito"            },
+            { value: "NOM-035",label: "metodología oficial" },
           ]}
+          bullets={[
+            "Diagnóstico en 5 dominios NOM-035 STPS",
+            "Termómetro de riesgo psicosocial global",
+            "Perfil: Clima saludable / En tensión / Crítico",
+            "Recomendación accionable por área de mayor riesgo",
+          ]}
+          ctaLabel="Iniciar diagnóstico NOM-035 →"
         />
       )}
 
@@ -152,14 +150,13 @@ export default function QuizEngine() {
         </div>
       )}
 
-      {/* CAPTURE — Preview borrosa + formulario */}
+      {/* CAPTURE — preview borrosa + formulario */}
       {estado === "capture" && resultadoFinal && (
         <div className="relative">
-          {/* Preview borrosa del resultado */}
           <div className="pointer-events-none select-none" style={{ filter: "blur(6px)", opacity: 0.45 }}>
             <QuizResult
               score={resultadoFinal.puntaje}
-              nivel={resultadoFinal.nivel}
+              nivel={nivelClimaToDb(resultadoFinal.nivel)}
               descripcion={resultadoFinal.descripcion}
               servicio_recomendado={resultadoFinal.servicio_recomendado}
               nombre="Tu nombre"
@@ -167,12 +164,10 @@ export default function QuizEngine() {
               ejes={resultadoFinal.ejes}
             />
           </div>
-
-          {/* Formulario superpuesto */}
           <div className="absolute inset-0 flex items-start justify-center pt-8 px-4">
             <div className="w-full max-w-lg">
               <LeadCaptureForm
-                quizType="burnout"
+                quizType="clima"
                 partialScore={resultadoFinal.puntaje}
                 onSubmit={handleLeadSubmit}
                 isLoading={isSubmitting}
@@ -191,7 +186,7 @@ export default function QuizEngine() {
       {estado === "result" && resultadoFinal && leadData && (
         <QuizResult
           score={resultadoFinal.puntaje}
-          nivel={resultadoFinal.nivel}
+          nivel={nivelClimaToDb(resultadoFinal.nivel)}
           descripcion={resultadoFinal.descripcion}
           servicio_recomendado={resultadoFinal.servicio_recomendado}
           nombre={leadData.nombre}
