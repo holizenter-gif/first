@@ -3,14 +3,6 @@ import SectionLabel from "./SectionLabel";
 
 const EQUIPO = [
   {
-    nombre:       "Eliane Herrera",
-    especialidad: "Instructora MBSR certificada · Brown University",
-    filosofia:    "Creo que la ciencia y el silencio no se contradicen. Se necesitan.",
-    experiencia:  "8 años",
-    certs:        ["MBSR Brown University", "Mindfulness aplicado", "Neurociencia del estrés"],
-    iniciales:    "EH",
-  },
-  {
     nombre:       "Noemí Molina",
     especialidad: "Psicóloga clínica · Terapia holística integrativa",
     filosofia:    "Sanar el cuerpo y sanar la mente son el mismo acto.",
@@ -51,7 +43,7 @@ export default function EquipoEspecialistas() {
           </p>
         </FadeIn>
 
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
           {EQUIPO.map((e, i) => (
             <FadeIn key={e.nombre} delay={i * 0.12}>
               <div

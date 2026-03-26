@@ -20,10 +20,10 @@ export default function BotonAgregar({ producto, variant = "primary", size = "md
 
   const base = `${SIZE_CLASS[size]} font-semibold rounded-lg transition-colors`;
   const variantClass = variant === "primary"
-    ? "bg-brand-gold text-white hover:bg-amber-700"
+    ? "bg-brand-teal text-white hover:bg-amber-700"
     : variant === "outline"
-    ? "border-2 border-brand-gold text-brand-gold hover:bg-brand-gold hover:text-white"
-    : "w-10 h-10 flex items-center justify-center bg-brand-gold text-white rounded-full";
+    ? "border-2 border-brand-teal text-brand-teal hover:bg-brand-teal hover:text-white"
+    : "w-10 h-10 flex items-center justify-center bg-brand-teal text-white rounded-full";
 
   return (
     <button onClick={handleClick} className={`${base} ${variantClass}`}>

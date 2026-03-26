@@ -44,7 +44,7 @@ export default function PodcastSection() {
           </h2>
           <p className="font-sans mb-12 max-w-2xl" style={{ fontSize: "16px", color: "var(--hl-text-muted)" }}>
             Cada episodio, un especialista. Cada especialista, un camino distinto hacia el mismo centro.
-            Conducido por Eliane Herrera, Noemí Molina y Ulises Zarco.
+            Conducido por Noemí Molina y Ulises Zarco.
           </p>
         </FadeIn>
 

@@ -44,7 +44,7 @@ export default function NosotrosPage() {
             de justificar ante la dirección.
           </p>
           <p className="font-sans text-lg leading-relaxed mb-6" style={{ color: "#6B7280" }}>
-            Eliane, Noemí y Ulises se conocieron en un programa de formación en mindfulness
+            Noemí y Ulises se conocieron en un programa de formación en mindfulness
             basado en MBSR y descubrieron que compartían la misma visión: un espacio donde
             la ciencia clínica, la terapia holística y la tradición contemplativa no se
             contradicen — se potencian.
