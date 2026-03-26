@@ -1,79 +1,221 @@
 "use client";
-import { AlertTriangle, AlertCircle, Calendar, ArrowRight, Share2, CheckCircle } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Calendar, ArrowRight, Share2 } from "lucide-react";
+import type { EjeScore } from "@/lib/quiz-scoring";
 
 interface QuizResultProps {
-  score: number; nivel: "bajo" | "riesgo" | "critico"; descripcion: string;
-  servicio_recomendado: string; color: string; emoji: string; nombre: string; empresa: string;
+  score:                number;
+  nivel:                "bajo" | "riesgo" | "critico";
+  descripcion:          string;
+  servicio_recomendado: string;
+  nombre:               string;
+  empresa:              string;
+  ejes:                 EjeScore[];
 }
 
-const CONFIG = {
-  critico: { label: "Atención Prioritaria", icon: AlertCircle, bg: "bg-red-50", border: "border-red-200", iconColor: "text-red-600", ctaLabel: "Agenda diagnóstico GRATIS ahora", urgency: "Tu equipo necesita atención inmediata" },
-  riesgo:  { label: "Zona de Riesgo",       icon: AlertTriangle, bg: "bg-amber-50", border: "border-amber-200", iconColor: "text-amber-600", ctaLabel: "Reservar taller grupal", urgency: "Actúa antes de que escale a burnout crítico" },
-  bajo:    { label: "Bienestar Activo",      icon: CheckCircle,  bg: "bg-green-50", border: "border-green-200", iconColor: "text-green-600", ctaLabel: "Conocer membresía Club Holizenter", urgency: "Mantén y fortalece el bienestar de tu equipo" },
+const NIVEL_CONFIG = {
+  bajo: {
+    label:   "Equilibrio activo",
+    emoji:   "🌱",
+    color:   "#5CB996",
+    bg:      "#EBF7F2",
+    border:  "#A8DCC8",
+    cta:     "Agendar diagnóstico preventivo",
+    urgency: "Tu equipo tiene bases sólidas. Este es el momento de reforzarlas.",
+  },
+  riesgo: {
+    label:   "Riesgo moderado",
+    emoji:   "⚠️",
+    color:   "#F59E0B",
+    bg:      "#FFFBEB",
+    border:  "#FCD34D",
+    cta:     "Agendar diagnóstico completo",
+    urgency: "La intervención ahora es más efectiva que esperar 3-6 meses.",
+  },
+  critico: {
+    label:   "Burnout activo",
+    emoji:   "🚨",
+    color:   "#EF4444",
+    bg:      "#FEF2F2",
+    border:  "#FCA5A5",
+    cta:     "Hablar con un especialista ahora",
+    urgency: "Este nivel requiere atención profesional, no un taller.",
+  },
 };
 
-export default function QuizResult({ score, nivel, descripcion, servicio_recomendado, emoji, nombre, empresa }: QuizResultProps) {
-  const cfg  = CONFIG[nivel];
-  const Icon = cfg.icon;
-  const barColor = nivel === "critico" ? "#DC2626" : nivel === "riesgo" ? "#D97706" : "#1B4332";
+function colorPorPct(pct: number): string {
+  if (pct <= 40) return "#5CB996";
+  if (pct <= 70) return "#F59E0B";
+  return "#EF4444";
+}
+
+// ── Termómetro SVG ────────────────────────────────────────────────────
+function Termometro({ score, color }: { score: number; color: string }) {
+  const [animated, setAnimated] = useState(false);
+  useEffect(() => { const t = setTimeout(() => setAnimated(true), 300); return () => clearTimeout(t); }, []);
+
+  const height = 120;
+  const fillH  = animated ? Math.round((score / 100) * height) : 0;
+  const trackY = 10;
+
+  return (
+    <div className="flex flex-col items-center gap-1">
+      <svg width="36" height="160" viewBox="0 0 36 160" className="overflow-visible">
+        {/* Track */}
+        <rect x="13" y={trackY} width="10" height={height} rx="5" fill="#E5E7EB" />
+        {/* Fill animado */}
+        <rect
+          x="13"
+          y={trackY + height - fillH}
+          width="10"
+          height={fillH}
+          rx="5"
+          fill={color}
+          style={{ transition: "height 1.2s cubic-bezier(0.34,1.56,0.64,1), y 1.2s cubic-bezier(0.34,1.56,0.64,1)" }}
+        />
+        {/* Bulbo */}
+        <circle cx="18" cy={trackY + height + 14} r="12" fill={color} />
+        <circle cx="18" cy={trackY + height + 14} r="7" fill="white" opacity="0.3" />
+        {/* Score label */}
+        <text x="18" y={trackY - 6} textAnchor="middle" fontSize="11" fontWeight="700" fill={color}>
+          {animated ? score : 0}%
+        </text>
+      </svg>
+      <span className="text-xs font-sans text-gray-400 mt-1">Score global</span>
+    </div>
+  );
+}
+
+// ── Barra animada ─────────────────────────────────────────────────────
+function BarraEje({ eje, delay }: { eje: EjeScore; delay: number }) {
+  const [animated, setAnimated] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setAnimated(true), delay);
+    return () => clearTimeout(t);
+  }, [delay]);
+
+  const color = colorPorPct(eje.pct);
+  const width = animated ? `${eje.pct}%` : "0%";
+
+  return (
+    <div>
+      <div className="flex justify-between items-center mb-1.5">
+        <span className="font-sans font-medium text-sm" style={{ color: "#374151" }}>{eje.label}</span>
+        <span className="font-display font-bold text-sm" style={{ color }}>{eje.pct}%</span>
+      </div>
+      <div className="h-3 rounded-full overflow-hidden" style={{ background: "#E5E7EB" }}>
+        <div
+          className="h-full rounded-full"
+          style={{
+            width,
+            background: color,
+            transition: `width 1s cubic-bezier(0.34,1.56,0.64,1) ${delay}ms`,
+          }}
+        />
+      </div>
+    </div>
+  );
+}
+
+// ── Resultado principal ───────────────────────────────────────────────
+export default function QuizResult({
+  score, nivel, descripcion, servicio_recomendado, nombre, empresa, ejes,
+}: QuizResultProps) {
+  const cfg = NIVEL_CONFIG[nivel];
 
   const handleShare = () => {
-    if (navigator.share) navigator.share({ title: "Mi diagnóstico — Holizenter", text: `Mi resultado: ${score}% — ${cfg.label}`, url: window.location.href });
+    if (navigator.share) {
+      navigator.share({
+        title: "Mi diagnóstico de burnout — Holizenter",
+        text:  `Resultado: ${score}% — ${cfg.label}`,
+        url:   window.location.href,
+      });
+    }
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F0E8] py-12 px-4">
-      <div className="max-w-2xl mx-auto">
-        <div className="text-center mb-8">
-          <div className="text-5xl mb-3">{emoji}</div>
-          <p className="text-[#1B4332] font-medium text-sm mb-2">Reporte de {nombre} · {empresa}</p>
-          <h1 className="font-serif text-3xl md:text-4xl font-bold text-gray-900">Tu diagnóstico de bienestar</h1>
+    <div className="min-h-screen py-10 px-4" style={{ background: "#F5F2EC" }}>
+      <div className="max-w-2xl mx-auto space-y-5">
+
+        {/* Header */}
+        <div className="text-center">
+          <p className="font-sans text-sm text-gray-400 mb-1">
+            Diagnóstico de {nombre} · {empresa}
+          </p>
+          <h1 className="font-display font-bold text-2xl md:text-3xl" style={{ color: "#0D1A0F" }}>
+            Tu resultado de bienestar laboral
+          </h1>
         </div>
 
-        <div className={`${cfg.bg} ${cfg.border} border-2 rounded-2xl p-6 mb-6 text-center`}>
-          <div className="flex items-center justify-center gap-3 mb-3">
-            <Icon className={`w-7 h-7 ${cfg.iconColor}`} />
-            <span className={`font-bold text-lg ${cfg.iconColor}`}>{cfg.label}</span>
+        {/* Score card: termómetro + barras */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+          <div
+            className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-display font-semibold mb-5"
+            style={{ background: cfg.bg, color: cfg.color, border: `1px solid ${cfg.border}` }}
+          >
+            <span>{cfg.emoji}</span> {cfg.label}
           </div>
-          <div className="text-6xl font-bold text-gray-900 mb-2">{score}%</div>
-          <div className="w-full bg-white rounded-full h-3 mb-4 overflow-hidden">
-            <div className="h-full rounded-full transition-all duration-1000" style={{ width: `${score}%`, background: barColor }} />
-          </div>
-          <p className="text-gray-600 text-sm leading-relaxed">{descripcion}</p>
-        </div>
 
-        <div className="bg-[#1B4332] rounded-2xl p-6 mb-6">
-          <p className="text-white/70 text-xs font-medium uppercase tracking-wider mb-2">Recomendación para tu empresa</p>
-          <h3 className="text-white font-bold text-lg mb-1">{servicio_recomendado}</h3>
-          <p className="text-white/70 text-sm">{cfg.urgency}</p>
-        </div>
-
-        <div className="bg-white rounded-2xl p-4 mb-6 flex items-center gap-3 shadow-sm">
-          <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
-            <CheckCircle className="w-5 h-5 text-green-600" />
-          </div>
-          <div>
-            <p className="font-medium text-gray-800 text-sm">Reporte enviado a tu email</p>
-            <p className="text-gray-500 text-xs">Revisa tu bandeja de entrada en los próximos 60 segundos</p>
+          <div className="flex gap-6 items-start">
+            <Termometro score={score} color={cfg.color} />
+            <div className="flex-1 space-y-4 pt-1">
+              {ejes.map((eje, i) => (
+                <BarraEje key={eje.label} eje={eje} delay={400 + i * 200} />
+              ))}
+            </div>
           </div>
         </div>
 
+        {/* Descripción */}
+        <div
+          className="rounded-2xl p-5 border"
+          style={{ background: cfg.bg, borderColor: cfg.border }}
+        >
+          <p className="font-sans text-base leading-relaxed" style={{ color: "#374151" }}>
+            {descripcion}
+          </p>
+        </div>
+
+        {/* Recomendación */}
+        <div className="rounded-2xl p-5" style={{ background: "#0D1A0F" }}>
+          <p className="text-xs font-display font-semibold uppercase tracking-widest mb-1" style={{ color: "rgba(255,255,255,0.5)" }}>
+            Recomendación
+          </p>
+          <p className="font-display font-bold text-white text-base mb-1">{servicio_recomendado}</p>
+          <p className="font-sans text-sm" style={{ color: "rgba(255,255,255,0.6)" }}>{cfg.urgency}</p>
+        </div>
+
+        {/* CTAs */}
         <div className="space-y-3">
           <a
             href={`/agendar?nombre=${encodeURIComponent(nombre)}&empresa=${encodeURIComponent(empresa)}`}
-            className="w-full flex items-center justify-center gap-2 py-4 bg-brand-teal hover:bg-brand-teal-dark text-white font-semibold rounded-xl text-base transition-colors"
+            className="w-full flex items-center justify-center gap-2 py-4 rounded-full font-display font-semibold text-white transition-colors"
+            style={{ background: "#5CB996" }}
           >
-            <Calendar className="w-5 h-5" />{cfg.ctaLabel}<ArrowRight className="w-5 h-5" />
+            <Calendar className="w-5 h-5" />
+            {cfg.cta}
+            <ArrowRight className="w-5 h-5" />
           </a>
-          <a href="/cotizador" className="w-full flex items-center justify-center py-4 border-2 border-[#1B4332] text-[#1B4332] font-semibold rounded-xl text-base hover:bg-[#1B4332] hover:text-white transition-colors">
+          <a
+            href="/cotizador"
+            className="w-full flex items-center justify-center py-4 rounded-full font-display font-semibold border-2 transition-colors"
+            style={{ borderColor: "#0D1A0F", color: "#0D1A0F" }}
+          >
             Ver cotizador de servicios
           </a>
-          <button onClick={handleShare} className="w-full flex items-center justify-center gap-2 py-3 text-gray-500 hover:text-[#1B4332] text-sm transition-colors">
-            <Share2 className="w-4 h-4" />Compartir mi resultado
+          <button
+            onClick={handleShare}
+            className="w-full flex items-center justify-center gap-2 py-3 text-sm transition-colors font-sans"
+            style={{ color: "#9CA3AF" }}
+          >
+            <Share2 className="w-4 h-4" /> Compartir mi resultado
           </button>
         </div>
-        <div className="mt-8 text-center">
-          <a href="/" className="text-xs text-gray-400 hover:text-gray-600 transition-colors">← Volver al inicio</a>
+
+        <div className="text-center">
+          <a href="/" className="text-xs text-gray-400 hover:text-gray-600 transition-colors">
+            ← Volver al inicio
+          </a>
         </div>
       </div>
     </div>
