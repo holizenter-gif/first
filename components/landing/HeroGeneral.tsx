@@ -23,20 +23,6 @@ export default function HeroGeneral() {
         <div className="max-w-3xl">
 
           <FadeIn delay={0}>
-            <div
-              className="inline-flex items-center gap-2 text-xs font-sans font-medium px-4 py-2 rounded-full mb-10 border"
-              style={{
-                background:  "var(--hl-green-pale)",
-                color:       "var(--hl-green)",
-                borderColor: "var(--hl-divider)",
-              }}
-            >
-              <span className="w-1.5 h-1.5 rounded-full bg-[#2D5A3D] animate-pulse" />
-              Holizenter · El Poder de tu Bienestar
-            </div>
-          </FadeIn>
-
-          <FadeIn delay={0.1}>
             <h1
               className="font-sans font-bold leading-[1.08] mb-6"
               style={{

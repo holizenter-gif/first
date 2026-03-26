@@ -1,53 +1,107 @@
-import fs   from "fs";
-import path from "path";
-import matter      from "gray-matter";
-import readingTime from "reading-time";
+import { createClient } from "@/lib/supabase/server";
 
 export interface BlogPost {
+  id:             string;
   slug:           string;
   titulo:         string;
-  descripcion:    string;
-  fecha:          string;
-  autor:          string;
-  categoria:      string;
-  imagen:         string;
-  keywords:       string[];
-  tiempo_lectura: string;
+  descripcion:    string | null;
   contenido:      string;
+  imagen_url:     string | null;
+  categoria:      string;
+  tags:           string[];
+  autor:          string;
+  quiz_id:        string | null;
+  publicado:      boolean;
+  destacado:      boolean;
+  vistas:         number;
+  tiempo_lectura: string;
+  created_at:     string;
+  updated_at:     string;
+  published_at:   string | null;
 }
 
-const BLOG_DIR = path.join(process.cwd(), "content/blog");
+export const CATEGORIA_LABELS: Record<string, string> = {
+  articulo:    "Artículo",
+  noticia:     "Noticia",
+  reflexion:   "Reflexión",
+  guia:        "Guía",
+  caso_exito:  "Caso de éxito",
+};
 
-export function getAllPosts(): BlogPost[] {
-  if (!fs.existsSync(BLOG_DIR)) return [];
+export const CATEGORIA_COLORS: Record<string, string> = {
+  articulo:    "bg-brand-teal text-white",
+  noticia:     "bg-brand-dark text-white",
+  reflexion:   "bg-brand-olive-50 text-brand-olive",
+  guia:        "bg-brand-teal-50 text-brand-teal",
+  caso_exito:  "bg-amber-50 text-amber-700",
+};
 
-  const files = fs.readdirSync(BLOG_DIR).filter((f) => f.endsWith(".mdx"));
+export async function getAllPosts(opts?: {
+  categoria?: string;
+  busqueda?:  string;
+  limite?:    number;
+}): Promise<BlogPost[]> {
+  const supabase = await createClient();
+  let query = supabase
+    .from("articulos")
+    .select("*")
+    .eq("publicado", true)
+    .order("published_at", { ascending: false });
 
-  return files
-    .map((file) => {
-      const raw = fs.readFileSync(path.join(BLOG_DIR, file), "utf-8");
-      const { data, content } = matter(raw);
-      const stats = readingTime(content);
-      return {
-        slug:           data.slug           ?? file.replace(".mdx", ""),
-        titulo:         data.titulo         ?? "",
-        descripcion:    data.descripcion    ?? "",
-        fecha:          data.fecha          ?? "",
-        autor:          data.autor          ?? "Holizenter",
-        categoria:      data.categoria      ?? "Bienestar",
-        imagen:         data.imagen         ?? "/blog/default.jpg",
-        keywords:       data.keywords       ?? [],
-        tiempo_lectura: data.tiempo_lectura ?? `${Math.ceil(stats.minutes)} min`,
-        contenido:      content,
-      } as BlogPost;
-    })
-    .sort((a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime());
+  if (opts?.categoria && opts.categoria !== "todos") {
+    query = query.eq("categoria", opts.categoria);
+  }
+  if (opts?.busqueda) {
+    query = query.or(
+      `titulo.ilike.%${opts.busqueda}%,descripcion.ilike.%${opts.busqueda}%`
+    );
+  }
+  if (opts?.limite) {
+    query = query.limit(opts.limite);
+  }
+
+  const { data, error } = await query;
+  if (error) { console.error("Error cargando artículos:", error); return []; }
+  return (data ?? []) as BlogPost[];
 }
 
-export function getPostBySlug(slug: string): BlogPost | null {
-  return getAllPosts().find((p) => p.slug === slug) ?? null;
+export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("articulos")
+    .select("*")
+    .eq("slug", slug)
+    .eq("publicado", true)
+    .single();
+
+  if (error) return null;
+
+  // Incrementar vistas
+  await supabase
+    .from("articulos")
+    .update({ vistas: (data.vistas ?? 0) + 1 })
+    .eq("id", data.id);
+
+  return data as BlogPost;
 }
 
-export function getRelatedPosts(slug: string, limit = 2): BlogPost[] {
-  return getAllPosts().filter((p) => p.slug !== slug).slice(0, limit);
+export async function getRelatedPosts(slug: string, limit = 2): Promise<BlogPost[]> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("articulos")
+    .select("*")
+    .eq("publicado", true)
+    .neq("slug", slug)
+    .limit(limit);
+  return (data ?? []) as BlogPost[];
+}
+
+// Solo para el admin — sin filtro de publicado
+export async function getAllPostsAdmin(): Promise<BlogPost[]> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("articulos")
+    .select("*")
+    .order("created_at", { ascending: false });
+  return (data ?? []) as BlogPost[];
 }

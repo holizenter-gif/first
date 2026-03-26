@@ -27,7 +27,7 @@ const SPOTIFY_SHOW_ID = "5pfkh3LDv0ebuwN7pinzau";
 
 export default function PodcastSection() {
   return (
-    <section className="py-24 px-4 bg-white">
+    <section className="py-24 px-4 bg-white overflow-hidden">
       <div className="max-w-6xl mx-auto">
 
         <FadeIn>
@@ -48,11 +48,14 @@ export default function PodcastSection() {
           </p>
         </FadeIn>
 
-        <div className="grid lg:grid-cols-2 gap-10 items-start">
+        <div className="flex flex-col lg:grid lg:grid-cols-2 gap-8 items-start w-full overflow-hidden">
 
-          {/* Embed Spotify */}
-          <FadeIn direction="left">
-            <div className="rounded-2xl overflow-hidden shadow-sm border" style={{ borderColor: "var(--hl-divider)" }}>
+          {/* Embed Spotify — ancho controlado */}
+          <FadeIn direction="left" className="w-full min-w-0">
+            <div
+              className="rounded-2xl overflow-hidden shadow-sm border w-full"
+              style={{ borderColor: "var(--hl-divider)" }}
+            >
               <iframe
                 src={`https://open.spotify.com/embed/show/${SPOTIFY_SHOW_ID}?utm_source=generator&theme=0`}
                 width="100%"
@@ -61,22 +64,24 @@ export default function PodcastSection() {
                 allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
                 loading="lazy"
                 title="Holizenter — El Poder de tu Bienestar Podcast"
+                style={{ display: "block", maxWidth: "100%" }}
               />
             </div>
 
+            {/* Plataformas */}
             <div className="flex flex-wrap gap-3 mt-4">
               {[
-                { nombre: "Spotify",       href: `https://open.spotify.com/show/${SPOTIFY_SHOW_ID}`, bg: "#1DB954", color: "#fff" },
-                { nombre: "Apple Podcasts", href: "#",                                                 bg: "#9933CC", color: "#fff" },
-                { nombre: "iVoox",          href: "#",                                                 bg: "#FF6B35", color: "#fff" },
+                { nombre: "Spotify",        href: `https://open.spotify.com/show/${SPOTIFY_SHOW_ID}`, bg: "#1DB954", color: "#fff" },
+                { nombre: "Apple Podcasts", href: "#", bg: "#9933CC", color: "#fff" },
+                { nombre: "iVoox",          href: "#", bg: "#FF6B35", color: "#fff" },
               ].map((p) => (
                 <Link
                   key={p.nombre}
                   href={p.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 text-xs font-sans font-semibold px-4 py-2 transition-opacity hover:opacity-80"
-                  style={{ background: p.bg, color: p.color, borderRadius: "4px" }}
+                  className="inline-flex items-center gap-1.5 text-xs font-sans font-semibold px-4 py-2 rounded-full transition-opacity hover:opacity-80 whitespace-nowrap"
+                  style={{ background: p.bg, color: p.color }}
                 >
                   {p.nombre}
                 </Link>
@@ -84,32 +89,41 @@ export default function PodcastSection() {
             </div>
           </FadeIn>
 
-          {/* Episodios recientes */}
-          <FadeIn direction="right">
+          {/* Episodios recientes — ancho controlado */}
+          <FadeIn direction="right" className="w-full min-w-0">
             <div className="space-y-4">
-              <p className="font-sans font-semibold text-sm mb-4" style={{ color: "var(--hl-text-muted)" }}>
+              <p
+                className="font-sans font-semibold text-sm mb-4"
+                style={{ color: "var(--hl-text-muted)" }}
+              >
                 Episodios recientes
               </p>
               {EPISODIOS_RECIENTES.map((ep, i) => (
                 <div
                   key={ep.titulo}
-                  className="rounded-xl p-4 border flex gap-4 items-start"
+                  className="rounded-xl p-4 border flex gap-4 items-start w-full"
                   style={{ background: "var(--hl-beige)", borderColor: "var(--hl-divider)" }}
                 >
                   <div
                     className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0"
-                    style={{ background: "var(--hl-green)" }}
+                    style={{ background: "var(--hl-green)", minWidth: "40px" }}
                   >
                     {String(i + 1).padStart(2, "0")}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h4 className="font-sans font-semibold mb-0.5 truncate" style={{ fontSize: "14px", color: "var(--hl-text)" }}>
+                    <h4
+                      className="font-sans font-semibold mb-0.5 truncate"
+                      style={{ fontSize: "14px", color: "var(--hl-text)" }}
+                    >
                       {ep.titulo}
                     </h4>
                     <p className="font-sans mb-1" style={{ fontSize: "11px", color: "var(--hl-green)" }}>
                       {ep.invitado}
                     </p>
-                    <p className="font-sans leading-snug" style={{ fontSize: "12px", color: "var(--hl-text-muted)" }}>
+                    <p
+                      className="font-sans leading-snug line-clamp-2"
+                      style={{ fontSize: "12px", color: "var(--hl-text-muted)" }}
+                    >
                       {ep.resumen}
                     </p>
                     <p className="font-sans mt-1.5" style={{ fontSize: "11px", color: "var(--hl-text-muted)" }}>
