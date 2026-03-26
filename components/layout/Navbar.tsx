@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Menu, X, ChevronDown } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import Logo from "@/components/brand/Logo";
+import BotonCarrito from "@/components/tienda/BotonCarrito";
 
 const SERVICIOS = [
   { label: "Talleres Grupales",           href: "/servicios/talleres",       desc: "Experiencias vivenciales para equipos" },
@@ -64,6 +65,7 @@ export default function Navbar() {
             )}
           </li>
           {[
+            { label: "Tienda",     href: "/tienda"     },
             { label: "Directorio", href: "/directorio" },
             { label: "Blog",       href: "/blog"       },
             { label: "Nosotros",   href: "/nosotros"   },
@@ -84,6 +86,7 @@ export default function Navbar() {
           >
             Contacto
           </Link>
+          <BotonCarrito solid={solid} />
           <Link
             href="/agendar"
             className="px-5 py-2.5 bg-brand-teal text-white text-sm font-display font-semibold rounded-full hover:bg-brand-teal-dark transition-colors shadow-sm shadow-brand-teal/20"
@@ -114,6 +117,7 @@ export default function Navbar() {
                 ))}
                 <div className="pt-4 border-t border-gray-100 mt-4 space-y-1">
                   {[
+                    { label: "Tienda",     href: "/tienda"     },
                     { label: "Directorio", href: "/directorio" },
                     { label: "Blog",       href: "/blog"       },
                     { label: "Nosotros",   href: "/nosotros"   },

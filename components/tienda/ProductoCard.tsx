@@ -1,47 +1,90 @@
+import Link from "next/link";
+import { getLabelTipo, calcularDescuento } from "@/lib/data/productos-helpers";
+import AgregarCarritoBtn from "./AgregarCarritoBtn";
 import type { Producto } from "@/lib/supabase/types";
+
+const TIPO_EMOJI: Record<string, string> = {
+  curso_digital:   "🎓",
+  material_fisico: "📚",
+  merchandising:   "🌿",
+  taller_grabado:  "🎥",
+  membresia:       "⭐",
+};
 
 interface ProductoCardProps {
   producto: Producto;
-  variant?: "grid" | "list" | "featured";
-  onAgregarCarrito?: (producto: Producto) => void;
 }
 
-export default function ProductoCard({ producto, variant = "grid", onAgregarCarrito }: ProductoCardProps) {
-  const descuento = producto.precio_original
-    ? Math.round(((producto.precio_original - producto.precio) / producto.precio_original) * 100)
-    : null;
+export default function ProductoCard({ producto }: ProductoCardProps) {
+  const descuento = calcularDescuento(producto.precio, producto.precio_original);
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:border-brand-teal transition-colors">
-      <div className="h-48 bg-brand-beige flex items-center justify-center text-4xl relative">
-        <span>🛍️</span>
-        {descuento && (
-          <span className="absolute top-3 right-3 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-            -{descuento}%
-          </span>
-        )}
-      </div>
-      <div className="p-4">
-        <span className="text-xs text-brand-teal font-semibold uppercase tracking-wider">{producto.tipo.replace("_", " ")}</span>
-        <h3 className="mt-1 font-semibold text-brand-dark text-sm leading-snug line-clamp-2">{producto.nombre}</h3>
-        <p className="mt-2 text-xs text-gray-500 line-clamp-2">{producto.descripcion}</p>
-        <div className="mt-3 flex items-center gap-2">
-          <span className="font-bold text-brand-dark">${producto.precio.toLocaleString()}</span>
-          {producto.precio_original && (
-            <span className="text-xs text-gray-400 line-through">${producto.precio_original.toLocaleString()}</span>
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col hover:shadow-md transition-shadow group">
+      {/* Imagen */}
+      <Link href={`/tienda/${producto.slug}`}>
+        <div
+          className="h-48 flex items-center justify-center text-5xl relative"
+          style={{ background: "#EBF7F2" }}
+        >
+          <span>{TIPO_EMOJI[producto.tipo] ?? "🛍️"}</span>
+          {descuento && (
+            <span
+              className="absolute top-3 right-3 text-white text-xs font-bold px-2.5 py-1 rounded-full"
+              style={{ background: "#E53E3E" }}
+            >
+              -{descuento}%
+            </span>
           )}
-          <span className="text-xs text-gray-400">MXN</span>
-        </div>
-        <div className="mt-3 flex gap-2">
-          <a href={`/tienda/${producto.slug}`} className="flex-1 text-center py-2 border border-brand-dark text-brand-dark text-xs font-semibold rounded-lg hover:bg-brand-dark hover:text-white transition-colors">
-            Ver detalle
-          </a>
-          {onAgregarCarrito && (
-            <button onClick={() => onAgregarCarrito(producto)} className="flex-1 py-2 bg-brand-teal text-white text-xs font-semibold rounded-lg hover:bg-amber-700 transition-colors">
-              Agregar
-            </button>
+          {producto.destacado && !descuento && (
+            <span
+              className="absolute top-3 right-3 text-white text-xs font-semibold px-2.5 py-1 rounded-full"
+              style={{ background: "#5CB996" }}
+            >
+              Destacado
+            </span>
           )}
         </div>
+      </Link>
+
+      {/* Body */}
+      <div className="p-5 flex flex-col flex-1">
+        <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#5CB996" }}>
+          {getLabelTipo(producto.tipo)}
+        </span>
+
+        <Link href={`/tienda/${producto.slug}`}>
+          <h3
+            className="mt-1 font-display font-bold text-sm leading-snug line-clamp-2 group-hover:underline"
+            style={{ color: "#0D1A0F" }}
+          >
+            {producto.nombre}
+          </h3>
+        </Link>
+
+        <p className="mt-2 text-xs text-gray-500 leading-relaxed line-clamp-2 flex-1">
+          {producto.descripcion}
+        </p>
+
+        <div className="mt-4 flex items-end justify-between gap-2">
+          <div>
+            <span className="font-display font-bold text-base" style={{ color: "#0D1A0F" }}>
+              ${producto.precio.toLocaleString("es-MX")}
+            </span>
+            {producto.precio_original && (
+              <span className="text-xs text-gray-400 line-through ml-1.5">
+                ${producto.precio_original.toLocaleString("es-MX")}
+              </span>
+            )}
+            <span className="text-xs text-gray-400 ml-1">MXN</span>
+          </div>
+        </div>
+
+        <AgregarCarritoBtn
+          producto={producto}
+          variant="secondary"
+          className="mt-3 w-full"
+          label="Agregar"
+        />
       </div>
     </div>
   );
