@@ -1,22 +1,109 @@
-import { PreguntaQuiz } from "./preguntas-burnout";
+import type { PreguntaQuiz } from "./preguntas-burnout";
 
-// Preguntas del quiz de estrés (legacy — se reemplazarán en Prompt Quiz 2)
-// Se usan eje:1 y tipo:"opciones" como placeholder hasta actualización
+const LIKERT_OPCIONES = [
+  { label: "Casi nunca",     value: 1 },
+  { label: "Pocas veces",    value: 2 },
+  { label: "A veces",        value: 3 },
+  { label: "Frecuentemente", value: 4 },
+  { label: "Casi siempre",   value: 5 },
+];
+
 export const PREGUNTAS_ESTRES: PreguntaQuiz[] = [
-  { id: "e1", eje: 1, tipo: "opciones", texto: "¿Con qué frecuencia sientes que tienes demasiado trabajo y poco tiempo para completarlo?",
-    opciones: [{ label: "Rara vez", value: 1 }, { label: "Algunas veces al mes", value: 2 }, { label: "Varias veces a la semana", value: 4 }, { label: "Todos los días", value: 5 }] },
-  { id: "e2", eje: 1, tipo: "opciones", texto: "¿Cómo describes tu calidad de sueño en los últimos 3 meses?",
-    opciones: [{ label: "Excelente, descanso bien", value: 1 }, { label: "Regular, con noches difíciles ocasionales", value: 2 }, { label: "Mala, frecuentemente despierto cansado", value: 4 }, { label: "Muy mala, insomnio frecuente", value: 5 }] },
-  { id: "e3", eje: 1, tipo: "opciones", texto: "¿Puedes desconectarte del trabajo durante tu tiempo libre?",
-    opciones: [{ label: "Sí, logro desconectarme completamente", value: 1 }, { label: "Mayormente sí, con algunos pensamientos", value: 2 }, { label: "Me cuesta mucho desconectarme", value: 4 }, { label: "Nunca logro desconectarme", value: 5 }] },
-  { id: "e4", eje: 1, tipo: "opciones", texto: "¿Con qué frecuencia experimentas síntomas físicos relacionados al estrés?",
-    opciones: [{ label: "Muy rara vez", value: 1 }, { label: "Una o dos veces al mes", value: 2 }, { label: "Varias veces a la semana", value: 4 }, { label: "Diariamente", value: 5 }] },
-  { id: "e5", eje: 2, tipo: "opciones", texto: "¿Cómo es tu nivel de energía durante la jornada laboral?",
-    opciones: [{ label: "Alto y sostenido durante el día", value: 1 }, { label: "Baja hacia el final del día", value: 2 }, { label: "Bajo la mayor parte del día", value: 4 }, { label: "Me siento agotado desde el inicio", value: 5 }] },
-  { id: "e6", eje: 2, tipo: "opciones", texto: "¿Con qué frecuencia sientes irritabilidad o cambios de humor relacionados al trabajo?",
-    opciones: [{ label: "Rara vez", value: 1 }, { label: "Ocasionalmente", value: 2 }, { label: "Frecuentemente", value: 4 }, { label: "Es mi estado habitual", value: 5 }] },
-  { id: "e7", eje: 3, tipo: "opciones", texto: "¿Realizas actividades de autocuidado regularmente?",
-    opciones: [{ label: "Sí, tengo rutinas establecidas", value: 1 }, { label: "Ocasionalmente cuando tengo tiempo", value: 2 }, { label: "Casi nunca por falta de tiempo", value: 4 }, { label: "No tengo ninguna práctica de autocuidado", value: 5 }] },
-  { id: "e8", eje: 3, tipo: "opciones", texto: "¿Cómo describes tu capacidad de concentración en el trabajo?",
-    opciones: [{ label: "Excelente, me enfoco fácilmente", value: 1 }, { label: "Buena, con distracciones ocasionales", value: 2 }, { label: "Me cuesta mantener el foco", value: 4 }, { label: "Muy difícil concentrarme", value: 5 }] },
+  // ── EJE 1: CARGA Y DEMANDAS (4 preguntas · máx 20pts) ─────────────
+  {
+    id: "e1", eje: 1, tipo: "likert",
+    texto: "¿Con qué frecuencia sientes que la cantidad de trabajo que tienes es difícil de sostener en el tiempo?",
+    opciones: LIKERT_OPCIONES,
+  },
+  {
+    id: "e2", eje: 1, tipo: "opciones",
+    texto: "Cuando termina tu jornada laboral, ¿cómo describirías tu relación con los pendientes?",
+    opciones: [
+      { label: "Los cierro bien, salgo con la mente tranquila",                   value: 1 },
+      { label: "Quedan cosas, pero es manejable",                                 value: 2 },
+      { label: "Siempre hay más de lo que puedo terminar",                        value: 3 },
+      { label: "Los pendientes me siguen fuera del trabajo",                      value: 4 },
+      { label: "Siento que nunca es suficiente, sin importar cuánto haga",        value: 5 },
+    ],
+  },
+  {
+    id: "e3", eje: 1, tipo: "opciones",
+    texto: "¿Cómo afecta la presión del tiempo la calidad de tu trabajo?",
+    opciones: [
+      { label: "No la afecta, tengo margen suficiente",                           value: 1 },
+      { label: "A veces me apresuro, pero el resultado es bueno",                 value: 2 },
+      { label: "Con frecuencia tengo que sacrificar calidad por velocidad",       value: 4 },
+      { label: "Es constante — la presión ya distorsiona cómo trabajo",           value: 5 },
+    ],
+  },
+  {
+    id: "e4", eje: 1, tipo: "likert",
+    texto: "¿Con qué frecuencia las interrupciones o cambios de prioridad rompen tu concentración de forma significativa?",
+    opciones: LIKERT_OPCIONES,
+  },
+
+  // ── EJE 2: CONTROL Y AUTONOMÍA (3 preguntas · máx 15pts) ──────────
+  {
+    id: "e5", eje: 2, tipo: "opciones",
+    texto: "¿Qué tan claro tienes lo que se espera de ti en tu rol?",
+    opciones: [
+      { label: "Muy claro — sé exactamente mis prioridades y límites",            value: 1 },
+      { label: "Bastante claro, aunque a veces hay zonas grises",                 value: 2 },
+      { label: "Hay ambigüedad frecuente que me genera tensión",                  value: 4 },
+      { label: "No está claro — eso es una fuente constante de estrés",           value: 5 },
+    ],
+  },
+  {
+    id: "e6", eje: 2, tipo: "opciones",
+    texto: "¿Sientes que tienes autonomía real para decidir cómo hacer tu trabajo?",
+    opciones: [
+      { label: "Sí, tengo margen real para decidir",                              value: 1 },
+      { label: "En algunos aspectos sí, en otros no",                             value: 2 },
+      { label: "Poco — hay mucho control o aprobación constante",                 value: 4 },
+      { label: "No — casi todo requiere validación externa",                      value: 5 },
+    ],
+  },
+  {
+    id: "e7", eje: 2, tipo: "opciones",
+    texto: "Cuando el liderazgo toma decisiones que afectan tu trabajo, ¿cómo lo vives?",
+    opciones: [
+      { label: "Con confianza — generalmente tienen sentido",                     value: 1 },
+      { label: "A veces no entiendo el porqué, pero lo acepto",                   value: 2 },
+      { label: "Con frecuencia genera presión o confusión en el equipo",          value: 3 },
+      { label: "Es una fuente constante de tensión o frustración",                value: 5 },
+    ],
+  },
+
+  // ── EJE 3: SOPORTE ORGANIZACIONAL (3 preguntas · máx 15pts) ───────
+  {
+    id: "e8", eje: 3, tipo: "opciones",
+    texto: "Si hoy estuvieras al límite de tu capacidad, ¿qué tan probable es que alguien en tu organización lo notara y actuara?",
+    opciones: [
+      { label: "Muy probable — hay cultura de apoyo real",                        value: 1 },
+      { label: "Quizás, si yo lo dijera explícitamente",                          value: 2 },
+      { label: "Poco probable — cada quien resuelve lo suyo",                     value: 4 },
+      { label: "No pasaría — no es parte de la cultura",                          value: 5 },
+    ],
+  },
+  {
+    id: "e9", eje: 3, tipo: "opciones",
+    texto: "¿Sientes que tu esfuerzo es reconocido de forma que te importa — no solo con palabras, sino con hechos?",
+    opciones: [
+      { label: "Sí, hay reconocimiento real y consistente",                       value: 1 },
+      { label: "A veces, aunque podría ser más",                                  value: 2 },
+      { label: "Rara vez — el esfuerzo se da por sentado",                        value: 4 },
+      { label: "No — trabajar más no cambia nada",                                value: 5 },
+    ],
+  },
+  {
+    id: "e10", eje: 3, tipo: "opciones",
+    texto: "Si tuvieras que describir el nivel de estrés de tu entorno laboral hoy, ¿qué elegirías?",
+    opciones: [
+      { label: "Manejable y con sentido",                                          value: 1 },
+      { label: "Intenso pero sostenible",                                          value: 2 },
+      { label: "Alto y con pocas válvulas de escape",                              value: 3 },
+      { label: "Al límite",                                                        value: 4 },
+      { label: "Insostenible",                                                     value: 5 },
+    ],
+  },
 ];
