@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Check } from "lucide-react";
+import { ArrowLeft, Check, PackageX } from "lucide-react";
 import { getProductoBySlug } from "@/lib/data/productos-server";
 import {
   getLabelTipo,
@@ -20,7 +19,7 @@ interface Props {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const producto = await getProductoBySlug(slug);
-  if (!producto) return { title: "Producto no encontrado" };
+  if (!producto) return { title: "Producto no disponible — Tienda Holizenter" };
   return {
     title: `${producto.meta_titulo ?? producto.nombre} — Tienda Holizenter`,
     description: producto.meta_descripcion ?? producto.descripcion_corta ?? producto.descripcion ?? undefined,
@@ -33,9 +32,62 @@ export async function generateStaticParams() {
 
 export default async function ProductoDetallePage({ params }: Props) {
   const { slug } = await params;
-  const producto = await getProductoBySlug(slug);
-  if (!producto) notFound();
 
+  let producto = null;
+  try {
+    producto = await getProductoBySlug(slug);
+  } catch {
+    // DB error — fall through to unavailable state
+  }
+
+  // ── Producto no encontrado o no disponible ───────────────────────────────
+  if (!producto) {
+    return (
+      <div className="min-h-screen bg-white">
+        {/* Breadcrumb */}
+        <div className="px-4 py-3 border-b border-gray-100">
+          <div className="max-w-6xl mx-auto flex items-center gap-2 text-sm text-gray-400 font-sans">
+            <Link href="/tienda" className="hover:text-brand-teal transition-colors flex items-center gap-1">
+              <ArrowLeft className="w-3.5 h-3.5" /> Tienda
+            </Link>
+          </div>
+        </div>
+
+        {/* Estado no disponible */}
+        <div className="flex items-center justify-center px-4 py-24">
+          <div className="max-w-md w-full text-center">
+            <div
+              className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6"
+              style={{ background: "#F5F2EC" }}
+            >
+              <PackageX className="w-9 h-9" style={{ color: "#5CB996" }} />
+            </div>
+            <h1
+              className="font-display font-bold text-2xl mb-3"
+              style={{ color: "#0D1A0F" }}
+            >
+              Producto no disponible
+            </h1>
+            <p className="font-sans text-base text-gray-500 mb-2 leading-relaxed">
+              Este producto está agotado o ya no se encuentra disponible por el momento.
+            </p>
+            <p className="font-sans text-sm text-gray-400 mb-8">
+              Puede que regrese próximamente. Mientras tanto, explora el resto de nuestro catálogo.
+            </p>
+            <Link
+              href="/tienda"
+              className="inline-flex items-center gap-2 px-7 py-3 rounded-full font-display font-semibold text-white transition-opacity hover:opacity-90"
+              style={{ background: "#5CB996" }}
+            >
+              Ver catálogo completo →
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Producto encontrado ──────────────────────────────────────────────────
   const pEfectivo = getPrecioEfectivo(producto);
   const dscto     = descuentoPct(producto);
   const relacionados: typeof producto[] = [];
