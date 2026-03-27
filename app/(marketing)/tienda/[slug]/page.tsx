@@ -1,25 +1,17 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Check, Clock, Star } from "lucide-react";
-import { getProductoBySlug, getLabelTipo, calcularDescuento } from "@/lib/data/productos-helpers";
-import { PRODUCTOS_MOCK } from "@/lib/data/productos-mock";
+import { ArrowLeft, Check } from "lucide-react";
+import {
+  getProductoBySlug,
+  getLabelTipo,
+  getPrecioEfectivo,
+  descuentoPct,
+  formatPrecio,
+  getModalidadEnvio,
+} from "@/lib/data/productos-helpers";
 import AgregarCarritoBtn from "@/components/tienda/AgregarCarritoBtn";
 import ProductoCard from "@/components/tienda/ProductoCard";
-
-const TIPO_EMOJI: Record<string, string> = {
-  curso_digital:   "🎓",
-  material_fisico: "📚",
-  merchandising:   "🌿",
-  taller_grabado:  "🎥",
-  membresia:       "⭐",
-};
-
-const NIVEL_LABEL: Record<string, string> = {
-  basico:      "Básico",
-  intermedio:  "Intermedio",
-  avanzado:    "Avanzado",
-};
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -27,27 +19,26 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const producto = getProductoBySlug(slug);
+  const producto = await getProductoBySlug(slug);
   if (!producto) return { title: "Producto no encontrado" };
   return {
-    title: `${producto.nombre} — Tienda Holizenter`,
-    description: producto.descripcion,
+    title: `${producto.meta_titulo ?? producto.nombre} — Tienda Holizenter`,
+    description: producto.meta_descripcion ?? producto.descripcion_corta ?? producto.descripcion ?? undefined,
   };
 }
 
 export async function generateStaticParams() {
-  return PRODUCTOS_MOCK.map((p) => ({ slug: p.slug }));
+  return [];
 }
 
 export default async function ProductoDetallePage({ params }: Props) {
   const { slug } = await params;
-  const producto = getProductoBySlug(slug);
+  const producto = await getProductoBySlug(slug);
   if (!producto) notFound();
 
-  const descuento = calcularDescuento(producto.precio, producto.precio_original);
-  const relacionados = PRODUCTOS_MOCK.filter(
-    (p) => p.activo && p.categoria_slug === producto.categoria_slug && p.id !== producto.id
-  ).slice(0, 4);
+  const pEfectivo = getPrecioEfectivo(producto);
+  const dscto     = descuentoPct(producto);
+  const relacionados: typeof producto[] = [];
 
   return (
     <div className="min-h-screen bg-white">
@@ -69,10 +60,15 @@ export default async function ProductoDetallePage({ params }: Props) {
 
           {/* Imagen */}
           <div
-            className="rounded-2xl flex items-center justify-center aspect-square max-h-96 text-8xl"
+            className="rounded-2xl overflow-hidden flex items-center justify-center aspect-square max-h-96"
             style={{ background: "#EBF7F2" }}
           >
-            {TIPO_EMOJI[producto.tipo] ?? "🛍️"}
+            {producto.imagen_url ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={producto.imagen_url} alt={producto.nombre} className="w-full h-full object-cover" />
+            ) : (
+              <span className="text-8xl">🛍️</span>
+            )}
           </div>
 
           {/* Info */}
@@ -81,7 +77,7 @@ export default async function ProductoDetallePage({ params }: Props) {
               className="inline-block text-xs font-semibold uppercase tracking-widest px-3 py-1 rounded-full mb-3"
               style={{ background: "#EBF7F2", color: "#5CB996" }}
             >
-              {getLabelTipo(producto.tipo)}
+              {getLabelTipo(producto.categoria)}
             </span>
 
             <h1
@@ -91,43 +87,40 @@ export default async function ProductoDetallePage({ params }: Props) {
               {producto.nombre}
             </h1>
 
-            <p className="font-sans text-base leading-relaxed text-gray-600 mb-6">
-              {producto.descripcion_larga}
-            </p>
+            {producto.descripcion_corta && (
+              <p className="font-sans text-base leading-relaxed text-gray-600 mb-4">
+                {producto.descripcion_corta}
+              </p>
+            )}
+
+            {producto.descripcion && (
+              <p className="font-sans text-sm leading-relaxed text-gray-500 mb-6">
+                {producto.descripcion}
+              </p>
+            )}
 
             {/* Detalles rápidos */}
             <div className="flex flex-wrap gap-3 mb-6">
-              {producto.duracion_horas && (
-                <span
-                  className="flex items-center gap-1.5 text-xs font-sans font-medium px-3 py-1.5 rounded-full"
-                  style={{ background: "#F5F2EC", color: "#6B7280" }}
-                >
-                  <Clock className="w-3.5 h-3.5" />
-                  {producto.duracion_horas}h de contenido
-                </span>
-              )}
-              {producto.nivel && (
+              <span
+                className="text-xs font-sans font-medium px-3 py-1.5 rounded-full"
+                style={{ background: "#F5F2EC", color: "#6B7280" }}
+              >
+                {getModalidadEnvio(producto)}
+              </span>
+              {producto.digital && producto.dias_acceso > 0 && (
                 <span
                   className="text-xs font-sans font-medium px-3 py-1.5 rounded-full"
                   style={{ background: "#F5F2EC", color: "#6B7280" }}
                 >
-                  Nivel: {NIVEL_LABEL[producto.nivel]}
+                  Acceso {producto.dias_acceso} días
                 </span>
               )}
-              {producto.instructor && (
+              {producto.sku && (
                 <span
                   className="text-xs font-sans font-medium px-3 py-1.5 rounded-full"
                   style={{ background: "#F5F2EC", color: "#6B7280" }}
                 >
-                  Instructor: {producto.instructor}
-                </span>
-              )}
-              {producto.requiere_envio && (
-                <span
-                  className="text-xs font-sans font-medium px-3 py-1.5 rounded-full"
-                  style={{ background: "#FFF7ED", color: "#D97706" }}
-                >
-                  Producto físico — envío incluido CDMX
+                  SKU: {producto.sku}
                 </span>
               )}
             </div>
@@ -139,20 +132,19 @@ export default async function ProductoDetallePage({ params }: Props) {
             >
               <div className="flex items-end gap-3 mb-4">
                 <span className="font-display font-bold text-3xl" style={{ color: "#0D1A0F" }}>
-                  ${producto.precio.toLocaleString("es-MX")}
+                  {formatPrecio(pEfectivo)}
                 </span>
-                {producto.precio_original && (
+                {dscto !== null && producto.precio_original && (
                   <span className="text-base text-gray-400 line-through mb-0.5">
-                    ${producto.precio_original.toLocaleString("es-MX")}
+                    {formatPrecio(producto.precio_original)}
                   </span>
                 )}
-                <span className="text-sm text-gray-400 mb-0.5">MXN</span>
-                {descuento && (
+                {dscto !== null && (
                   <span
                     className="text-xs font-bold px-2.5 py-1 rounded-full text-white mb-0.5"
                     style={{ background: "#E53E3E" }}
                   >
-                    -{descuento}% OFF
+                    -{dscto}% OFF
                   </span>
                 )}
               </div>
@@ -165,40 +157,74 @@ export default async function ProductoDetallePage({ params }: Props) {
             </div>
 
             {/* Tags */}
-            <div className="flex flex-wrap gap-2">
-              {producto.tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="text-xs font-sans px-2.5 py-1 rounded-full"
-                  style={{ background: "#EBF7F2", color: "#3A8A6E" }}
-                >
-                  #{tag}
-                </span>
-              ))}
-            </div>
+            {producto.tags.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {producto.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="text-xs font-sans px-2.5 py-1 rounded-full"
+                    style={{ background: "#EBF7F2", color: "#3A8A6E" }}
+                  >
+                    #{tag}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </section>
 
-      {/* Incluye */}
-      {producto.incluye && producto.incluye.length > 0 && (
+      {/* Variantes */}
+      {producto.variantes.length > 0 && (
         <section className="py-10 px-4" style={{ background: "#F5F2EC" }}>
           <div className="max-w-4xl mx-auto">
             <h2 className="font-display font-bold text-xl mb-6" style={{ color: "#0D1A0F" }}>
-              ¿Qué incluye?
+              Variantes disponibles
             </h2>
             <div className="grid sm:grid-cols-2 gap-3">
-              {producto.incluye.map((item) => (
-                <div key={item} className="flex items-start gap-3 bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
-                  <div
-                    className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
-                    style={{ background: "#5CB996" }}
-                  >
-                    <Check className="w-3.5 h-3.5 text-white" />
-                  </div>
-                  <span className="font-sans text-sm text-gray-700">{item}</span>
+              {producto.variantes.map((v) => (
+                <div key={v.id} className="flex items-center justify-between bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
+                  <span className="font-sans text-sm text-gray-700">{v.nombre}</span>
+                  {v.precio_extra > 0 && (
+                    <span className="text-xs font-semibold" style={{ color: "#5CB996" }}>
+                      +{formatPrecio(v.precio_extra)}
+                    </span>
+                  )}
                 </div>
               ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Digital notice */}
+      {producto.digital && producto.archivo_url && (
+        <section className="py-8 px-4">
+          <div className="max-w-4xl mx-auto">
+            <div
+              className="flex items-start gap-4 p-5 rounded-2xl border"
+              style={{ background: "#EBF7F2", borderColor: "#5CB996" }}
+            >
+              <div
+                className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                style={{ background: "#5CB996" }}
+              >
+                <Check className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <p className="font-sans font-semibold text-sm" style={{ color: "#0D1A0F" }}>
+                  Producto digital — descarga inmediata
+                </p>
+                {producto.archivo_nombre && (
+                  <p className="font-sans text-xs text-gray-500 mt-1">
+                    Archivo: {producto.archivo_nombre}
+                    {producto.archivo_tamano && ` (${(producto.archivo_tamano / 1024 / 1024).toFixed(1)} MB)`}
+                  </p>
+                )}
+                <p className="font-sans text-xs text-gray-500 mt-0.5">
+                  Recibirás el enlace de descarga por correo y en tu cuenta.
+                </p>
+              </div>
             </div>
           </div>
         </section>

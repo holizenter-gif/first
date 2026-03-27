@@ -93,36 +93,9 @@ export type Servicio = {
 
 // ─── MARKETPLACE ────────────────────────────────────────────
 
+export type { Producto } from "@/lib/data/productos-helpers";
+import type { Producto } from "@/lib/data/productos-helpers";
 export type ProductoTipo = "curso_digital" | "material_fisico" | "merchandising" | "taller_grabado" | "membresia";
-
-export type Producto = {
-  id: string;
-  nombre: string;
-  slug: string;
-  descripcion: string;
-  descripcion_larga: string;
-  tipo: ProductoTipo;
-  precio: number;
-  precio_original?: number;
-  moneda: "MXN";
-  imagen_url: string;
-  imagenes_extra: string[];
-  activo: boolean;
-  destacado: boolean;
-  stock?: number;
-  requiere_envio: boolean;
-  peso_kg?: number;
-  archivo_url?: string;
-  duracion_horas?: number;
-  nivel?: "basico" | "intermedio" | "avanzado";
-  instructor?: string;
-  incluye: string[];
-  categoria_slug: string;
-  tags: string[];
-  stripe_price_id?: string;
-  mp_preference_id?: string;
-  created_at: string;
-};
 
 export type CategoriaTienda = {
   id: string;

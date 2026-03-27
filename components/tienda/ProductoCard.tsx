@@ -1,14 +1,14 @@
 import Link from "next/link";
-import { getLabelTipo, calcularDescuento } from "@/lib/data/productos-helpers";
+import { getLabelTipo, calcularDescuento, getPrecioEfectivo } from "@/lib/data/productos-helpers";
 import AgregarCarritoBtn from "./AgregarCarritoBtn";
 import type { Producto } from "@/lib/supabase/types";
 
-const TIPO_EMOJI: Record<string, string> = {
-  curso_digital:   "🎓",
-  material_fisico: "📚",
-  merchandising:   "🌿",
-  taller_grabado:  "🎥",
-  membresia:       "⭐",
+const CATEGORIA_EMOJI: Record<string, string> = {
+  cursos:            "🎓",
+  materiales:        "📄",
+  merchandising:     "🌿",
+  talleres_grabados: "🎥",
+  membresia:         "⭐",
 };
 
 interface ProductoCardProps {
@@ -16,7 +16,8 @@ interface ProductoCardProps {
 }
 
 export default function ProductoCard({ producto }: ProductoCardProps) {
-  const descuento = calcularDescuento(producto.precio, producto.precio_original);
+  const pEfectivo = getPrecioEfectivo(producto);
+  const descuento = calcularDescuento(pEfectivo, producto.precio_original ?? producto.precio);
 
   return (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col hover:shadow-md transition-shadow group">
@@ -26,7 +27,7 @@ export default function ProductoCard({ producto }: ProductoCardProps) {
           className="h-48 flex items-center justify-center text-5xl relative"
           style={{ background: "#EBF7F2" }}
         >
-          <span>{TIPO_EMOJI[producto.tipo] ?? "🛍️"}</span>
+          <span>{CATEGORIA_EMOJI[producto.categoria] ?? "🛍️"}</span>
           {descuento && (
             <span
               className="absolute top-3 right-3 text-white text-xs font-bold px-2.5 py-1 rounded-full"
@@ -49,7 +50,7 @@ export default function ProductoCard({ producto }: ProductoCardProps) {
       {/* Body */}
       <div className="p-5 flex flex-col flex-1">
         <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: "#5CB996" }}>
-          {getLabelTipo(producto.tipo)}
+          {getLabelTipo(producto.categoria)}
         </span>
 
         <Link href={`/tienda/${producto.slug}`}>
@@ -68,9 +69,9 @@ export default function ProductoCard({ producto }: ProductoCardProps) {
         <div className="mt-4 flex items-end justify-between gap-2">
           <div>
             <span className="font-display font-bold text-base" style={{ color: "#0D1A0F" }}>
-              ${producto.precio.toLocaleString("es-MX")}
+              ${pEfectivo.toLocaleString("es-MX")}
             </span>
-            {producto.precio_original && (
+            {descuento && producto.precio_original && (
               <span className="text-xs text-gray-400 line-through ml-1.5">
                 ${producto.precio_original.toLocaleString("es-MX")}
               </span>

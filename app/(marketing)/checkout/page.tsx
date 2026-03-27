@@ -88,7 +88,7 @@ export default function CheckoutPage() {
           items: items.map((i) => ({
             producto_id: i.producto.id,
             nombre:      i.producto.nombre,
-            tipo:        i.producto.tipo,
+            tipo:        i.producto.categoria,
             precio:      i.producto.precio,
             cantidad:    i.cantidad,
             imagen_url:  i.producto.imagen_url,
@@ -214,11 +214,11 @@ export default function CheckoutPage() {
                         className="w-10 h-10 rounded-lg flex items-center justify-center text-xl flex-shrink-0"
                         style={{ background: "#EBF7F2" }}
                       >
-                        {item.producto.tipo === "curso_digital" && "🎓"}
-                        {item.producto.tipo === "material_fisico" && "📚"}
-                        {item.producto.tipo === "merchandising" && "🌿"}
-                        {item.producto.tipo === "taller_grabado" && "🎥"}
-                        {item.producto.tipo === "membresia" && "⭐"}
+                        {item.producto.categoria === "cursos"            && "🎓"}
+                        {item.producto.categoria === "materiales"        && "📄"}
+                        {item.producto.categoria === "merchandising"     && "🌿"}
+                        {item.producto.categoria === "talleres_grabados" && "🎥"}
+                        {item.producto.categoria === "membresia"         && "⭐"}
                       </div>
                       <div>
                         <p className="font-sans text-sm font-medium" style={{ color: "#0D1A0F" }}>

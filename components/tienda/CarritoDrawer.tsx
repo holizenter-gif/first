@@ -90,11 +90,11 @@ export default function CarritoDrawer() {
                     className="w-16 h-16 rounded-xl flex items-center justify-center text-2xl flex-shrink-0"
                     style={{ background: "#EBF7F2" }}
                   >
-                    {item.producto.tipo === "curso_digital" && "🎓"}
-                    {item.producto.tipo === "material_fisico" && "📚"}
-                    {item.producto.tipo === "merchandising" && "🌿"}
-                    {item.producto.tipo === "taller_grabado" && "🎥"}
-                    {item.producto.tipo === "membresia" && "⭐"}
+                    {item.producto.categoria === "cursos"            && "🎓"}
+                    {item.producto.categoria === "materiales"        && "📄"}
+                    {item.producto.categoria === "merchandising"     && "🌿"}
+                    {item.producto.categoria === "talleres_grabados" && "🎥"}
+                    {item.producto.categoria === "membresia"         && "⭐"}
                   </div>
 
                   <div className="flex-1 min-w-0">

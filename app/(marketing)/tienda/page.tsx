@@ -14,14 +14,14 @@ export default function TiendaPage() {
   const productos = useMemo(() => {
     let lista = PRODUCTOS_MOCK.filter((p) => p.activo);
     if (categoriaActiva !== "todos") {
-      lista = lista.filter((p) => p.categoria_slug === categoriaActiva);
+      lista = lista.filter((p) => p.categoria === categoriaActiva);
     }
     if (busqueda.trim()) {
       const q = busqueda.toLowerCase();
       lista = lista.filter(
         (p) =>
           p.nombre.toLowerCase().includes(q) ||
-          p.descripcion.toLowerCase().includes(q) ||
+          (p.descripcion ?? "").toLowerCase().includes(q) ||
           p.tags.some((t) => t.toLowerCase().includes(q))
       );
     }
