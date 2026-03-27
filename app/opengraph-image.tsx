@@ -86,7 +86,7 @@ export default function OGImage() {
             borderRadius: "999px",
           }}
         >
-          Diagnóstico gratis → holizenter.mx
+          Diagnóstico gratis → holizenter.com
         </div>
       </div>
     ),

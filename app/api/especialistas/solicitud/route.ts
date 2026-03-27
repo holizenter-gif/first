@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
       const msgs: Record<string, string> = {
         pendiente: "Ya tienes una solicitud pendiente de revisión.",
         aprobado:  "Tu solicitud ya fue aprobada. Revisa tu email.",
-        rechazado: "Tu solicitud fue rechazada anteriormente. Escríbenos a hola@holizenter.mx.",
+        rechazado: "Tu solicitud fue rechazada anteriormente. Escríbenos a hola@holizenter.com.",
       };
       return NextResponse.json(
         { error: msgs[existe.status as string] ?? "Ya existe una solicitud." },
@@ -86,7 +86,7 @@ export async function POST(req: NextRequest) {
 
     // 5. Notificación al admin
     await sendEmail({
-      to: [{ email: "hola@holizenter.mx", name: "Holizenter Admin" }],
+      to: [{ email: "hola@holizenter.com", name: "Holizenter Admin" }],
       subject: `🧑‍⚕️ Nueva solicitud de especialista: ${nombre}`,
       htmlContent: `
         <div style="font-family:Inter,Arial,sans-serif;max-width:500px;margin:0 auto">
@@ -99,7 +99,7 @@ export async function POST(req: NextRequest) {
             <tr><td><b>WhatsApp:</b></td><td>${whatsapp ?? "—"}</td></tr>
           </table>
           <p style="margin-top:16px">
-            <a href="${process.env.NEXT_PUBLIC_APP_URL ?? "https://holizenter.mx"}/admin/especialistas"
+            <a href="${process.env.NEXT_PUBLIC_APP_URL ?? "https://holizenter.com"}/admin/especialistas"
                style="background:#5CB996;color:#fff;padding:10px 20px;border-radius:99px;text-decoration:none;font-weight:600">
               Revisar en el admin →
             </a>

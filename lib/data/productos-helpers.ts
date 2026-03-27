@@ -37,6 +37,7 @@ export interface Producto {
   max_descargas:        number;
   dias_acceso:          number;
   variantes:            Variante[];
+  imagen_alt:           string | null;
   meta_titulo:          string | null;
   meta_descripcion:     string | null;
   orden:                number;

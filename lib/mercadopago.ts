@@ -20,7 +20,7 @@ export interface CrearPreferenciaParams {
 }
 
 export async function crearPreferencia(params: CrearPreferenciaParams) {
-  const base = process.env.NEXT_PUBLIC_APP_URL ?? "https://holizenter.mx";
+  const base = process.env.NEXT_PUBLIC_APP_URL ?? "https://holizenter.com";
   const preference = new Preference(client);
 
   return preference.create({

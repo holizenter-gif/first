@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   openGraph: {
     title:       "Holizenter — Tu punto de encuentro para el bienestar real",
     description: "Físico, emocional y espiritual. Para personas y empresas. MBSR · Terapia holística · Bienestar organizacional.",
-    url:         process.env.NEXT_PUBLIC_APP_URL ?? "https://holizenter.mx",
+    url:         process.env.NEXT_PUBLIC_APP_URL ?? "https://holizenter.com",
     images:      [{ url: "/og-image.jpg", width: 1200, height: 630 }],
   },
 };

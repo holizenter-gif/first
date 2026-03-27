@@ -40,7 +40,7 @@ export default function TerminosPage() {
 
           <Section title="Aceptación de términos">
             <p>
-              Al acceder o usar la plataforma Holizenter (holizenter.mx), aceptas quedar vinculado
+              Al acceder o usar la plataforma Holizenter (holizenter.com), aceptas quedar vinculado
               a estos Términos y Condiciones. Si no estás de acuerdo, no uses nuestra plataforma.
             </p>
           </Section>
@@ -115,8 +115,8 @@ export default function TerminosPage() {
           <Section title="Contacto">
             <p>
               Para dudas sobre estos términos, escríbenos a{" "}
-              <a href="mailto:hola@holizenter.mx" style={{ color: "#5CB996" }}>
-                hola@holizenter.mx
+              <a href="mailto:hola@holizenter.com" style={{ color: "#5CB996" }}>
+                hola@holizenter.com
               </a>
               .
             </p>

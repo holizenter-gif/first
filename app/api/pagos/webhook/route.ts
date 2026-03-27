@@ -42,6 +42,10 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (nuevoStatus === "aprobado" && pago) {
+      if (pago.email_cliente) {
+        generarDescargas(supabase, pago.id, pago.email_cliente).catch(console.error);
+      }
+
       Promise.allSettled([
         pago.email_cliente && pago.nombre_cliente
           ? sendPagoConfirmacion({
@@ -69,4 +73,51 @@ export async function POST(req: NextRequest) {
 
 export async function GET() {
   return NextResponse.json({ status: "Webhook activo" });
+}
+
+async function generarDescargas(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  ordenId:  string,
+  email:    string
+) {
+  const { data: orden } = await supabase
+    .from("ordenes")
+    .select("productos")
+    .eq("id", ordenId)
+    .single();
+
+  if (!orden?.productos) return;
+
+  const items = orden.productos as { id: string; cantidad: number }[];
+
+  for (const item of items) {
+    const { data: producto } = await supabase
+      .from("productos")
+      .select("id, digital, archivo_url, max_descargas, dias_acceso")
+      .eq("id", item.id)
+      .single();
+
+    if (!producto?.digital || !producto?.archivo_url) continue;
+
+    const { data: existe } = await supabase
+      .from("descargas")
+      .select("id")
+      .eq("orden_id", ordenId)
+      .eq("producto_id", producto.id)
+      .single();
+
+    if (existe) continue;
+
+    const expiraEn = new Date();
+    expiraEn.setDate(expiraEn.getDate() + (producto.dias_acceso ?? 365));
+
+    await supabase.from("descargas").insert({
+      orden_id:            ordenId,
+      producto_id:         producto.id,
+      email,
+      max_descargas:       producto.max_descargas ?? 3,
+      descargas_realizadas: 0,
+      expira_en:           expiraEn.toISOString(),
+    });
+  }
 }

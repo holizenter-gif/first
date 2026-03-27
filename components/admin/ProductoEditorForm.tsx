@@ -2,6 +2,7 @@
 
 import { useState, useRef }  from "react";
 import { useRouter }          from "next/navigation";
+import ImagenUploader         from "@/components/admin/ImagenUploader";
 import {
   Loader2, Upload, X, Plus, Trash2,
   Package, FileDigit, Truck, Tag,
@@ -74,6 +75,8 @@ export default function ProductoEditorForm({ producto, modo }: ProductoEditorFor
   const [tags,           setTags]           = useState(producto?.tags?.join(", ")  ?? "");
   const [metaTitulo,     setMetaTitulo]     = useState(producto?.meta_titulo       ?? "");
   const [metaDesc,       setMetaDesc]       = useState(producto?.meta_descripcion  ?? "");
+  const [imagenUrl,      setImagenUrl]      = useState(producto?.imagen_url        ?? "");
+  const [imagenAlt,      setImagenAlt]      = useState((producto as { imagen_alt?: string })?.imagen_alt ?? "");
   const [loading,        setLoading]        = useState(false);
   const [error,          setError]          = useState("");
   const [seccionAbierta, setSeccionAbierta] = useState<string>("basico");
@@ -140,6 +143,8 @@ export default function ProductoEditorForm({ producto, modo }: ProductoEditorFor
         tags: tags.split(",").map((t) => t.trim()).filter(Boolean),
         meta_titulo:     metaTitulo || null,
         meta_descripcion: metaDesc || null,
+        imagen_url:      imagenUrl || null,
+        imagen_alt:      imagenAlt || (nombre || null),
       };
 
       const url    = modo === "crear" ? "/api/admin/productos" : `/api/admin/productos/${producto?.id}`;
@@ -230,6 +235,27 @@ export default function ProductoEditorForm({ producto, modo }: ProductoEditorFor
             <label className={labelClass}>Tags (separados por coma)</label>
             <input value={tags} onChange={(e) => setTags(e.target.value)} placeholder="mbsr, mindfulness, burnout" className={inputClass} />
           </div>
+          <ImagenUploader
+            value={imagenUrl}
+            onChange={setImagenUrl}
+            bucket="imagenes-productos"
+            label="Imagen principal del producto"
+            aspectRatio="cuadrado"
+          />
+          {imagenUrl && (
+            <div>
+              <label className={labelClass}>Alt text de la imagen (SEO)</label>
+              <input
+                value={imagenAlt}
+                onChange={(e) => setImagenAlt(e.target.value)}
+                placeholder={nombre || "Nombre del producto — Holizenter"}
+                className={inputClass}
+              />
+              <p className="text-gray-400 text-xs mt-1">
+                Si lo dejas vacío se usa el nombre del producto automáticamente.
+              </p>
+            </div>
+          )}
         </SeccionCard>
 
         <SeccionCard id="precio">

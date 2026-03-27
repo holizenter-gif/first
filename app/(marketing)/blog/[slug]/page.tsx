@@ -45,7 +45,7 @@ export default async function BlogPostPage({ params }: Props) {
     headline:      post.titulo,
     description:   post.descripcion,
     author: { "@type": "Person", name: post.autor },
-    publisher: { "@type": "Organization", name: "Holizenter", url: process.env.NEXT_PUBLIC_APP_URL ?? "https://holizenter.mx" },
+    publisher: { "@type": "Organization", name: "Holizenter", url: process.env.NEXT_PUBLIC_APP_URL ?? "https://holizenter.com" },
     datePublished: post.published_at ?? post.created_at,
     keywords:      post.tags.join(", "),
   };

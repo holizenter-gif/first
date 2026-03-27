@@ -90,8 +90,8 @@ export default function PrivacidadPage() {
             <p>
               Tienes derecho a Acceder, Rectificar, Cancelar u Oponerte al tratamiento de tus datos
               personales (derechos ARCO). Para ejercerlos, envía un correo a{" "}
-              <a href="mailto:privacidad@holizenter.mx" style={{ color: "#5CB996" }}>
-                privacidad@holizenter.mx
+              <a href="mailto:privacidad@holizenter.com" style={{ color: "#5CB996" }}>
+                privacidad@holizenter.com
               </a>{" "}
               con el asunto "Derechos ARCO" e indicando tu nombre completo y la solicitud específica.
               Responderemos en un plazo máximo de 20 días hábiles.
@@ -110,8 +110,8 @@ export default function PrivacidadPage() {
           <Section title="Contacto">
             <p>
               Para cualquier duda sobre el tratamiento de tus datos, escríbenos a{" "}
-              <a href="mailto:hola@holizenter.mx" style={{ color: "#5CB996" }}>
-                hola@holizenter.mx
+              <a href="mailto:hola@holizenter.com" style={{ color: "#5CB996" }}>
+                hola@holizenter.com
               </a>
               .
             </p>

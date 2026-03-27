@@ -2,8 +2,10 @@
 
 import { useState }    from "react";
 import { useRouter }   from "next/navigation";
-import { Loader2, Eye, Save, Globe, EyeOff } from "lucide-react";
+import { Loader2, Save, Globe } from "lucide-react";
 import type { BlogPost } from "@/lib/blog";
+import ImagenUploader  from "@/components/admin/ImagenUploader";
+import EditorContenido from "@/components/admin/EditorContenido";
 
 const CATEGORIAS = [
   { value: "articulo",   label: "Artículo"       },
@@ -43,9 +45,10 @@ export default function ArticuloEditor({ articulo, modo }: ArticuloEditorProps) 
   const [tiempo,      setTiempo]      = useState(articulo?.tiempo_lectura ?? "5 min");
   const [publicado,   setPublicado]   = useState(articulo?.publicado     ?? false);
   const [destacado,   setDestacado]   = useState(articulo?.destacado     ?? false);
+  const [imagenUrl,   setImagenUrl]   = useState((articulo as { imagen_url?: string })?.imagen_url ?? "");
+  const [imagenAlt,   setImagenAlt]   = useState((articulo as { imagen_alt?: string })?.imagen_alt ?? "");
   const [loading,     setLoading]     = useState(false);
   const [error,       setError]       = useState("");
-  const [preview,     setPreview]     = useState(false);
 
   const generarSlug = (texto: string) =>
     texto.toLowerCase()
@@ -75,6 +78,8 @@ export default function ArticuloEditor({ articulo, modo }: ArticuloEditorProps) 
         tiempo_lectura: tiempo,
         publicado: publicar !== undefined ? publicar : publicado,
         destacado,
+        imagen_url: imagenUrl || null,
+        imagen_alt: imagenAlt || null,
       };
 
       const url    = modo === "crear" ? "/api/admin/articulos" : `/api/admin/articulos/${articulo?.id}`;
@@ -104,6 +109,30 @@ export default function ArticuloEditor({ articulo, modo }: ArticuloEditorProps) 
       {/* Editor principal */}
       <div className="lg:col-span-2 space-y-5">
 
+        {/* Imagen de portada */}
+        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+          <ImagenUploader
+            value={imagenUrl}
+            onChange={setImagenUrl}
+            bucket="imagenes-blog"
+            label="Imagen de portada del artículo"
+            aspectRatio="banner"
+          />
+          {imagenUrl && (
+            <div className="mt-3">
+              <label className="text-xs text-gray-500 font-display mb-1.5 block">
+                Alt text de la imagen (para SEO y accesibilidad)
+              </label>
+              <input
+                value={imagenAlt}
+                onChange={(e) => setImagenAlt(e.target.value)}
+                placeholder="Describe la imagen para Google y lectores de pantalla"
+                className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-brand-teal"
+              />
+            </div>
+          )}
+        </div>
+
         {/* Título */}
         <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
           <label className="text-xs text-gray-500 font-display mb-1.5 block">Título *</label>
@@ -116,7 +145,7 @@ export default function ArticuloEditor({ articulo, modo }: ArticuloEditorProps) 
           <div className="mt-2">
             <label className="text-xs text-gray-400 font-display mb-1 block">Slug (URL)</label>
             <div className="flex items-center gap-2">
-              <span className="text-gray-400 text-xs whitespace-nowrap">holizenter.mx/blog/</span>
+              <span className="text-gray-400 text-xs whitespace-nowrap">holizenter.com/blog/</span>
               <input
                 value={slug}
                 onChange={(e) => setSlug(generarSlug(e.target.value))}
@@ -142,40 +171,9 @@ export default function ArticuloEditor({ articulo, modo }: ArticuloEditorProps) 
           <p className="text-xs text-gray-400 mt-1">{descripcion.length}/160 caracteres</p>
         </div>
 
-        {/* Contenido MDX */}
+        {/* Contenido */}
         <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-          <div className="flex items-center justify-between mb-3">
-            <label className="text-xs text-gray-500 font-display">
-              Contenido (soporta Markdown)
-            </label>
-            <button
-              onClick={() => setPreview(!preview)}
-              className="flex items-center gap-1.5 text-xs text-brand-teal font-display hover:underline"
-            >
-              {preview ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-              {preview ? "Editar" : "Vista previa"}
-            </button>
-          </div>
-
-          {preview ? (
-            <div className="prose prose-sm max-w-none min-h-[300px] p-3 border border-gray-100 rounded-lg bg-brand-beige">
-              <p className="text-gray-400 text-xs italic">
-                Vista previa disponible al guardar — edita el contenido en Markdown.
-              </p>
-              <pre className="text-xs text-gray-600 whitespace-pre-wrap">{contenido}</pre>
-            </div>
-          ) : (
-            <textarea
-              value={contenido}
-              onChange={(e) => setContenido(e.target.value)}
-              rows={16}
-              placeholder={`## Título de sección\n\nEscribe el cuerpo del artículo en Markdown.\n\n**Texto en negrita** e *italica*.\n\n- Lista de puntos\n- Otro punto`}
-              className="w-full text-sm font-mono border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-brand-teal resize-y"
-            />
-          )}
-          <p className="text-xs text-gray-400 mt-1">
-            Soporta Markdown: **negrita**, *cursiva*, ## títulos, - listas, [link](url)
-          </p>
+          <EditorContenido value={contenido} onChange={setContenido} />
         </div>
 
         {error && (

@@ -15,7 +15,7 @@ export async function sendEmail(params: SendEmailParams): Promise<void> {
     method: "POST",
     headers: { "Content-Type": "application/json", "api-key": process.env.BREVO_API_KEY },
     body: JSON.stringify({
-      sender: { email: process.env.BREVO_SENDER_EMAIL ?? "hola@holizenter.mx", name: process.env.BREVO_SENDER_NAME ?? "Holizenter" },
+      sender: { email: process.env.BREVO_SENDER_EMAIL ?? "hola@holizenter.com", name: process.env.BREVO_SENDER_NAME ?? "Holizenter" },
       ...params,
     }),
   });
@@ -30,7 +30,7 @@ export async function sendQuizReport(params: {
   const nivelColor: Record<string, string> = { critico: "#DC2626", riesgo: "#D97706", bajo: "#1B4332" };
   const color = nivelColor[params.nivel] ?? "#1B4332";
   const label = nivelLabel[params.nivel] ?? params.nivel;
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://holizenter.mx";
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://holizenter.com";
 
   const html = `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"></head>
 <body style="margin:0;padding:0;background:#F5F0E8;font-family:Inter,Arial,sans-serif">
@@ -96,7 +96,7 @@ export async function sendCitaConfirmacion(params: {
     day: "numeric", hour: "2-digit", minute: "2-digit",
   }).format(new Date(params.fecha));
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://holizenter.mx";
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://holizenter.com";
 
   const html = `
 <!DOCTYPE html>
@@ -171,7 +171,7 @@ export async function sendPagoConfirmacion(params: {
     style: "currency", currency: "MXN", minimumFractionDigits: 0,
   }).format(params.monto);
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://holizenter.mx";
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://holizenter.com";
 
   const html = `
 <!DOCTYPE html>

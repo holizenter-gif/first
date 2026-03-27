@@ -67,8 +67,8 @@ export default function ContactoPage() {
                     {
                       Icon:  Mail,
                       label: "Email",
-                      value: "hola@holizenter.mx",
-                      href:  "mailto:hola@holizenter.mx",
+                      value: "hola@holizenter.com",
+                      href:  "mailto:hola@holizenter.com",
                       color: "#5CB996",
                     },
                     {

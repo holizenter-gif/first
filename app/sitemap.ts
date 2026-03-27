@@ -2,7 +2,7 @@ import { MetadataRoute } from "next";
 import { createClient }  from "@/lib/supabase/server";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const base = process.env.NEXT_PUBLIC_APP_URL ?? "https://holizenter.mx";
+  const base = process.env.NEXT_PUBLIC_APP_URL ?? "https://holizenter.com";
   const now  = new Date();
 
   const staticRoutes: MetadataRoute.Sitemap = [
@@ -32,6 +32,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${base}/tienda/categoria/merchandising`,     lastModified: now, changeFrequency: "weekly", priority: 0.7 },
     { url: `${base}/tienda/categoria/talleres-grabados`, lastModified: now, changeFrequency: "weekly", priority: 0.7 },
     { url: `${base}/membresia`,                     lastModified: now, changeFrequency: "monthly", priority: 0.7 },
+    { url: `${base}/que-es-burnout`,                lastModified: now, changeFrequency: "monthly", priority: 0.8 },
+    { url: `${base}/que-es-nom-035`,                lastModified: now, changeFrequency: "monthly", priority: 0.8 },
   ];
 
   try {

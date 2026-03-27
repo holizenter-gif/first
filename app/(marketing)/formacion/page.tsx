@@ -92,7 +92,7 @@ const REQUISITOS = [
 ];
 
 const RED_BENEFICIOS = [
-  "Directorio de profesionales en holizenter.mx con perfil verificado",
+  "Directorio de profesionales en holizenter.com con perfil verificado",
   "Derivación de clientes que buscan tu especialidad",
   "Acceso a materiales y recursos clínicos continuamente actualizados",
   "Comunidad privada de práctica entre instructores y terapeutas",
@@ -368,8 +368,8 @@ export default function FormacionPage() {
             <FormularioInteresProfesional />
             <p className="text-xs text-center mt-4" style={{ color: "var(--hl-text-muted)" }}>
               También puedes escribirnos a{" "}
-              <a href="mailto:hola@holizenter.mx" style={{ color: "var(--hl-green)" }}>
-                hola@holizenter.mx
+              <a href="mailto:hola@holizenter.com" style={{ color: "var(--hl-green)" }}>
+                hola@holizenter.com
               </a>
             </p>
           </FadeInSection>

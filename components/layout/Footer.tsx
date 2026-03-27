@@ -70,7 +70,7 @@ export default function Footer() {
           <div>
             <h4 className="font-display font-semibold mb-5 text-white/60 uppercase text-xs tracking-widest">Contacto</h4>
             <ul className="space-y-3 text-sm text-white/50 mb-6">
-              <li><a href="mailto:hola@holizenter.mx" className="hover:text-brand-teal transition-colors">hola@holizenter.mx</a></li>
+              <li><a href="mailto:hola@holizenter.com" className="hover:text-brand-teal transition-colors">hola@holizenter.com</a></li>
               <li>Ciudad de México, México</li>
             </ul>
             <h4 className="font-display font-semibold mb-3 text-white/60 uppercase text-xs tracking-widest">Legal</h4>

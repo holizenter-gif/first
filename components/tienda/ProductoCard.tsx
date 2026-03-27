@@ -24,10 +24,19 @@ export default function ProductoCard({ producto }: ProductoCardProps) {
       {/* Imagen */}
       <Link href={`/tienda/${producto.slug}`}>
         <div
-          className="h-48 flex items-center justify-center text-5xl relative"
+          className="h-48 flex items-center justify-center text-5xl relative overflow-hidden"
           style={{ background: "#EBF7F2" }}
         >
-          <span>{CATEGORIA_EMOJI[producto.categoria] ?? "🛍️"}</span>
+          {producto.imagen_url ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={producto.imagen_url}
+              alt={producto.imagen_alt ?? producto.nombre}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <span>{CATEGORIA_EMOJI[producto.categoria] ?? "🛍️"}</span>
+          )}
           {descuento && (
             <span
               className="absolute top-3 right-3 text-white text-xs font-bold px-2.5 py-1 rounded-full"

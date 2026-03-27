@@ -33,7 +33,7 @@ const dmSerif = DM_Serif_Display({
   style:    ["normal", "italic"],
 });
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://holizenter.mx";
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://holizenter.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(APP_URL),
@@ -62,13 +62,57 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image" },
 };
 
+const orgSchema = {
+  "@context": "https://schema.org",
+  "@type": ["Organization", "LocalBusiness", "HealthAndBeautyBusiness"],
+  "@id": "https://holizenter.com/#organization",
+  name: "Holizenter",
+  alternateName: "Holizenter — El Poder de tu Bienestar",
+  url: "https://holizenter.com",
+  logo: {
+    "@type": "ImageObject",
+    url: "https://holizenter.com/brand/imagotipo-color.png",
+  },
+  description:
+    "Hub de bienestar holístico para personas y empresas en México. Programa MBSR certificado por Brown University, diagnóstico laboral gratuito, talleres corporativos y directorio de especialistas.",
+  foundingDate: "2023",
+  address: {
+    "@type": "PostalAddress",
+    addressLocality: "Ciudad de México",
+    addressRegion: "CDMX",
+    addressCountry: "MX",
+  },
+  contactPoint: {
+    "@type": "ContactPoint",
+    contactType: "customer support",
+    email: "hola@holizenter.com",
+    availableLanguage: "Spanish",
+  },
+  hasOfferCatalog: {
+    "@type": "OfferCatalog",
+    name: "Servicios de bienestar Holizenter",
+    itemListElement: [
+      { "@type": "Offer", itemOffered: { "@type": "Service", name: "Diagnóstico de Bienestar Laboral Gratuito" } },
+      { "@type": "Offer", itemOffered: { "@type": "Service", name: "Talleres de Bienestar Corporativo" } },
+      { "@type": "Offer", itemOffered: { "@type": "Service", name: "Programa MBSR 8 Semanas" } },
+      { "@type": "Offer", itemOffered: { "@type": "Service", name: "Sensibilización Alta Dirección" } },
+    ],
+  },
+};
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html
       lang="es"
       className={`${inter.variable} ${playfair.variable} ${montserrat.variable} ${dmSerif.variable}`}
     >
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema) }}
+        />
+        {children}
+      </body>
     </html>
   );
 }
