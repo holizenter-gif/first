@@ -9,6 +9,8 @@ import LeadCaptureForm from "./LeadCaptureForm";
 import QuizAnalyzing   from "./QuizAnalyzing";
 import QuizResult      from "./QuizResult";
 import AbandonPopup    from "./AbandonPopup";
+import { registerLead }  from "@/lib/quiz-cookie";
+import { analytics }     from "@/lib/analytics";
 
 type QuizState = "welcome" | "question" | "capture" | "analyzing" | "result";
 
@@ -50,7 +52,10 @@ export default function QuizEngineSatisfaccion() {
     return () => { document.removeEventListener("mouseleave", fn); clearTimeout(timer); };
   }, [estado, indicePregunta]);
 
-  const handleStart = () => setEstado("question");
+  const handleStart = () => {
+    analytics.quizStart("satisfaccion");
+    setEstado("question");
+  };
   const handleBack  = () => { if (indicePregunta > 0) setIndice((i) => i - 1); };
 
   const handleAnswer = useCallback((value: number) => {
@@ -62,12 +67,15 @@ export default function QuizEngineSatisfaccion() {
     } else {
       const resultado = getScoreResultSatisfaccion(nr);
       setResultado(resultado);
+      analytics.quizComplete("satisfaccion", resultado.puntaje, resultado.nivel);
       setEstado("capture");
     }
   }, [respuestas, preguntaActual, indicePregunta, totalPregs]);
 
   const handleLeadSubmit = async (data: LeadFormData) => {
     setLeadData(data);
+    const isNewLead = registerLead(data.email);
+    analytics.leadSubmit("satisfaccion", isNewLead);
     setEstado("analyzing");
     setSubmitting(true);
 

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link             from "next/link";
 import { CheckCircle, AlertCircle, ArrowRight } from "lucide-react";
+import QuizCTA from "@/components/quiz/QuizCTA";
 
 export const metadata: Metadata = {
   title: "NOM-035 STPS — Cumplimiento para empresas en México | Holizenter",
@@ -154,6 +155,11 @@ export default function Nom035Page() {
           </div>
         </div>
       </section>
+
+      {/* Quiz CTA */}
+      <div className="max-w-3xl mx-auto px-4 py-10">
+        <QuizCTA quiz_id_override="clima" variant="banner" source_section="nom035_bottom" />
+      </div>
 
     </div>
   );

@@ -6,6 +6,7 @@ import { MapPin, Clock, CheckCircle, ArrowLeft, Building2 } from "lucide-react";
 import { getProfesionalBySlug } from "@/lib/data/profesionales-helpers";
 import { getModalidadLabel, formatPrecioSesion } from "@/lib/data/profesionales-utils";
 import CalEmbed from "@/components/cal/CalEmbed";
+import { createClient } from "@/lib/supabase/server";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -25,6 +26,11 @@ export default async function ProfesionalPage({ params }: Props) {
   const { slug } = await params;
   const p = await getProfesionalBySlug(slug);
   if (!p) notFound();
+
+  // Increment profile view count (fire-and-forget)
+  createClient().then((supabase) => {
+    supabase.rpc("incrementar_vistas_profesional", { profesional_id: p.id }).catch(() => {});
+  });
 
   const calUsername = process.env.NEXT_PUBLIC_CAL_USERNAME ?? "holizenter";
   const calSlug     = p.cal_username ?? (process.env.NEXT_PUBLIC_CAL_EVENT_DIAGNOSTICO ?? "diagnostico");

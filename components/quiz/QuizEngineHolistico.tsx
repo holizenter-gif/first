@@ -10,6 +10,8 @@ import QuizAnalyzing   from "./QuizAnalyzing";
 import QuizResult      from "./QuizResult";
 import AbandonPopup    from "./AbandonPopup";
 import type { PreguntaQuiz } from "@/lib/data/preguntas-burnout";
+import { registerLead }  from "@/lib/quiz-cookie";
+import { analytics }     from "@/lib/analytics";
 
 type QuizState = "welcome" | "question" | "capture" | "analyzing" | "result";
 
@@ -51,7 +53,10 @@ export default function QuizEngineHolistico() {
     return () => { document.removeEventListener("mouseleave", fn); clearTimeout(timer); };
   }, [estado, indicePregunta]);
 
-  const handleStart = () => setEstado("question");
+  const handleStart = () => {
+    analytics.quizStart("holistico");
+    setEstado("question");
+  };
   const handleBack  = () => { if (indicePregunta > 0) setIndice((i) => i - 1); };
 
   const handleAnswer = useCallback((value: number) => {
@@ -63,12 +68,15 @@ export default function QuizEngineHolistico() {
     } else {
       const resultado = getScoreResultHolistico(nr);
       setResultado(resultado);
+      analytics.quizComplete("holistico", resultado.puntaje, resultado.nivel);
       setEstado("capture");
     }
   }, [respuestas, preguntaActual, indicePregunta, totalPregs]);
 
   const handleLeadSubmit = async (data: LeadFormData) => {
     setLeadData(data);
+    const isNewLead = registerLead(data.email);
+    analytics.leadSubmit("holistico", isNewLead);
     setEstado("analyzing");
     setSubmitting(true);
 

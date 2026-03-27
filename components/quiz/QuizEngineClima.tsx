@@ -10,6 +10,8 @@ import QuizAnalyzing   from "./QuizAnalyzing";
 import QuizResult      from "./QuizResult";
 import AbandonPopup    from "./AbandonPopup";
 import type { PreguntaQuiz } from "@/lib/data/preguntas-burnout";
+import { registerLead }  from "@/lib/quiz-cookie";
+import { analytics }     from "@/lib/analytics";
 
 type QuizState = "welcome" | "question" | "capture" | "analyzing" | "result";
 
@@ -52,7 +54,10 @@ export default function QuizEngineClima() {
     return () => { document.removeEventListener("mouseleave", fn); clearTimeout(timer); };
   }, [estado, indicePregunta]);
 
-  const handleStart = () => setEstado("question");
+  const handleStart = () => {
+    analytics.quizStart("clima");
+    setEstado("question");
+  };
   const handleBack  = () => { if (indicePregunta > 0) setIndice((i) => i - 1); };
 
   const handleAnswer = useCallback((value: number) => {
@@ -64,12 +69,15 @@ export default function QuizEngineClima() {
     } else {
       const resultado = getScoreResultClima(nr);
       setResultado(resultado);
+      analytics.quizComplete("clima", resultado.puntaje, resultado.nivel);
       setEstado("capture");
     }
   }, [respuestas, preguntaActual, indicePregunta, totalPregs]);
 
   const handleLeadSubmit = async (data: LeadFormData) => {
     setLeadData(data);
+    const isNewLead = registerLead(data.email);
+    analytics.leadSubmit("clima", isNewLead);
     setEstado("analyzing");
     setSubmitting(true);
 

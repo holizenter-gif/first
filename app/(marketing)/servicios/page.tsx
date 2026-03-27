@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, Clock, Users } from "lucide-react";
 import { SERVICIOS, formatPrecio } from "@/lib/data/servicios";
+import QuizCTA from "@/components/quiz/QuizCTA";
 
 export const metadata = {
   title: "Servicios de Bienestar Corporativo | Holizenter",
@@ -112,6 +113,11 @@ export default function ServiciosPage() {
           </div>
         </div>
       </section>
+
+      {/* Quiz CTA */}
+      <div className="max-w-3xl mx-auto px-4 py-10">
+        <QuizCTA quiz_id_override="burnout" variant="banner" source_section="servicios_bottom" />
+      </div>
     </div>
   );
 }

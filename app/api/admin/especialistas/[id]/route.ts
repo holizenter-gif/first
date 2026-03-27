@@ -91,7 +91,7 @@ export async function POST(req: NextRequest, { params }: Ctx) {
               ha sido <strong style="color:#5CB996">aprobada</strong>.
             </p>
             <div style="text-align:center;margin:20px 0">
-              <a href="https://holizenter.mx/portal/login"
+              <a href="${process.env.NEXT_PUBLIC_APP_URL ?? "https://holizenter.mx"}/portal/login"
                  style="background:#5CB996;color:#fff;padding:12px 28px;border-radius:99px;text-decoration:none;font-weight:700;font-size:14px">
                 Entrar a mi portal →
               </a>

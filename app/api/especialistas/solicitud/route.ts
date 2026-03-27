@@ -99,7 +99,7 @@ export async function POST(req: NextRequest) {
             <tr><td><b>WhatsApp:</b></td><td>${whatsapp ?? "—"}</td></tr>
           </table>
           <p style="margin-top:16px">
-            <a href="https://holizenter.mx/admin/especialistas"
+            <a href="${process.env.NEXT_PUBLIC_APP_URL ?? "https://holizenter.mx"}/admin/especialistas"
                style="background:#5CB996;color:#fff;padding:10px 20px;border-radius:99px;text-decoration:none;font-weight:600">
               Revisar en el admin →
             </a>

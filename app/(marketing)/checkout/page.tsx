@@ -57,6 +57,7 @@ export default function CheckoutPage() {
   const [errors, setErrors] = useState<Partial<DatosComprador>>({});
   const [loading, setLoading] = useState(false);
   const [preferenceUrl, setPreferenceUrl] = useState<string | null>(null);
+  const [errorPago, setErrorPago] = useState<string | null>(null);
 
   const costoEnvio = tieneProductosFisicos() ? 150 : 0;
   const total = subtotal() + costoEnvio;
@@ -80,6 +81,7 @@ export default function CheckoutPage() {
   // ── Paso 3: crear preferencia MP ─────────────────────────
   const crearPreferencia = async () => {
     setLoading(true);
+    setErrorPago(null);
     try {
       const res = await fetch("/api/tienda/orden/crear", {
         method: "POST",
@@ -103,14 +105,14 @@ export default function CheckoutPage() {
       });
       const json = await res.json();
       if (json.init_point) {
+        setPreferenceUrl(json.init_point);
         vaciarCarrito();
         window.location.href = json.init_point;
       } else {
-        setPreferenceUrl(null);
-        alert("Error al crear la preferencia de pago. Intenta de nuevo.");
+        setErrorPago("No se pudo generar el pago. Intenta de nuevo o contáctanos.");
       }
     } catch {
-      alert("Error de conexión. Por favor intenta de nuevo.");
+      setErrorPago("Error de conexión. Por favor intenta de nuevo.");
     } finally {
       setLoading(false);
     }
@@ -284,7 +286,27 @@ export default function CheckoutPage() {
         {/* ── PASO 3: Procesando ────────────────────────── */}
         {paso === 3 && (
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-10 text-center">
-            {loading ? (
+            {errorPago ? (
+              <>
+                <div
+                  className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
+                  style={{ background: "#FEF2F2" }}
+                >
+                  <span style={{ fontSize: "2rem" }}>⚠️</span>
+                </div>
+                <h2 className="font-display font-bold text-xl mb-2" style={{ color: "#0D1A0F" }}>
+                  Hubo un problema
+                </h2>
+                <p className="font-sans text-sm text-gray-500 mb-6">{errorPago}</p>
+                <button
+                  onClick={() => { setPaso(2); setErrorPago(null); }}
+                  className="px-6 py-3 rounded-full font-display font-semibold text-white text-sm"
+                  style={{ background: "#5CB996" }}
+                >
+                  Intentar de nuevo
+                </button>
+              </>
+            ) : loading ? (
               <>
                 <Loader2 className="w-10 h-10 animate-spin mx-auto mb-4" style={{ color: "#5CB996" }} />
                 <h2 className="font-display font-bold text-xl mb-2" style={{ color: "#0D1A0F" }}>
@@ -307,10 +329,13 @@ export default function CheckoutPage() {
                 </h2>
                 <p className="font-sans text-sm text-gray-500">
                   Si no eres redirigido automáticamente,{" "}
-                  <a href="#" className="underline" style={{ color: "#5CB996" }}>
-                    haz clic aquí
-                  </a>
-                  .
+                  {preferenceUrl ? (
+                    <a href={preferenceUrl} className="underline" style={{ color: "#5CB996" }}>
+                      haz clic aquí
+                    </a>
+                  ) : (
+                    <span>escríbenos por WhatsApp.</span>
+                  )}
                 </p>
               </>
             )}

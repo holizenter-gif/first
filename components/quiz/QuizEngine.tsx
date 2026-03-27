@@ -9,6 +9,8 @@ import LeadCaptureForm from "./LeadCaptureForm";
 import QuizAnalyzing   from "./QuizAnalyzing";
 import QuizResult      from "./QuizResult";
 import AbandonPopup    from "./AbandonPopup";
+import { registerLead }  from "@/lib/quiz-cookie";
+import { analytics }     from "@/lib/analytics";
 
 export type QuizState = "welcome" | "question" | "capture" | "analyzing" | "result";
 
@@ -60,7 +62,10 @@ export default function QuizEngine() {
     return () => { document.removeEventListener("mouseleave", fn); clearTimeout(timer); };
   }, [estado, indicePregunta]);
 
-  const handleStart = () => setEstado("question");
+  const handleStart = () => {
+    analytics.quizStart("burnout");
+    setEstado("question");
+  };
   const handleBack  = () => { if (indicePregunta > 0) setIndice((i) => i - 1); };
 
   const handleAnswer = useCallback((value: number) => {
@@ -73,12 +78,15 @@ export default function QuizEngine() {
       // Última pregunta — calcular resultado y mostrar capture con preview borrosa
       const resultado = getScoreResult(nr);
       setResultadoFinal(resultado);
+      analytics.quizComplete("burnout", resultado.puntaje, resultado.nivel);
       setEstado("capture");
     }
   }, [respuestas, preguntaActual, indicePregunta, totalPregs]);
 
   const handleLeadSubmit = async (data: LeadFormData) => {
     setLeadData(data);
+    const isNewLead = registerLead(data.email);
+    analytics.leadSubmit("burnout", isNewLead);
     setEstado("analyzing");
     setSubmitting(true);
 

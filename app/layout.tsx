@@ -33,8 +33,10 @@ const dmSerif = DM_Serif_Display({
   style:    ["normal", "italic"],
 });
 
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://holizenter.mx";
+
 export const metadata: Metadata = {
-  metadataBase: new URL("https://holizenter.mx"),
+  metadataBase: new URL(APP_URL),
   title: {
     default: "Holizenter — El Poder de tu Bienestar | Bienestar Holístico para Empresas",
     template: "%s | Holizenter",
@@ -47,12 +49,15 @@ export const metadata: Metadata = {
     "talleres bienestar corporativo CDMX",
     "NOM-035 programa bienestar",
   ],
+  alternates: {
+    canonical: APP_URL,
+  },
   openGraph: {
     type: "website",
     locale: "es_MX",
-    url: "https://holizenter.mx",
+    url: APP_URL,
     siteName: "Holizenter",
-    images: [{ url: "/og-image.jpg", width: 1200, height: 630 }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630 }],
   },
   twitter: { card: "summary_large_image" },
 };

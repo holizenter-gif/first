@@ -69,6 +69,7 @@ export default function Navbar() {
             { label: "Directorio", href: "/directorio" },
             { label: "Blog",       href: "/blog"       },
             { label: "Nosotros",   href: "/nosotros"   },
+            { label: "NOM-035",    href: "/nom-035"    },
           ].map((item) => (
             <li key={item.href}>
               <Link href={item.href} className={`font-display transition-colors ${solid ? "text-gray-700 hover:text-brand-teal" : "text-white/90 hover:text-white"}`}>
@@ -80,12 +81,6 @@ export default function Navbar() {
 
         {/* Desktop CTA */}
         <div className="hidden md:flex items-center gap-3">
-          <Link
-            href="/contacto"
-            className={`text-sm font-display font-medium transition-colors ${solid ? "text-gray-600 hover:text-brand-teal" : "text-white/80 hover:text-white"}`}
-          >
-            Contacto
-          </Link>
           <BotonCarrito solid={solid} />
           <Link
             href="/agendar"
@@ -132,7 +127,10 @@ export default function Navbar() {
                   ))}
                 </div>
               </nav>
-              <div className="p-6 border-t border-gray-100">
+              <div className="p-6 border-t border-gray-100 space-y-3">
+                <div className="flex justify-center">
+                  <BotonCarrito solid />
+                </div>
                 <Link href="/agendar"
                   className="block w-full text-center py-3 bg-brand-teal text-white font-display font-semibold rounded-full hover:bg-brand-teal-dark transition-colors"
                   onClick={() => setMobileOpen(false)}

@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+Disallow: /admin/
+Disallow: /portal/
+Disallow: /api/
+Disallow: /checkout/
+
+Sitemap: https://holizenter.mx/sitemap.xml
