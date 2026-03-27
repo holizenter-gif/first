@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Check } from "lucide-react";
+import { getProductoBySlug } from "@/lib/data/productos-server";
 import {
-  getProductoBySlug,
   getLabelTipo,
   getPrecioEfectivo,
   descuentoPct,
