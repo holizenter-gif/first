@@ -25,10 +25,13 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   const rol = user?.user_metadata?.rol as string | undefined;
 
-  // ── Proteger /admin — solo rol admin ──────────────
+  // ── Proteger /admin — cualquier usuario autenticado excepto especialistas ──
   if (pathname.startsWith("/admin")) {
     if (!user) return NextResponse.redirect(new URL("/auth", request.url));
-    if (rol !== "admin") return NextResponse.redirect(new URL("/portal", request.url));
+    // Especialistas tienen su propio portal, no acceso al admin
+    if (rol === "especialista" || rol === "especialista_pendiente") {
+      return NextResponse.redirect(new URL("/portal", request.url));
+    }
     return response;
   }
 
@@ -39,8 +42,8 @@ export async function middleware(request: NextRequest) {
     pathname !== "/portal/reset-password"
   ) {
     if (!user) return NextResponse.redirect(new URL("/portal/login", request.url));
-    if (rol === "admin") return NextResponse.redirect(new URL("/admin", request.url));
-    if (rol !== "especialista") return NextResponse.redirect(new URL("/portal/login", request.url));
+    // Admins y usuarios sin rol van al admin, no al portal
+    if (rol !== "especialista") return NextResponse.redirect(new URL("/admin", request.url));
     return response;
   }
 
