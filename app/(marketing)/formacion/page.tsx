@@ -4,8 +4,9 @@ import {
   ArrowRight, GraduationCap, Users,
   BookOpen, CheckCircle, Star,
 } from "lucide-react";
-import FadeInSection from "@/components/landing/FadeInSection";
-import SectionLabel  from "@/components/landing/SectionLabel";
+import FadeInSection                   from "@/components/landing/FadeInSection";
+import SectionLabel                    from "@/components/landing/SectionLabel";
+import FormularioInteresProfesional    from "@/components/landing/FormularioInteresProfesional";
 
 export const metadata: Metadata = {
   title: "Formación para Profesionales del Bienestar | Holizenter",
@@ -346,40 +347,31 @@ export default function FormacionPage() {
 
       {/* ── CTA FINAL ─────────────────────────── */}
       <section id="unirse" className="py-20 px-4" style={{ background: "var(--hl-beige)" }}>
-        <div className="max-w-2xl mx-auto text-center">
+        <div className="max-w-2xl mx-auto">
           <FadeInSection>
-            <SectionLabel text="Próximo paso" className="justify-center" />
-            <h2
-              className="font-sans font-bold mb-3"
-              style={{ fontSize: "clamp(24px,3.5vw,38px)", color: "var(--hl-text)", letterSpacing: "-0.02em" }}
-            >
-              ¿Te interesa algún programa?
-            </h2>
-            <p
-              className="font-sans mb-8"
-              style={{ fontSize: "15px", color: "var(--hl-text-muted)" }}
-            >
-              Déjanos tus datos y nos ponemos en contacto para contarte
-              los detalles del programa que más se adapta a tu perfil.
-            </p>
-            <div
-              className="rounded-2xl p-6 shadow-sm border"
-              style={{ background: "#fff", borderColor: "var(--hl-divider)" }}
-            >
-              <p className="text-sm text-gray-500 text-center mb-4">
-                Rellena el formulario y te contactamos en menos de 48 horas.
-              </p>
-              <Link
-                href="/contacto?origen=formacion"
-                className="w-full flex items-center justify-center gap-2 font-sans font-semibold px-6 py-4 rounded-full transition-all hover:scale-[1.02]"
-                style={{ background: "var(--hl-green)", color: "#fff", fontSize: "15px" }}
+            <div className="text-center mb-8">
+              <SectionLabel text="Únete al directorio" className="justify-center" />
+              <h2
+                className="font-sans font-bold mb-3"
+                style={{ fontSize: "clamp(24px,3.5vw,38px)", color: "var(--hl-text)", letterSpacing: "-0.02em" }}
               >
-                Ir al formulario de contacto <ArrowRight className="w-5 h-5" />
-              </Link>
-              <p className="text-xs text-center mt-3" style={{ color: "var(--hl-text-muted)" }}>
-                También puedes escribirnos directamente a hola@holizenter.mx
+                Forma parte del{" "}
+                <em className="font-dm-serif italic font-normal" style={{ color: "var(--hl-green)" }}>
+                  equipo Holizenter
+                </em>
+              </h2>
+              <p className="font-sans" style={{ fontSize: "15px", color: "var(--hl-text-muted)" }}>
+                Completa el formulario para solicitar tu ingreso al directorio de especialistas.
+                Recibirás respuesta en 3-5 días hábiles.
               </p>
             </div>
+            <FormularioInteresProfesional />
+            <p className="text-xs text-center mt-4" style={{ color: "var(--hl-text-muted)" }}>
+              También puedes escribirnos a{" "}
+              <a href="mailto:hola@holizenter.mx" style={{ color: "var(--hl-green)" }}>
+                hola@holizenter.mx
+              </a>
+            </p>
           </FadeInSection>
         </div>
       </section>

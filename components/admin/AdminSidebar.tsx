@@ -2,20 +2,42 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LayoutDashboard, Calendar, CreditCard, Users, LogOut, Menu, X } from "lucide-react";
+import {
+  LayoutDashboard, Calendar, CreditCard, Users,
+  LogOut, Menu, X, ShoppingBag, FileText,
+  UserCheck,
+} from "lucide-react";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
-const NAV = [
-  { href: "/admin",             label: "Dashboard",   Icon: LayoutDashboard },
-  { href: "/admin/citas",       label: "Citas",        Icon: Calendar },
-  { href: "/admin/pagos",       label: "Pagos",        Icon: CreditCard },
-  { href: "/admin/directorio",  label: "Directorio",   Icon: Users },
+const NAV_GROUPS = [
+  {
+    label: "Principal",
+    items: [
+      { href: "/admin",            label: "Dashboard",    Icon: LayoutDashboard },
+      { href: "/admin/citas",      label: "Citas",        Icon: Calendar        },
+      { href: "/admin/pagos",      label: "Pagos",        Icon: CreditCard      },
+    ],
+  },
+  {
+    label: "Directorio",
+    items: [
+      { href: "/admin/directorio",    label: "Especialistas",  Icon: Users      },
+      { href: "/admin/especialistas", label: "Solicitudes",    Icon: UserCheck  },
+    ],
+  },
+  {
+    label: "Contenido",
+    items: [
+      { href: "/admin/blog",   label: "Blog",   Icon: FileText    },
+      { href: "/admin/tienda", label: "Tienda", Icon: ShoppingBag },
+    ],
+  },
 ];
 
 export default function AdminSidebar() {
   const pathname = usePathname();
-  const router = useRouter();
+  const router   = useRouter();
   const [open, setOpen] = useState(false);
 
   async function handleLogout() {
@@ -23,6 +45,9 @@ export default function AdminSidebar() {
     await supabase.auth.signOut();
     router.replace("/auth");
   }
+
+  const isActive = (href: string) =>
+    href === "/admin" ? pathname === "/admin" : pathname.startsWith(href);
 
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
@@ -35,27 +60,39 @@ export default function AdminSidebar() {
         </p>
       </div>
 
-      <nav className="flex-1 px-3 py-4 space-y-1">
-        {NAV.map(({ href, label, Icon }) => {
-          const active = pathname === href;
-          return (
-            <Link
-              key={href}
-              href={href}
-              onClick={() => setOpen(false)}
-              className="flex items-center gap-3 px-3 py-2.5 font-sans font-medium transition-colors"
-              style={{
-                fontSize: "14px",
-                borderRadius: "6px",
-                color: active ? "#fff" : "var(--hl-text)",
-                background: active ? "var(--hl-green)" : "transparent",
-              }}
+      <nav className="flex-1 px-3 py-4 space-y-5 overflow-y-auto">
+        {NAV_GROUPS.map((group) => (
+          <div key={group.label}>
+            <p
+              className="px-3 mb-1 text-xs font-sans font-semibold uppercase tracking-wider"
+              style={{ color: "var(--hl-text-muted)" }}
             >
-              <Icon size={16} strokeWidth={1.8} />
-              {label}
-            </Link>
-          );
-        })}
+              {group.label}
+            </p>
+            <div className="space-y-0.5">
+              {group.items.map(({ href, label, Icon }) => {
+                const active = isActive(href);
+                return (
+                  <Link
+                    key={href}
+                    href={href}
+                    onClick={() => setOpen(false)}
+                    className="flex items-center gap-3 px-3 py-2.5 font-sans font-medium transition-colors"
+                    style={{
+                      fontSize:   "14px",
+                      borderRadius: "6px",
+                      color:      active ? "#fff" : "var(--hl-text)",
+                      background: active ? "var(--hl-green)" : "transparent",
+                    }}
+                  >
+                    <Icon size={16} strokeWidth={1.8} />
+                    {label}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        ))}
       </nav>
 
       <div className="px-3 py-4 border-t" style={{ borderColor: "var(--hl-divider)" }}>
@@ -77,8 +114,8 @@ export default function AdminSidebar() {
       <aside
         className="hidden md:flex flex-col w-52 min-h-screen sticky top-0"
         style={{
-          background: "#fff",
-          borderRight: "1px solid var(--hl-divider)",
+          background:   "#fff",
+          borderRight:  "1px solid var(--hl-divider)",
         }}
       >
         <SidebarContent />
@@ -88,7 +125,7 @@ export default function AdminSidebar() {
       <div
         className="md:hidden flex items-center justify-between px-4 py-3 sticky top-0 z-40"
         style={{
-          background: "#fff",
+          background:   "#fff",
           borderBottom: "1px solid var(--hl-divider)",
         }}
       >

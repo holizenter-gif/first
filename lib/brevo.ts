@@ -6,7 +6,7 @@ interface SendEmailParams {
   htmlContent: string;
 }
 
-async function sendEmail(params: SendEmailParams): Promise<void> {
+export async function sendEmail(params: SendEmailParams): Promise<void> {
   if (!process.env.BREVO_API_KEY) {
     console.log("📧 [BREVO MOCK] falta BREVO_API_KEY — destinatario:", params.to[0].email);
     return;
