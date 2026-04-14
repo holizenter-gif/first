@@ -38,6 +38,7 @@ export interface Producto {
   dias_acceso:          number;
   variantes:            Variante[];
   imagen_alt:           string | null;
+  imagenes_galeria:     string[];
   meta_titulo:          string | null;
   meta_descripcion:     string | null;
   orden:                number;

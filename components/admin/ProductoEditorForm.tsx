@@ -2,6 +2,7 @@
 
 import { useState, useRef }  from "react";
 import { useRouter }          from "next/navigation";
+import Image                  from "next/image";
 import ImagenUploader         from "@/components/admin/ImagenUploader";
 import {
   Loader2, Upload, X, Plus, Trash2,
@@ -77,6 +78,7 @@ export default function ProductoEditorForm({ producto, modo }: ProductoEditorFor
   const [metaDesc,       setMetaDesc]       = useState(producto?.meta_descripcion  ?? "");
   const [imagenUrl,      setImagenUrl]      = useState(producto?.imagen_url        ?? "");
   const [imagenAlt,      setImagenAlt]      = useState((producto as { imagen_alt?: string })?.imagen_alt ?? "");
+  const [galeria,        setGaleria]        = useState<string[]>(producto?.imagenes_galeria ?? []);
   const [loading,        setLoading]        = useState(false);
   const [error,          setError]          = useState("");
   const [seccionAbierta, setSeccionAbierta] = useState<string>("basico");
@@ -145,6 +147,7 @@ export default function ProductoEditorForm({ producto, modo }: ProductoEditorFor
         meta_descripcion: metaDesc || null,
         imagen_url:      imagenUrl || null,
         imagen_alt:      imagenAlt || (nombre || null),
+        imagenes_galeria: galeria,
       };
 
       const url    = modo === "crear" ? "/api/admin/productos" : `/api/admin/productos/${producto?.id}`;
@@ -256,6 +259,35 @@ export default function ProductoEditorForm({ producto, modo }: ProductoEditorFor
               </p>
             </div>
           )}
+
+          <div className="mt-4">
+            <label className="text-xs text-gray-500 font-display mb-2 block">
+              Galería adicional (máx. 5 imágenes)
+            </label>
+            <div className="grid grid-cols-3 gap-3">
+              {galeria.map((url, i) => (
+                <div key={i} className="relative aspect-square rounded-xl overflow-hidden border border-gray-200">
+                  <Image src={url} alt={`Foto ${i + 1}`} fill className="object-cover" />
+                  <button
+                    type="button"
+                    onClick={() => setGaleria(galeria.filter((_, j) => j !== i))}
+                    className="absolute top-1 right-1 bg-white/90 rounded-full w-6 h-6 flex items-center justify-center shadow-sm"
+                  >
+                    <X className="w-3 h-3 text-gray-600" />
+                  </button>
+                </div>
+              ))}
+              {galeria.length < 5 && (
+                <ImagenUploader
+                  value=""
+                  onChange={(url) => setGaleria([...galeria, url])}
+                  bucket="imagenes-productos"
+                  label=""
+                  aspectRatio="cuadrado"
+                />
+              )}
+            </div>
+          </div>
         </SeccionCard>
 
         <SeccionCard id="precio">

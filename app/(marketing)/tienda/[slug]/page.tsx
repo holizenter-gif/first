@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowLeft, Check, PackageX } from "lucide-react";
 import { getProductoBySlug } from "@/lib/data/productos-server";
 import {
@@ -108,16 +109,28 @@ export default async function ProductoDetallePage({ params }: Props) {
       <section className="py-10 px-4">
         <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-12 items-start">
 
-          {/* Imagen */}
-          <div
-            className="rounded-2xl overflow-hidden flex items-center justify-center aspect-square max-h-96"
-            style={{ background: "#EBF7F2" }}
-          >
-            {producto.imagen_url ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={producto.imagen_url} alt={producto.nombre} className="w-full h-full object-cover" />
-            ) : (
-              <span className="text-8xl">🛍️</span>
+          {/* Imagen principal + galería */}
+          <div>
+            <div
+              className="rounded-2xl overflow-hidden flex items-center justify-center aspect-square max-h-96"
+              style={{ background: "#EBF7F2" }}
+            >
+              {producto.imagen_url ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={producto.imagen_url} alt={producto.nombre} className="w-full h-full object-cover" />
+              ) : (
+                <span className="text-8xl">🛍️</span>
+              )}
+            </div>
+
+            {(producto.imagenes_galeria ?? []).length > 0 && (
+              <div className="grid grid-cols-4 gap-2 mt-3">
+                {(producto.imagenes_galeria ?? []).map((url, i) => (
+                  <div key={i} className="relative aspect-square rounded-xl overflow-hidden border border-gray-100 cursor-pointer hover:opacity-90 transition-opacity">
+                    <Image src={url} alt={`${producto.nombre} foto ${i + 1}`} fill className="object-cover" />
+                  </div>
+                ))}
+              </div>
             )}
           </div>
 

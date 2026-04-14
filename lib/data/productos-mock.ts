@@ -19,6 +19,7 @@ const base = {
   fecha_fin_oferta:    null,
   imagen_url:          null,
   imagen_alt:          null,
+  imagenes_galeria:    [],
   descripcion_corta:   null,
   digital:             true,
   requiere_envio:      false,
