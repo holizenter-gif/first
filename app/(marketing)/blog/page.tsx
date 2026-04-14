@@ -1,4 +1,5 @@
 import type { Metadata }     from "next";
+import Image                 from "next/image";
 import Link                  from "next/link";
 import { getAllPosts,
          CATEGORIA_LABELS,
@@ -65,7 +66,16 @@ export default async function BlogPage() {
                   className="group bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 flex flex-col"
                 >
                   <div className="relative h-44 bg-brand-teal-50 overflow-hidden flex-shrink-0 flex items-center justify-center">
-                    <span className="text-5xl opacity-20">📝</span>
+                    {post.imagen_url ? (
+                      <Image
+                        src={post.imagen_url}
+                        alt={post.imagen_alt ?? post.titulo}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                    ) : (
+                      <span className="text-5xl opacity-20">📝</span>
+                    )}
                     <div className="absolute top-3 left-3">
                       <span className={`text-xs font-display font-medium px-2.5 py-1 rounded-full flex items-center gap-1 ${CATEGORIA_COLORS[post.categoria] ?? "bg-gray-100 text-gray-600"}`}>
                         <Tag className="w-3 h-3" />

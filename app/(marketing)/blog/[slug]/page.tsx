@@ -1,5 +1,6 @@
 import type { Metadata }           from "next";
 import { notFound }                from "next/navigation";
+import Image                       from "next/image";
 import Link                        from "next/link";
 import { MDXRemote }               from "next-mdx-remote/rsc";
 import { getPostBySlug,
@@ -101,6 +102,18 @@ export default async function BlogPostPage({ params }: Props) {
           </div>
         </div>
       </section>
+
+      {post.imagen_url && (
+        <div className="relative w-full h-72 md:h-96 overflow-hidden">
+          <Image
+            src={post.imagen_url}
+            alt={post.imagen_alt ?? post.titulo}
+            fill
+            className="object-cover"
+            priority
+          />
+        </div>
+      )}
 
       <article className="py-12 px-4">
         <div className="max-w-3xl mx-auto">

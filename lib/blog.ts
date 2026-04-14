@@ -7,6 +7,7 @@ export interface BlogPost {
   descripcion:    string | null;
   contenido:      string;
   imagen_url:     string | null;
+  imagen_alt:     string | null;
   categoria:      string;
   tags:           string[];
   autor:          string;
