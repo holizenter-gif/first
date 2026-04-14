@@ -1,7 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   const response = NextResponse.next();
@@ -25,7 +25,7 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   const rol = user?.user_metadata?.rol as string | undefined;
 
-  // ── Proteger /admin — cualquier usuario autenticado excepto especialistas ──
+  // -- Proteger /admin -- solo usuarios autenticados con rol admin --
   if (pathname.startsWith("/admin")) {
     if (!user) return NextResponse.redirect(new URL("/auth", request.url));
     // Especialistas tienen su propio portal, no acceso al admin
@@ -35,7 +35,7 @@ export async function middleware(request: NextRequest) {
     return response;
   }
 
-  // ── Proteger /portal — solo rol especialista ──────
+  // -- Proteger /portal -- solo rol especialista --
   if (
     pathname.startsWith("/portal") &&
     pathname !== "/portal/login" &&
