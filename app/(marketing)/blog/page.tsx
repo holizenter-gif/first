@@ -24,7 +24,7 @@ export default async function BlogPage() {
       <section className="bg-brand-dark pt-8 pb-16 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <div className="inline-block bg-white/10 text-brand-teal text-xs font-display px-4 py-1.5 rounded-full mb-6 tracking-wider">
-            Blog · Holizenter
+            InsightLab · Holizenter
           </div>
           <h1 className="font-display text-4xl md:text-5xl font-bold text-white mb-4">
             Bienestar con base real
@@ -65,7 +65,7 @@ export default async function BlogPage() {
                   href={`/blog/${post.slug}`}
                   className="group bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 flex flex-col"
                 >
-                  <div className="relative h-44 bg-brand-teal-50 overflow-hidden flex-shrink-0 flex items-center justify-center">
+                  <div className="relative aspect-video bg-brand-teal-50 overflow-hidden flex-shrink-0 flex items-center justify-center">
                     {post.imagen_url ? (
                       <Image
                         src={post.imagen_url}

@@ -60,7 +60,7 @@ export default function Footer() {
             <ul className="space-y-3 text-sm text-white/50">
               <li><Link href="/nosotros"  className="hover:text-brand-teal transition-colors">Nosotros</Link></li>
               <li><Link href="/directorio" className="hover:text-brand-teal transition-colors">Directorio de Expertos</Link></li>
-              <li><Link href="/blog"       className="hover:text-brand-teal transition-colors">Blog</Link></li>
+              <li><Link href="/blog"       className="hover:text-brand-teal transition-colors">InsightLab</Link></li>
               <li><Link href="/nom-035"    className="hover:text-brand-teal transition-colors">NOM-035</Link></li>
               <li><Link href="/contacto"   className="hover:text-brand-teal transition-colors">Contacto</Link></li>
             </ul>
