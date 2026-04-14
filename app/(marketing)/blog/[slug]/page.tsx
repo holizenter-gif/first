@@ -121,26 +121,7 @@ export default async function BlogPostPage({ params }: Props) {
       <article className="py-12 px-4">
         <div className="max-w-3xl mx-auto">
           {post.contenido ? (
-            <div className="prose prose-lg max-w-none
-  prose-headings:font-display prose-headings:text-brand-dark prose-headings:font-bold
-  prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-4
-  prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-3
-  prose-p:text-gray-600 prose-p:leading-relaxed prose-p:mb-4
-  prose-strong:text-brand-dark prose-strong:font-semibold
-  prose-a:text-brand-teal prose-a:underline
-  prose-ul:text-gray-600 prose-ul:my-4 prose-li:my-1
-  prose-ol:text-gray-600
-  prose-blockquote:border-l-4 prose-blockquote:border-brand-teal
-  prose-blockquote:bg-brand-teal-50 prose-blockquote:px-5 prose-blockquote:py-3
-  prose-blockquote:rounded-r-xl prose-blockquote:not-italic
-  prose-table:w-full prose-table:border-collapse prose-table:my-6
-  prose-th:bg-brand-dark prose-th:text-white prose-th:font-display
-  prose-th:text-sm prose-th:px-4 prose-th:py-3 prose-th:text-left
-  prose-td:border prose-td:border-gray-200 prose-td:px-4 prose-td:py-2
-  prose-td:text-sm prose-td:text-gray-600
-  prose-code:bg-gray-100 prose-code:text-brand-dark
-  prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm
-  prose-pre:bg-brand-dark prose-pre:text-white prose-pre:rounded-xl prose-pre:p-5">
+            <div className="prose prose-lg max-w-none prose-headings:font-display prose-headings:text-brand-dark prose-headings:font-bold prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-4 prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-3 prose-p:text-gray-600 prose-p:leading-relaxed prose-p:mb-4 prose-strong:text-brand-dark prose-strong:font-semibold prose-a:text-brand-teal prose-a:underline prose-ul:text-gray-600 prose-ul:my-4 prose-li:my-1 prose-ol:text-gray-600 prose-blockquote:border-l-4 prose-blockquote:border-brand-teal prose-blockquote:bg-brand-teal-50 prose-blockquote:px-5 prose-blockquote:py-3 prose-blockquote:rounded-r-xl prose-blockquote:not-italic prose-table:w-full prose-table:border-collapse prose-table:my-6 prose-th:bg-brand-dark prose-th:text-white prose-th:font-display prose-th:text-sm prose-th:px-4 prose-th:py-3 prose-th:text-left prose-td:border prose-td:border-gray-200 prose-td:px-4 prose-td:py-2 prose-td:text-sm prose-td:text-gray-600 prose-code:bg-gray-100 prose-code:text-brand-dark prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-pre:bg-brand-dark prose-pre:text-white prose-pre:rounded-xl prose-pre:p-5">
               <ReactMarkdown remarkPlugins={[remarkGfm]}>
                 {post.contenido}
               </ReactMarkdown>
