@@ -202,3 +202,23 @@
   --hl-text:         #1A2B1F;
   --hl-text-muted:   #4A5E4E;
 }
+
+/* ═══ Prose — Estilos Markdown para artículos del blog ═══ */
+@plugin "@tailwindcss/typography";
+
+.prose h2 { font-size: 1.5rem; font-weight: 700; margin-top: 2.5rem; margin-bottom: 1rem; color: #0D1A0F; }
+.prose h3 { font-size: 1.25rem; font-weight: 600; margin-top: 2rem; margin-bottom: 0.75rem; color: #0D1A0F; }
+.prose p { color: #4B5563; line-height: 1.8; margin-bottom: 1rem; }
+.prose strong { color: #0D1A0F; font-weight: 600; }
+.prose em { font-style: italic; }
+.prose ul { list-style: disc; padding-left: 1.5rem; margin: 1rem 0; color: #4B5563; }
+.prose ol { list-style: decimal; padding-left: 1.5rem; margin: 1rem 0; color: #4B5563; }
+.prose li { margin: 0.25rem 0; }
+.prose a { color: #5CB996; text-decoration: underline; }
+.prose blockquote { border-left: 4px solid #5CB996; background: #EBF7F2; padding: 0.75rem 1.25rem; border-radius: 0 0.75rem 0.75rem 0; }
+.prose table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; }
+.prose th { background: #0D1A0F; color: #fff; padding: 0.5rem 1rem; text-align: left; font-size: 0.875rem; }
+.prose td { border: 1px solid #E5E7EB; padding: 0.5rem 1rem; font-size: 0.875rem; color: #4B5563; }
+.prose tr:nth-child(even) { background: #F5F2EC; }
+.prose code { background: #F3F4F6; padding: 0.125rem 0.375rem; border-radius: 0.25rem; font-size: 0.875rem; }
+.prose pre { background: #0D1A0F; color: #fff; padding: 1.25rem; border-radius: 0.75rem; }
