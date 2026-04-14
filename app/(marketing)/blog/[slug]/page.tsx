@@ -105,14 +105,16 @@ export default async function BlogPostPage({ params }: Props) {
       </section>
 
       {post.imagen_url && (
-        <div className="relative w-full overflow-hidden" style={{ aspectRatio: "3/2" }}>
-          <Image
-            src={post.imagen_url}
-            alt={post.imagen_alt ?? post.titulo}
-            fill
-            className="object-cover object-center"
-            priority
-          />
+        <div className="max-w-3xl mx-auto px-4 py-6">
+          <div className="relative w-full rounded-2xl overflow-hidden" style={{ aspectRatio: "3/2" }}>
+            <Image
+              src={post.imagen_url}
+              alt={post.imagen_alt ?? post.titulo}
+              fill
+              className="object-cover object-center"
+              priority
+            />
+          </div>
         </div>
       )}
 

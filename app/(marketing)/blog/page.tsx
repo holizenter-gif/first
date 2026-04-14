@@ -65,7 +65,7 @@ export default async function BlogPage() {
                   href={`/blog/${post.slug}`}
                   className="group bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 flex flex-col"
                 >
-                  <div className="relative aspect-video bg-brand-teal-50 overflow-hidden flex-shrink-0 flex items-center justify-center">
+                  <div className="relative w-full overflow-hidden rounded-t-2xl bg-brand-teal-50 flex items-center justify-center" style={{ aspectRatio: "3/2" }}>
                     {post.imagen_url ? (
                       <Image
                         src={post.imagen_url}
