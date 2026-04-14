@@ -5,6 +5,7 @@ const STATS = [
   { valor: "75%",     label: "de trabajadores MX sufre estrés laboral",  fuente: "IMSS"        },
   { valor: "+500",    label: "colaboradores acompañados individualmente", fuente: "Holizenter"  },
   { valor: "3 años",  label: "construyendo comunidad de bienestar real",  fuente: "Desde 2023"  },
+  { valor: "4 min",   label: "para conocer tu diagnóstico de bienestar",  fuente: "Quiz gratuito" },
   { valor: "NOM-035", label: "cumplimiento garantizado para tu empresa",  fuente: "STPS México" },
 ];
 
@@ -51,7 +52,7 @@ export default function PruebaSocial() {
         </FadeIn>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-16">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-16">
           {STATS.map((s, i) => (
             <FadeIn key={s.valor} delay={i * 0.08}>
               <div
