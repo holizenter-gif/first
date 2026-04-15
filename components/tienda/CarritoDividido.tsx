@@ -10,7 +10,7 @@ interface Props {
   digitales:      ItemCarritoEnvio[];
   fisicos:        ItemCarritoEnvio[];
   resultadoEnvio: ResultadoEnvio;
-  onDireccion:    (d: DireccionEnvio | null) => void;
+  onDireccion:    (d: DireccionEnvio | null, costoEnvio?: number) => void;
 }
 
 export default function CarritoDividido({
@@ -88,7 +88,10 @@ export default function CarritoDividido({
 
           {/* Formulario de dirección */}
           <div className="px-5 pb-5 pt-4 border-t border-gray-100">
-            <DireccionEnvioForm onChange={onDireccion} />
+            <DireccionEnvioForm
+              onChange={onDireccion}
+              items={fisicos.map((i) => ({ id: i.id, cantidad: i.cantidad }))}
+            />
           </div>
         </div>
       )}
@@ -99,7 +102,7 @@ export default function CarritoDividido({
 
 function ItemRow({ item }: { item: ItemCarritoEnvio }) {
   return (
-    <div className="flex items-center gap-3 px-5 py-3">
+    <div className="flex items-center gap-3 px-5 py-3 min-w-0">
       <div className="w-12 h-12 rounded-xl bg-brand-beige flex-shrink-0 overflow-hidden flex items-center justify-center">
         {item.imagen ? (
           <Image src={item.imagen} alt={item.nombre} width={48} height={48}

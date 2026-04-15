@@ -1,15 +1,16 @@
 import Link from "next/link";
-import { Truck, Smartphone } from "lucide-react";
+import { Truck, Smartphone, GraduationCap, FileText, Gift, Video, Star, Package } from "lucide-react";
+import type { ElementType } from "react";
 import { getLabelTipo, calcularDescuento, getPrecioEfectivo } from "@/lib/data/productos-helpers";
 import AgregarCarritoBtn from "./AgregarCarritoBtn";
 import type { Producto } from "@/lib/supabase/types";
 
-const CATEGORIA_EMOJI: Record<string, string> = {
-  cursos:            "🎓",
-  materiales:        "📄",
-  merchandising:     "🌿",
-  talleres_grabados: "🎥",
-  membresia:         "⭐",
+const CATEGORIA_ICONS: Record<string, ElementType> = {
+  cursos:            GraduationCap,
+  materiales:        FileText,
+  merchandising:     Gift,
+  talleres_grabados: Video,
+  membresia:         Star,
 };
 
 interface ProductoCardProps {
@@ -36,7 +37,10 @@ export default function ProductoCard({ producto }: ProductoCardProps) {
               className="w-full h-full object-cover"
             />
           ) : (
-            <span>{CATEGORIA_EMOJI[producto.categoria] ?? "🛍️"}</span>
+            (() => {
+              const Icon = CATEGORIA_ICONS[producto.categoria] ?? Package;
+              return <Icon className="w-12 h-12 text-gray-300" />;
+            })()
           )}
           {descuento && (
             <span

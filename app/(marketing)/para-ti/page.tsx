@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link              from "next/link";
 import {
   ArrowRight, Heart, Brain, Sparkles,
-  CheckCircle, Star, Clock, Video,
+  CheckCircle, Star, Clock, Video, ImageIcon,
 } from "lucide-react";
 import FadeInSection from "@/components/landing/FadeInSection";
 import SectionLabel  from "@/components/landing/SectionLabel";
@@ -121,8 +121,8 @@ export default function ParaTiPage() {
           />
         </div>
 
-        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
-          <div className="max-w-2xl">
+        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-24 grid lg:grid-cols-2 gap-12 items-center">
+          <div>
 
             <FadeInSection delay={0}>
               <div
@@ -200,6 +200,25 @@ export default function ParaTiPage() {
             </FadeInSection>
 
           </div>
+
+          {/* Image placeholder — replace with real photo */}
+          <div className="hidden lg:flex items-center justify-center">
+            <div
+              className="w-full aspect-square max-w-sm rounded-3xl flex flex-col items-center justify-center gap-3"
+              style={{
+                background:  "linear-gradient(135deg, #C8E6D8 0%, #A8D5BB 100%)",
+                border:      "2px dashed #5CB996",
+              }}
+            >
+              <ImageIcon className="w-12 h-12" style={{ color: "#5CB996" }} />
+              <span className="font-sans text-sm font-semibold" style={{ color: "#3A8A6E" }}>
+                Foto pendiente
+              </span>
+              <span className="font-sans text-xs text-center px-6" style={{ color: "#5CB996" }}>
+                Agregar imagen del equipo o sesión
+              </span>
+            </div>
+          </div>
         </div>
 
         <div className="absolute bottom-0 left-0 right-0">
@@ -250,7 +269,7 @@ export default function ParaTiPage() {
             </p>
           </FadeInSection>
 
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {SERVICIOS_B2C.map((s, i) => {
               const Icon = s.icono;
               return (

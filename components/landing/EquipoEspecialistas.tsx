@@ -1,5 +1,26 @@
+import { ImageIcon } from "lucide-react";
 import FadeIn from "./FadeIn";
 import SectionLabel from "./SectionLabel";
+
+function AvatarPlaceholder({ iniciales }: { iniciales: string }) {
+  return (
+    <div className="relative w-20 h-20 mb-4 flex-shrink-0">
+      <div
+        className="w-20 h-20 rounded-full flex items-center justify-center font-sans font-bold text-xl text-white"
+        style={{ background: "linear-gradient(135deg, #5CB996 0%, #2D5A3D 100%)" }}
+      >
+        {iniciales}
+      </div>
+      <span
+        className="absolute -bottom-1 left-1/2 -translate-x-1/2 flex items-center gap-0.5 text-white font-sans font-medium whitespace-nowrap px-2 py-0.5 rounded-full"
+        style={{ background: "#5CB996", fontSize: "9px" }}
+      >
+        <ImageIcon className="w-2.5 h-2.5" />
+        Foto pendiente
+      </span>
+    </div>
+  );
+}
 
 const EQUIPO = [
   {
@@ -55,12 +76,7 @@ export default function EquipoEspecialistas() {
                   borderTop:    "3px solid var(--hl-green)",
                 }}
               >
-                <div
-                  className="w-16 h-16 rounded-full flex items-center justify-center font-sans font-bold text-lg text-white mb-4"
-                  style={{ background: "var(--hl-green)" }}
-                >
-                  {e.iniciales}
-                </div>
+                <AvatarPlaceholder iniciales={e.iniciales} />
 
                 <h3 className="font-sans font-bold mb-0.5" style={{ fontSize: "17px", color: "var(--hl-text)" }}>
                   {e.nombre}

@@ -65,7 +65,14 @@ export default function CheckoutPage() {
   const [preferenceUrl, setPreferenceUrl] = useState<string | null>(null);
   const [errorPago, setErrorPago] = useState<string | null>(null);
 
-  const [direccion,      setDireccion]      = useState<DireccionEnvio | null>(null);
+  const [direccion, setDireccion] = useState<DireccionEnvio | null>(null);
+
+  const handleDireccion = (d: DireccionEnvio | null, costoEnvio?: number) => {
+    setDireccion(d);
+    if (costoEnvio !== undefined) {
+      setResultadoEnvio((prev) => ({ ...prev, costo: costoEnvio, gratis: costoEnvio === 0 }));
+    }
+  };
   const [resultadoEnvio, setResultadoEnvio] = useState<ResultadoEnvio>({
     requiere_envio: false, costo: 0, gratis: true, total_fisicos: 0,
   });
@@ -246,7 +253,7 @@ export default function CheckoutPage() {
                     digitales={digitales}
                     fisicos={fisicos}
                     resultadoEnvio={resultadoEnvio}
-                    onDireccion={setDireccion}
+                    onDireccion={handleDireccion}
                   />
                 );
               })()}

@@ -1,15 +1,16 @@
 "use client";
 import { useState, useMemo } from "react";
-import { Search } from "lucide-react";
+import { Search, GraduationCap, FileText, Gift, Video, Star, Package, ShoppingBag } from "lucide-react";
+import type { ElementType } from "react";
 import ProductoCard from "@/components/tienda/ProductoCard";
 import type { Producto } from "@/lib/data/productos-helpers";
 
-const CATEGORIAS_LABELS: Record<string, { nombre: string; icono: string }> = {
-  cursos:            { nombre: "Cursos Digitales",  icono: "🎓" },
-  materiales:        { nombre: "Materiales",        icono: "📄" },
-  merchandising:     { nombre: "Merchandising",     icono: "🌿" },
-  talleres_grabados: { nombre: "Talleres Grabados", icono: "🎥" },
-  membresia:        { nombre: "Membresía",          icono: "⭐" },
+const CATEGORIAS_LABELS: Record<string, { nombre: string; Icon: ElementType }> = {
+  cursos:            { nombre: "Cursos Digitales",  Icon: GraduationCap },
+  materiales:        { nombre: "Materiales",        Icon: FileText },
+  merchandising:     { nombre: "Merchandising",     Icon: Gift },
+  talleres_grabados: { nombre: "Talleres Grabados", Icon: Video },
+  membresia:         { nombre: "Membresía",         Icon: Star },
 };
 
 interface Props {
@@ -23,7 +24,7 @@ export default function TiendaClientPage({ productos }: Props) {
   // Build categories from real products
   const categorias = useMemo(() => {
     const seen = new Set<string>();
-    const cats: Array<{ slug: string; nombre: string; icono: string }> = [];
+    const cats: Array<{ slug: string; nombre: string; Icon: ElementType }> = [];
     for (const p of productos) {
       if (!seen.has(p.categoria)) {
         seen.add(p.categoria);
@@ -31,14 +32,14 @@ export default function TiendaClientPage({ productos }: Props) {
         cats.push({
           slug:   p.categoria,
           nombre: meta?.nombre ?? p.categoria,
-          icono:  meta?.icono  ?? "🛍️",
+          Icon:   meta?.Icon   ?? Package,
         });
       }
     }
     return cats;
   }, [productos]);
 
-  const CATS = [{ slug: "todos", nombre: "Todos", icono: "🛍️" }, ...categorias];
+  const CATS = [{ slug: "todos", nombre: "Todos", Icon: ShoppingBag as ElementType }, ...categorias];
 
   const filtrados = useMemo(() => {
     let lista = productos.filter((p) => p.activo);
@@ -111,14 +112,15 @@ export default function TiendaClientPage({ productos }: Props) {
               <button
                 key={cat.slug}
                 onClick={() => setCategoriaActiva(cat.slug)}
-                className="px-4 py-2 rounded-full text-sm font-display font-medium transition-all"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-display font-medium transition-all"
                 style={
                   categoriaActiva === cat.slug
                     ? { background: "#5CB996", color: "#fff" }
                     : { background: "#F5F2EC", color: "#6B7280" }
                 }
               >
-                {cat.icono} {cat.nombre}
+                <cat.Icon className="w-3.5 h-3.5" />
+                {cat.nombre}
               </button>
             ))}
           </div>
@@ -129,8 +131,9 @@ export default function TiendaClientPage({ productos }: Props) {
       {categoriaActiva === "todos" && !busqueda && destacados.length > 0 && (
         <section className="py-10 px-4" style={{ background: "#F5F2EC" }}>
           <div className="max-w-6xl mx-auto">
-            <h2 className="font-display font-bold text-xl mb-6" style={{ color: "#0D1A0F" }}>
-              ⭐ Más populares
+            <h2 className="font-display font-bold text-xl mb-6 flex items-center gap-2" style={{ color: "#0D1A0F" }}>
+              <Star className="w-5 h-5" style={{ color: "#5CB996" }} />
+              Más populares
             </h2>
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
               {destacados.map((p) => (

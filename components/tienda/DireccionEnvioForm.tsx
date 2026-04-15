@@ -3,11 +3,17 @@
 import { useState }             from "react";
 import { Input }                from "@/components/ui/input";
 import { Label }                from "@/components/ui/label";
-import { MapPin, AlertCircle }  from "lucide-react";
+import { MapPin, AlertCircle, Loader2, Truck }  from "lucide-react";
 import { validarCP }            from "@/lib/envios";
 import type { DireccionEnvio }  from "@/lib/envios";
+import type { TarifaEnvio }     from "@/lib/skydropx";
 
-interface Props { onChange: (d: DireccionEnvio | null) => void; }
+interface ItemRef { id: string; cantidad: number; }
+
+interface Props {
+  onChange: (d: DireccionEnvio | null, costoEnvio?: number) => void;
+  items?:   ItemRef[];
+}
 
 const ESTADOS_MEXICO = [
   "Aguascalientes","Baja California","Baja California Sur","Campeche",
@@ -18,12 +24,46 @@ const ESTADOS_MEXICO = [
   "Tamaulipas","Tlaxcala","Veracruz","Yucatán","Zacatecas",
 ];
 
-export default function DireccionEnvioForm({ onChange }: Props) {
+export default function DireccionEnvioForm({ onChange, items = [] }: Props) {
   const [d, setD] = useState<DireccionEnvio>({
     nombre: "", calle: "", numero: "", colonia: "",
     ciudad: "", estado: "", cp: "", referencias: "",
   });
-  const [cpError, setCpError] = useState("");
+  const [cpError,      setCpError]      = useState("");
+  const [tarifas,      setTarifas]      = useState<TarifaEnvio[]>([]);
+  const [costoFijo,    setCostoFijo]    = useState(199);
+  const [cotizando,    setCotizando]    = useState(false);
+  const [tarifaElegida, setTarifaElegida] = useState<TarifaEnvio | null>(null);
+
+  const cotizar = async (cp: string, direccion: DireccionEnvio) => {
+    setCotizando(true);
+    setTarifas([]);
+    setTarifaElegida(null);
+    try {
+      const res = await fetch("/api/envios/cotizar", {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ cp_destino: cp, items }),
+      });
+      const data = await res.json();
+      const tarifasOk: TarifaEnvio[] = data.tarifas ?? [];
+      const fijo: number = data.costo_fijo ?? 199;
+      setCostoFijo(fijo);
+      setTarifas(tarifasOk);
+      // Auto-select cheapest or fixed
+      if (tarifasOk.length > 0) {
+        const barata = tarifasOk.reduce((a, b) => a.precio < b.precio ? a : b);
+        setTarifaElegida(barata);
+        onChange(direccion, barata.precio);
+      } else {
+        onChange(direccion, fijo);
+      }
+    } catch {
+      onChange(direccion, costoFijo);
+    } finally {
+      setCotizando(false);
+    }
+  };
 
   const update = (campo: keyof DireccionEnvio, valor: string) => {
     const nueva = { ...d, [campo]: valor };
@@ -40,7 +80,20 @@ export default function DireccionEnvioForm({ onChange }: Props) {
       nueva.colonia && nueva.ciudad && nueva.estado &&
       nueva.cp && validarCP(nueva.cp).valido;
 
-    onChange(completa ? nueva : null);
+    if (completa) {
+      cotizar(nueva.cp, nueva);
+    } else {
+      onChange(null);
+    }
+  };
+
+  const elegirTarifa = (tarifa: TarifaEnvio) => {
+    setTarifaElegida(tarifa);
+    const completa =
+      d.nombre && d.calle && d.numero &&
+      d.colonia && d.ciudad && d.estado &&
+      d.cp && validarCP(d.cp).valido;
+    if (completa) onChange(d, tarifa.precio);
   };
 
   return (
@@ -120,6 +173,65 @@ export default function DireccionEnvioForm({ onChange }: Props) {
         <Input value={d.referencias} onChange={(e) => update("referencias", e.target.value)}
           placeholder="Entre calles, color de fachada, etc." />
       </div>
+
+      {/* Opciones de envío */}
+      {cotizando && (
+        <div className="flex items-center gap-2 text-xs text-gray-500 pt-1">
+          <Loader2 className="w-3.5 h-3.5 animate-spin text-brand-teal" />
+          Cotizando opciones de envío…
+        </div>
+      )}
+
+      {!cotizando && tarifas.length > 0 && (
+        <div className="pt-2 space-y-2">
+          <p className="text-xs font-display font-semibold text-gray-600 flex items-center gap-1">
+            <Truck className="w-3.5 h-3.5" /> Opciones de envío
+          </p>
+          {tarifas.map((tarifa) => (
+            <label
+              key={tarifa.id}
+              className="flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl border cursor-pointer transition-all"
+              style={{
+                borderColor: tarifaElegida?.id === tarifa.id ? "#5CB996" : "#E5E7EB",
+                background:  tarifaElegida?.id === tarifa.id ? "#EBF7F2" : "#fff",
+              }}
+            >
+              <div className="flex items-center gap-2">
+                <input
+                  type="radio"
+                  name="tarifa_envio"
+                  checked={tarifaElegida?.id === tarifa.id}
+                  onChange={() => elegirTarifa(tarifa)}
+                  className="accent-[#5CB996]"
+                />
+                <div>
+                  <p className="text-xs font-display font-semibold text-gray-700">
+                    {tarifa.proveedor}
+                    <span className="font-normal text-gray-400 ml-1">— {tarifa.servicio}</span>
+                  </p>
+                  {tarifa.dias > 0 && (
+                    <p className="text-xs text-gray-400">{tarifa.dias} día{tarifa.dias !== 1 ? "s" : ""} hábiles</p>
+                  )}
+                </div>
+              </div>
+              <span className="font-display font-bold text-sm" style={{ color: "#0D1A0F" }}>
+                ${tarifa.precio.toLocaleString("es-MX")} MXN
+              </span>
+            </label>
+          ))}
+        </div>
+      )}
+
+      {!cotizando && tarifas.length === 0 && costoFijo > 0 && d.cp && validarCP(d.cp).valido && (
+        <div className="flex items-center justify-between px-3 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-xs">
+          <span className="font-display text-gray-500 flex items-center gap-1">
+            <Truck className="w-3.5 h-3.5" /> Envío estándar
+          </span>
+          <span className="font-display font-bold text-sm" style={{ color: "#0D1A0F" }}>
+            ${costoFijo.toLocaleString("es-MX")} MXN
+          </span>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft, Check, PackageX, Truck, Smartphone, Star } from "lucide-react";
+import { ArrowLeft, Check, PackageX, Package, Truck, Smartphone, Star } from "lucide-react";
 import { getProductoBySlug } from "@/lib/data/productos-server";
 import {
   getLabelTipo,
@@ -143,7 +143,7 @@ export default async function ProductoDetallePage({ params }: Props) {
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={producto.imagen_url} alt={producto.nombre} className="w-full h-full object-cover" />
               ) : (
-                <span className="text-8xl">🛍️</span>
+                <Package className="w-16 h-16 text-gray-300" />
               )}
             </div>
 
