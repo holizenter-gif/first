@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft, Check, PackageX } from "lucide-react";
+import { ArrowLeft, Check, PackageX, Truck, Smartphone } from "lucide-react";
 import { getProductoBySlug } from "@/lib/data/productos-server";
 import {
   getLabelTipo,
@@ -164,11 +164,10 @@ export default async function ProductoDetallePage({ params }: Props) {
 
             {/* Detalles rápidos */}
             <div className="flex flex-wrap gap-3 mb-6">
-              <span
-                className="text-xs font-sans font-medium px-3 py-1.5 rounded-full"
-                style={{ background: "#F5F2EC", color: "#6B7280" }}
-              >
-                {getModalidadEnvio(producto)}
+              <span className="flex items-center gap-1.5 bg-brand-teal-50 text-brand-teal text-xs font-display px-3 py-1.5 rounded-full">
+                {producto.digital
+                  ? <><Smartphone className="w-3 h-3" /> Acceso inmediato al pagar</>
+                  : <><Truck className="w-3 h-3" /> Envío $199 MXN · Todo México</>}
               </span>
               {producto.digital && producto.dias_acceso > 0 && (
                 <span

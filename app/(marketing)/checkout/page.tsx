@@ -1,9 +1,15 @@
 "use client";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { useCarrito } from "@/lib/store/carrito";
-import { ArrowLeft, ArrowRight, Check, ShoppingBag, Loader2 } from "lucide-react";
-import Link from "next/link";
+import { useState, useEffect }     from "react";
+import { useRouter }               from "next/navigation";
+import { useCarrito }              from "@/lib/store/carrito";
+import { ArrowLeft, ArrowRight, Check, ShoppingBag, Loader2, Truck } from "lucide-react";
+import Link                        from "next/link";
+import {
+  separarCarrito, calcularEnvio, CONFIG_ENVIO_DEFAULT,
+  type DireccionEnvio, type ItemCarritoEnvio, type ResultadoEnvio,
+} from "@/lib/envios";
+import CarritoDividido             from "@/components/tienda/CarritoDividido";
+import { formatMXN }               from "@/lib/cotizador";
 
 type Paso = 1 | 2 | 3;
 
@@ -59,8 +65,23 @@ export default function CheckoutPage() {
   const [preferenceUrl, setPreferenceUrl] = useState<string | null>(null);
   const [errorPago, setErrorPago] = useState<string | null>(null);
 
-  const costoEnvio = tieneProductosFisicos() ? 150 : 0;
-  const total = subtotal() + costoEnvio;
+  const [direccion,      setDireccion]      = useState<DireccionEnvio | null>(null);
+  const [resultadoEnvio, setResultadoEnvio] = useState<ResultadoEnvio>({
+    requiere_envio: false, costo: 0, gratis: true, total_fisicos: 0,
+  });
+  const configEnvio = CONFIG_ENVIO_DEFAULT;
+
+  useEffect(() => {
+    const itemsParaCalculo: ItemCarritoEnvio[] = items.map((i) => ({
+      id:       i.producto.id,
+      nombre:   i.producto.nombre,
+      precio:   i.producto.precio,
+      cantidad: i.cantidad,
+      digital:  i.producto.digital,
+      imagen:   i.producto.imagen_url,
+    }));
+    setResultadoEnvio(calcularEnvio(itemsParaCalculo, configEnvio));
+  }, [items]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Paso 1: validar datos ──────────────────────────────────
   const validarDatos = () => {
@@ -95,12 +116,14 @@ export default function CheckoutPage() {
             cantidad:    i.cantidad,
             imagen_url:  i.producto.imagen_url,
           })),
-          subtotal: subtotal(),
-          costo_envio: costoEnvio,
-          total,
-          email_comprador:  datos.email,
-          nombre_comprador: datos.nombre,
-          whatsapp:         datos.whatsapp,
+          subtotal:          subtotal(),
+          costo_envio:       resultadoEnvio.costo,
+          total:             subtotal() + resultadoEnvio.costo,
+          requiere_envio:    resultadoEnvio.requiere_envio,
+          direccion_envio:   direccion,
+          email_comprador:   datos.email,
+          nombre_comprador:  datos.nombre,
+          whatsapp:          datos.whatsapp,
         }),
       });
       const json = await res.json();
@@ -208,48 +231,46 @@ export default function CheckoutPage() {
                 Resumen de tu pedido
               </h2>
 
-              <div className="space-y-3 mb-5">
-                {items.map((item) => (
-                  <div key={item.producto.id} className="flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                      <div
-                        className="w-10 h-10 rounded-lg flex items-center justify-center text-xl flex-shrink-0"
-                        style={{ background: "#EBF7F2" }}
-                      >
-                        {item.producto.categoria === "cursos"            && "🎓"}
-                        {item.producto.categoria === "materiales"        && "📄"}
-                        {item.producto.categoria === "merchandising"     && "🌿"}
-                        {item.producto.categoria === "talleres_grabados" && "🎥"}
-                        {item.producto.categoria === "membresia"         && "⭐"}
-                      </div>
-                      <div>
-                        <p className="font-sans text-sm font-medium" style={{ color: "#0D1A0F" }}>
-                          {item.producto.nombre}
-                        </p>
-                        <p className="font-sans text-xs text-gray-400">x{item.cantidad}</p>
-                      </div>
-                    </div>
-                    <span className="font-sans font-semibold text-sm" style={{ color: "#0D1A0F" }}>
-                      ${(item.producto.precio * item.cantidad).toLocaleString("es-MX")}
-                    </span>
-                  </div>
-                ))}
-              </div>
+              {(() => {
+                const itemsConvertidos: ItemCarritoEnvio[] = items.map((i) => ({
+                  id:       i.producto.id,
+                  nombre:   i.producto.nombre,
+                  precio:   i.producto.precio,
+                  cantidad: i.cantidad,
+                  digital:  i.producto.digital,
+                  imagen:   i.producto.imagen_url,
+                }));
+                const { digitales, fisicos } = separarCarrito(itemsConvertidos);
+                return (
+                  <CarritoDividido
+                    digitales={digitales}
+                    fisicos={fisicos}
+                    resultadoEnvio={resultadoEnvio}
+                    onDireccion={setDireccion}
+                  />
+                );
+              })()}
 
-              <div className="border-t border-gray-100 pt-4 space-y-2">
+              <div className="border-t border-gray-100 pt-4 space-y-2 mt-4">
                 <div className="flex justify-between text-sm text-gray-500 font-sans">
                   <span>Subtotal</span>
-                  <span>${subtotal().toLocaleString("es-MX")} MXN</span>
+                  <span>{formatMXN(subtotal())} MXN</span>
                 </div>
-                {costoEnvio > 0 && (
+                {resultadoEnvio.requiere_envio && (
                   <div className="flex justify-between text-sm text-gray-500 font-sans">
-                    <span>Envío (CDMX)</span>
-                    <span>${costoEnvio.toLocaleString("es-MX")} MXN</span>
+                    <span className="flex items-center gap-1">
+                      <Truck className="w-3 h-3" /> Envío
+                    </span>
+                    <span>
+                      {resultadoEnvio.gratis
+                        ? <span className="text-brand-teal font-semibold">Gratis</span>
+                        : `${formatMXN(resultadoEnvio.costo)} MXN`}
+                    </span>
                   </div>
                 )}
                 <div className="flex justify-between font-display font-bold text-base pt-1" style={{ color: "#0D1A0F" }}>
                   <span>Total</span>
-                  <span>${total.toLocaleString("es-MX")} MXN</span>
+                  <span>{formatMXN(subtotal() + resultadoEnvio.costo)} MXN</span>
                 </div>
               </div>
             </div>
@@ -264,6 +285,11 @@ export default function CheckoutPage() {
               <p className="font-sans text-sm text-gray-600">{datos.whatsapp}</p>
             </div>
 
+            {resultadoEnvio.requiere_envio && !direccion && (
+              <p className="text-xs text-amber-600 text-center">
+                Completa la dirección de envío para continuar
+              </p>
+            )}
             <div className="flex gap-3">
               <button
                 onClick={() => setPaso(1)}
@@ -274,7 +300,8 @@ export default function CheckoutPage() {
               </button>
               <button
                 onClick={() => { setPaso(3); crearPreferencia(); }}
-                className="flex-1 py-3.5 rounded-full font-display font-semibold text-white transition-colors flex items-center justify-center gap-2"
+                disabled={resultadoEnvio.requiere_envio && !direccion}
+                className="flex-1 py-3.5 rounded-full font-display font-semibold text-white transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{ background: "#5CB996" }}
               >
                 Pagar con Mercado Pago <ArrowRight className="w-4 h-4" />

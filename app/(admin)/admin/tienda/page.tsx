@@ -18,6 +18,11 @@ export default async function AdminTiendaPage() {
     .select("*")
     .order("orden", { ascending: true });
 
+  const { data: configEnvio } = await supabase
+    .from("config_envios")
+    .select("*")
+    .single();
+
   const activos   = (productos ?? []).filter((p) => p.activo).length;
   const inactivos = (productos ?? []).length - activos;
 
@@ -102,6 +107,43 @@ export default async function AdminTiendaPage() {
               })}
             </tbody>
           </table>
+        </div>
+      </div>
+      {/* Config envíos */}
+      <div className="mt-8 bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h2 className="font-display font-bold text-brand-dark">Configuración de envíos</h2>
+            <p className="text-gray-400 text-xs mt-0.5">
+              Solo aplica a productos físicos. Los digitales siempre son gratis.
+            </p>
+          </div>
+          <span className="text-xs font-display font-semibold px-3 py-1 rounded-full bg-gray-100 text-gray-500">
+            {configEnvio?.envio_gratis_activo ? "Envío gratis activo" : "Envío gratis desactivado"}
+          </span>
+        </div>
+        <div className="grid grid-cols-3 gap-4">
+          <div className="bg-brand-beige rounded-xl p-4 text-center">
+            <p className="text-gray-500 text-xs mb-1">Costo estándar</p>
+            <p className="font-display font-bold text-brand-dark text-2xl">
+              ${configEnvio?.costo_estandar ?? 199} MXN
+            </p>
+            <p className="text-gray-400 text-xs mt-1">Por envío · Todo México</p>
+          </div>
+          <div className="bg-brand-beige rounded-xl p-4 text-center">
+            <p className="text-gray-500 text-xs mb-1">Umbral envío gratis</p>
+            <p className="font-display font-bold text-brand-dark text-2xl">
+              ${configEnvio?.umbral_gratis ?? 1000} MXN
+            </p>
+            <p className="text-gray-400 text-xs mt-1">Solo en productos físicos</p>
+          </div>
+          <div className="bg-brand-beige rounded-xl p-4 text-center">
+            <p className="text-gray-500 text-xs mb-1">Estado actual</p>
+            <p className="font-display font-bold text-gray-400 text-sm mt-2">
+              {configEnvio?.envio_gratis_activo ? "Activo" : "Desactivado"}
+            </p>
+            <p className="text-gray-400 text-xs">Activar en Supabase cuando sea necesario</p>
+          </div>
         </div>
       </div>
     </div>

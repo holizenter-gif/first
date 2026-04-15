@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Truck, Smartphone } from "lucide-react";
 import { getLabelTipo, calcularDescuento, getPrecioEfectivo } from "@/lib/data/productos-helpers";
 import AgregarCarritoBtn from "./AgregarCarritoBtn";
 import type { Producto } from "@/lib/supabase/types";
@@ -87,6 +88,12 @@ export default function ProductoCard({ producto }: ProductoCardProps) {
             )}
             <span className="text-xs text-gray-400 ml-1">MXN</span>
           </div>
+        </div>
+
+        <div className="flex items-center gap-1 text-xs text-gray-400 mt-1">
+          {producto.digital
+            ? <><Smartphone className="w-3 h-3" /> Acceso inmediato</>
+            : <><Truck className="w-3 h-3" /> Envío $199 MXN</>}
         </div>
 
         <AgregarCarritoBtn
