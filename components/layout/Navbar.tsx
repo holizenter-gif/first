@@ -54,11 +54,11 @@ export default function Navbar() {
                   <Link
                     key={s.href}
                     href={s.href}
-                    className="block px-5 py-3.5 hover:bg-brand-teal-50 transition-colors group"
+                    className="block px-4 py-3 hover:bg-brand-teal-50 transition-colors rounded-xl"
                     onClick={() => setSubmenuOpen(false)}
                   >
-                    <p className="font-display font-medium text-brand-dark group-hover:text-brand-teal transition-colors text-sm">{s.label}</p>
-                    <p className="text-xs text-gray-500 mt-0.5">{s.desc}</p>
+                    <p className="font-display font-semibold text-brand-dark text-sm">{s.label}</p>
+                    <p className="text-gray-400 text-xs mt-0.5">{s.desc}</p>
                   </Link>
                 ))}
               </div>

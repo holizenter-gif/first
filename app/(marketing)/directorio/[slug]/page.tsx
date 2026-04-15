@@ -32,8 +32,8 @@ export default async function ProfesionalPage({ params }: Props) {
     .then((supabase) => supabase.rpc("incrementar_vistas_profesional", { profesional_id: p.id }))
     .catch(() => {});
 
-  const calUsername = process.env.NEXT_PUBLIC_CAL_USERNAME ?? "holizenter";
-  const calSlug     = p.cal_username ?? (process.env.NEXT_PUBLIC_CAL_EVENT_DIAGNOSTICO ?? "diagnostico");
+  const calUsername = p.cal_username ?? process.env.NEXT_PUBLIC_CAL_USERNAME ?? "holizenter";
+  const calSlug     = process.env.NEXT_PUBLIC_CAL_EVENT_DIAGNOSTICO ?? "diagnostico";
 
   return (
     <div className="min-h-screen" style={{ background: "#F5F2EC" }}>
