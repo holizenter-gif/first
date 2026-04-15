@@ -90,11 +90,6 @@ export default function Navbar() {
           </Link>
         </div>
 
-        {/* Carrito visible en móvil */}
-        <div className="flex items-center gap-2 md:hidden">
-          <BotonCarrito solid={solid} />
-        </div>
-
         {/* Mobile */}
         <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
           <SheetTrigger className={`md:hidden p-2 rounded-lg transition-colors ${solid ? "text-brand-dark" : "text-white"}`}>

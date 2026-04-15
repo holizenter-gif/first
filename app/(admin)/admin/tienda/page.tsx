@@ -1,7 +1,7 @@
 import { createClient }    from "@/lib/supabase/server";
 import { redirect }        from "next/navigation";
 import Link                from "next/link";
-import { Plus, Eye, EyeOff, Edit, Package } from "lucide-react";
+import { Plus, Eye, EyeOff, Edit, Package, Star } from "lucide-react";
 import { CATEGORIA_LABELS, CATEGORIA_EMOJIS, formatPrecio, getPrecioEfectivo } from "@/lib/data/productos-helpers";
 import type { Producto } from "@/lib/data/productos-helpers";
 
@@ -100,6 +100,9 @@ export default async function AdminTiendaPage() {
                             <Package className="w-3 h-3" /> Ver
                           </Link>
                         )}
+                        <Link href={`/admin/resenas?producto=${p.id}`} className="text-amber-500 hover:text-amber-600 text-xs font-display flex items-center gap-1">
+                          <Star className="w-3 h-3" /> Reseñas
+                        </Link>
                       </div>
                     </td>
                   </tr>

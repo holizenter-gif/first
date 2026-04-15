@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft, Check, PackageX, Truck, Smartphone } from "lucide-react";
+import { ArrowLeft, Check, PackageX, Truck, Smartphone, Star } from "lucide-react";
 import { getProductoBySlug } from "@/lib/data/productos-server";
 import {
   getLabelTipo,
@@ -12,6 +12,10 @@ import {
 } from "@/lib/data/productos-helpers";
 import AgregarCarritoBtn from "@/components/tienda/AgregarCarritoBtn";
 import ProductoCard from "@/components/tienda/ProductoCard";
+import Estrellas from "@/components/tienda/Estrellas";
+import ListaResenas from "@/components/tienda/ListaResenas";
+import FormularioResena from "@/components/tienda/FormularioResena";
+import { createClient } from "@/lib/supabase/server";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -86,6 +90,26 @@ export default async function ProductoDetallePage({ params }: Props) {
     );
   }
 
+  // ── Reseñas ──────────────────────────────────────────────────────────────
+  let resenas: { id: string; nombre: string; calificacion: number; comentario: string; created_at: string }[] = [];
+  let promedio = 0;
+  let totalResenas = 0;
+  try {
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from("resenas")
+      .select("id, nombre, calificacion, comentario, created_at")
+      .eq("producto_id", producto.id)
+      .eq("aprobada", true)
+      .order("created_at", { ascending: false })
+      .limit(50);
+    if (data && data.length > 0) {
+      resenas = data;
+      totalResenas = data.length;
+      promedio = data.reduce((acc, r) => acc + r.calificacion, 0) / data.length;
+    }
+  } catch { /* reseñas no críticas */ }
+
   // ── Producto encontrado ──────────────────────────────────────────────────
   const pEfectivo = getPrecioEfectivo(producto);
   const dscto     = descuentoPct(producto);
@@ -144,11 +168,20 @@ export default async function ProductoDetallePage({ params }: Props) {
             </span>
 
             <h1
-              className="font-display font-bold mb-3"
+              className="font-display font-bold mb-2"
               style={{ fontSize: "clamp(22px,3vw,32px)", color: "#0D1A0F" }}
             >
               {producto.nombre}
             </h1>
+
+            {totalResenas > 0 && (
+              <div className="flex items-center gap-2 mb-3">
+                <Estrellas valor={promedio} size={16} />
+                <span className="font-sans text-sm text-gray-500">
+                  {promedio.toFixed(1)} ({totalResenas} {totalResenas === 1 ? "reseña" : "reseñas"})
+                </span>
+              </div>
+            )}
 
             {producto.descripcion_corta && (
               <p className="font-sans text-base leading-relaxed text-gray-600 mb-4">
@@ -307,6 +340,30 @@ export default async function ProductoDetallePage({ params }: Props) {
           </div>
         </section>
       )}
+
+      {/* Reseñas */}
+      <section className="py-12 px-4" style={{ background: "#F9FAFB" }}>
+        <div className="max-w-3xl mx-auto">
+          <h2 className="font-display font-bold text-xl mb-8" style={{ color: "#0D1A0F" }}>
+            Reseñas de clientes
+          </h2>
+          <div className="grid md:grid-cols-2 gap-10">
+            {/* Lista */}
+            <div>
+              <ListaResenas resenas={resenas} promedio={promedio} total={totalResenas} />
+            </div>
+            {/* Formulario */}
+            <div>
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                <h3 className="font-display font-bold text-base mb-5" style={{ color: "#0D1A0F" }}>
+                  Deja tu reseña
+                </h3>
+                <FormularioResena productoId={producto.id} />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
     </div>
   );

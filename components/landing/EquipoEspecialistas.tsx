@@ -4,7 +4,7 @@ import SectionLabel from "./SectionLabel";
 const EQUIPO = [
   {
     nombre:       "Noemí Molina",
-    especialidad: "Psicóloga clínica · Terapia holística integrativa",
+    especialidad: "Terapeuta holística · Terapia holística integrativa",
     filosofia:    "Sanar el cuerpo y sanar la mente son el mismo acto.",
     experiencia:  "12 años",
     certs:        ["Psicología clínica", "Terapia somática", "Psicología positiva"],

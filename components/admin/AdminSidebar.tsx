@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard, Calendar, CreditCard, Users,
   LogOut, Menu, X, ShoppingBag, FileText,
-  UserCheck,
+  UserCheck, Star,
 } from "lucide-react";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
@@ -29,8 +29,9 @@ const NAV_GROUPS = [
   {
     label: "Contenido",
     items: [
-      { href: "/admin/blog",   label: "Blog",   Icon: FileText    },
-      { href: "/admin/tienda", label: "Tienda", Icon: ShoppingBag },
+      { href: "/admin/blog",    label: "Blog",    Icon: FileText    },
+      { href: "/admin/tienda",  label: "Tienda",  Icon: ShoppingBag },
+      { href: "/admin/resenas", label: "Reseñas", Icon: Star        },
     ],
   },
 ];
