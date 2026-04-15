@@ -9,8 +9,10 @@ import LeadCaptureForm from "./LeadCaptureForm";
 import QuizAnalyzing   from "./QuizAnalyzing";
 import QuizResult      from "./QuizResult";
 import AbandonPopup    from "./AbandonPopup";
-import { registerLead }  from "@/lib/quiz-cookie";
-import { analytics }     from "@/lib/analytics";
+import { registerLead, getLeadCookie, setLeadCookie, isReturningLead, addQuizCompletado, hasCompletedQuiz } from "@/lib/quiz-cookie";
+import { analytics, trackQuizStarted, trackQuizCompleted, trackQuizLeadSubmitted } from "@/lib/analytics";
+
+const QUIZ_ID = "burnout";
 
 export type QuizState = "welcome" | "question" | "capture" | "analyzing" | "result";
 
@@ -42,6 +44,11 @@ export default function QuizEngine() {
 
   // Resultado final (se fija al terminar todas las preguntas)
   const [resultadoFinal, setResultadoFinal] = useState<ReturnType<typeof getScoreResult> | null>(null);
+
+  // Track quiz started on mount
+  useEffect(() => {
+    trackQuizStarted({ quiz_id: QUIZ_ID, source_page: window.location.pathname });
+  }, []);
 
   // beforeunload
   useEffect(() => {
@@ -75,9 +82,17 @@ export default function QuizEngine() {
     if (indicePregunta < totalPregs - 1) {
       setIndice((i) => i + 1);
     } else {
-      // Última pregunta — calcular resultado y mostrar capture con preview borrosa
+      // Última pregunta — calcular resultado
       const resultado = getScoreResult(nr);
       setResultadoFinal(resultado);
+      const cookieLead = getLeadCookie();
+      if (cookieLead) {
+        setLeadData({ nombre: cookieLead.nombre, empresa: cookieLead.empresa, email: cookieLead.email, whatsapp: "", acepta_privacidad: true });
+        addQuizCompletado(QUIZ_ID);
+        trackQuizCompleted({ quiz_id: QUIZ_ID, score_global: resultado.puntaje, nivel: resultado.nivel });
+        setEstado("result");
+        return;
+      }
       analytics.quizComplete("burnout", resultado.puntaje, resultado.nivel);
       setEstado("capture");
     }
@@ -86,7 +101,9 @@ export default function QuizEngine() {
   const handleLeadSubmit = async (data: LeadFormData) => {
     setLeadData(data);
     const isNewLead = registerLead(data.email);
+    setLeadCookie({ email: data.email, nombre: data.nombre, empresa: data.empresa ?? "", timestamp: Date.now(), quiz_id: QUIZ_ID });
     analytics.leadSubmit("burnout", isNewLead);
+    trackQuizLeadSubmitted({ quiz_id: QUIZ_ID, nivel: resultadoFinal?.nivel ?? "", is_returning_lead: false });
     setEstado("analyzing");
     setSubmitting(true);
 
@@ -173,6 +190,7 @@ export default function QuizEngine() {
               nombre="Tu nombre"
               empresa="Tu empresa"
               ejes={resultadoFinal.ejes}
+              quiz_id={QUIZ_ID}
             />
           </div>
 
@@ -205,6 +223,7 @@ export default function QuizEngine() {
           nombre={leadData.nombre}
           empresa={leadData.empresa}
           ejes={resultadoFinal.ejes}
+          quiz_id={QUIZ_ID}
         />
       )}
     </div>

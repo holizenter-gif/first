@@ -10,8 +10,10 @@ import QuizAnalyzing   from "./QuizAnalyzing";
 import QuizResult      from "./QuizResult";
 import AbandonPopup    from "./AbandonPopup";
 import type { PreguntaQuiz } from "@/lib/data/preguntas-burnout";
-import { registerLead }  from "@/lib/quiz-cookie";
-import { analytics }     from "@/lib/analytics";
+import { registerLead, getLeadCookie, setLeadCookie, addQuizCompletado } from "@/lib/quiz-cookie";
+import { analytics, trackQuizStarted, trackQuizCompleted, trackQuizLeadSubmitted } from "@/lib/analytics";
+
+const QUIZ_ID = "clima";
 
 type QuizState = "welcome" | "question" | "capture" | "analyzing" | "result";
 
@@ -36,6 +38,10 @@ export default function QuizEngineClima() {
   const preguntas      = PREGUNTAS_CLIMA as unknown as PreguntaQuiz[];
   const totalPregs     = preguntas.length;
   const preguntaActual = preguntas[indicePregunta];
+
+  useEffect(() => {
+    trackQuizStarted({ quiz_id: QUIZ_ID, source_page: window.location.pathname });
+  }, []);
 
   useEffect(() => {
     if (estado === "welcome" || estado === "result") return;
@@ -69,6 +75,14 @@ export default function QuizEngineClima() {
     } else {
       const resultado = getScoreResultClima(nr);
       setResultado(resultado);
+      const cookieLead = getLeadCookie();
+      if (cookieLead) {
+        setLeadData({ nombre: cookieLead.nombre, empresa: cookieLead.empresa, email: cookieLead.email, whatsapp: "", acepta_privacidad: true });
+        addQuizCompletado(QUIZ_ID);
+        trackQuizCompleted({ quiz_id: QUIZ_ID, score_global: resultado.puntaje, nivel: resultado.nivel });
+        setEstado("result");
+        return;
+      }
       analytics.quizComplete("clima", resultado.puntaje, resultado.nivel);
       setEstado("capture");
     }
@@ -77,7 +91,9 @@ export default function QuizEngineClima() {
   const handleLeadSubmit = async (data: LeadFormData) => {
     setLeadData(data);
     const isNewLead = registerLead(data.email);
+    setLeadCookie({ email: data.email, nombre: data.nombre, empresa: data.empresa ?? "", timestamp: Date.now(), quiz_id: QUIZ_ID });
     analytics.leadSubmit("clima", isNewLead);
+    trackQuizLeadSubmitted({ quiz_id: QUIZ_ID, nivel: resultadoFinal?.nivel ?? "", is_returning_lead: false });
     setEstado("analyzing");
     setSubmitting(true);
 
@@ -170,6 +186,7 @@ export default function QuizEngineClima() {
               nombre="Tu nombre"
               empresa="Tu empresa"
               ejes={resultadoFinal.ejes}
+              quiz_id={QUIZ_ID}
             />
           </div>
           <div className="absolute inset-0 flex items-start justify-center pt-8 px-4">

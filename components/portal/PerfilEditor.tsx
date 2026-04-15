@@ -17,6 +17,7 @@ interface Profesional {
   sitio_web?:        string | null;
   imagen_url?:       string | null;
   certificaciones?:  string[] | null;
+  cal_username?:     string | null;
   [key: string]:     unknown;
 }
 
@@ -35,6 +36,7 @@ export default function PerfilEditor({ profesional, userId }: Props) {
   const [sitio_web,     setSitioWeb]      = useState(profesional?.sitio_web     ?? "");
   const [imagen_url,    setImagenUrl]     = useState(profesional?.imagen_url    ?? "");
   const [certs,         setCerts]         = useState((profesional?.certificaciones ?? []).join(", "));
+  const [calUsername,   setCalUsername]   = useState((profesional?.cal_username as string) ?? "");
   const [saving,        setSaving]        = useState(false);
   const [saved,         setSaved]         = useState(false);
   const [error,         setError]         = useState("");
@@ -58,6 +60,7 @@ export default function PerfilEditor({ profesional, userId }: Props) {
           sitio_web,
           imagen_url,
           certificaciones: certs.split(",").map((c) => c.trim()).filter(Boolean),
+          cal_username: calUsername.trim() || null,
         }),
       });
       if (!res.ok) throw new Error("Error guardando perfil");
@@ -116,6 +119,22 @@ export default function PerfilEditor({ profesional, userId }: Props) {
         <div>
           <Label className={lbl} style={{ color: "var(--hl-text-muted)" }}>Foto de perfil (URL)</Label>
           <Input value={imagen_url} onChange={(e) => setImagenUrl(e.target.value)} placeholder="https://…" />
+        </div>
+
+        <div>
+          <Label className="text-xs font-sans font-semibold uppercase tracking-wide mb-1.5 block" style={{ color: "var(--hl-text-muted)" }}>
+            Username de Cal.com
+          </Label>
+          <div className="flex items-center gap-2">
+            <span className="text-gray-400 text-sm">cal.com/</span>
+            <Input
+              value={calUsername}
+              onChange={(e) => setCalUsername(e.target.value)}
+              placeholder="tu-nombre"
+              className="text-sm"
+            />
+          </div>
+          <p className="text-gray-400 text-xs mt-1">Tu URL de Cal.com para recibir citas</p>
         </div>
 
         <div className="grid sm:grid-cols-3 gap-4">

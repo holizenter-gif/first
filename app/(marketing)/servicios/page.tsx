@@ -32,6 +32,9 @@ export default function ServiciosPage() {
 
       {/* Cards */}
       <section className="py-20 px-4">
+        <div className="max-w-5xl mx-auto mb-10">
+          <QuizCTA quiz_id_override="burnout" source_section="servicios_page" variant="banner" />
+        </div>
         <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-8">
           {SERVICIOS.map((s) => (
             <Link

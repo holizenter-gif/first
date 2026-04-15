@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { Calendar, ArrowRight, Share2 } from "lucide-react";
 import type { EjeScore } from "@/lib/quiz-scoring";
+import { getTextoDimensionByLabel, getLabelNivel, getColorNivel } from "@/lib/data/quiz-dimensiones-textos";
 
 interface QuizResultProps {
   score:                number;
@@ -11,6 +12,7 @@ interface QuizResultProps {
   nombre:               string;
   empresa:              string;
   ejes:                 EjeScore[];
+  quiz_id?:             string;
 }
 
 const NIVEL_CONFIG = {
@@ -87,21 +89,32 @@ function Termometro({ score, color }: { score: number; color: string }) {
 }
 
 // ── Barra animada ─────────────────────────────────────────────────────
-function BarraEje({ eje, delay }: { eje: EjeScore; delay: number }) {
+function BarraEje({ eje, delay, quizId }: { eje: EjeScore; delay: number; quizId?: string }) {
   const [animated, setAnimated] = useState(false);
   useEffect(() => {
     const t = setTimeout(() => setAnimated(true), delay);
     return () => clearTimeout(t);
   }, [delay]);
 
-  const color = colorPorPct(eje.pct);
-  const width = animated ? `${eje.pct}%` : "0%";
+  const color    = colorPorPct(eje.pct);
+  const width    = animated ? `${eje.pct}%` : "0%";
+  const texto    = quizId ? getTextoDimensionByLabel(quizId, eje.label, eje.pct) : "";
+  const labelNvl = getLabelNivel(eje.pct);
+  const colorNvl = getColorNivel(eje.pct);
 
   return (
-    <div>
+    <div className="mb-1">
       <div className="flex justify-between items-center mb-1.5">
         <span className="font-sans font-medium text-sm" style={{ color: "#374151" }}>{eje.label}</span>
-        <span className="font-display font-bold text-sm" style={{ color }}>{eje.pct}%</span>
+        <div className="flex items-center gap-2">
+          <span
+            className="text-xs px-2 py-0.5 rounded-full font-semibold"
+            style={{ background: `${colorNvl}20`, color: colorNvl }}
+          >
+            {labelNvl}
+          </span>
+          <span className="font-display font-bold text-sm" style={{ color }}>{eje.pct}%</span>
+        </div>
       </div>
       <div className="h-3 rounded-full overflow-hidden" style={{ background: "#E5E7EB" }}>
         <div
@@ -113,13 +126,18 @@ function BarraEje({ eje, delay }: { eje: EjeScore; delay: number }) {
           }}
         />
       </div>
+      {texto && (
+        <p className="text-gray-500 text-xs leading-relaxed mt-2 pl-1">
+          {texto}
+        </p>
+      )}
     </div>
   );
 }
 
 // ── Resultado principal ───────────────────────────────────────────────
 export default function QuizResult({
-  score, nivel, descripcion, servicio_recomendado, nombre, empresa, ejes,
+  score, nivel, descripcion, servicio_recomendado, nombre, empresa, ejes, quiz_id,
 }: QuizResultProps) {
   const cfg = NIVEL_CONFIG[nivel];
 
@@ -160,7 +178,7 @@ export default function QuizResult({
             <Termometro score={score} color={cfg.color} />
             <div className="flex-1 space-y-4 pt-1">
               {ejes.map((eje, i) => (
-                <BarraEje key={eje.label} eje={eje} delay={400 + i * 200} />
+                <BarraEje key={eje.label} eje={eje} delay={400 + i * 200} quizId={quiz_id} />
               ))}
             </div>
           </div>

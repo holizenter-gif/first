@@ -10,6 +10,19 @@ function push(event: string, params?: Record<string, unknown>) {
   window.dataLayer.push({ event, ...params });
 }
 
+// ── Named standalone exports (newer API) ─────────────────────────────────
+export function trackQuizStarted({ quiz_id, source_page }: { quiz_id: string; source_page: string }) {
+  push("quiz_started", { quiz_id, source_page });
+}
+
+export function trackQuizCompleted({ quiz_id, score_global, nivel }: { quiz_id: string; score_global: number; nivel: string }) {
+  push("quiz_completed", { quiz_id, score_global, nivel });
+}
+
+export function trackQuizLeadSubmitted({ quiz_id, nivel, is_returning_lead }: { quiz_id: string; nivel: string; is_returning_lead: boolean }) {
+  push("quiz_lead_submitted", { quiz_id, nivel, is_returning_lead });
+}
+
 export const analytics = {
   // Quiz lifecycle
   quizStart:    (quiz_type: string) => push("quiz_start",    { quiz_type }),

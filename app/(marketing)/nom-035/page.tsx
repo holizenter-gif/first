@@ -88,6 +88,10 @@ export default function Nom035Page() {
         </div>
       </section>
 
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        <QuizCTA quiz_id_override="clima" source_section="nom035_page" variant="banner" />
+      </div>
+
       {/* Obligaciones */}
       <section className="py-16 px-4" style={{ background: "#F5F2EC" }}>
         <div className="max-w-5xl mx-auto">

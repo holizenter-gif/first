@@ -12,9 +12,11 @@ export default async function PortalDisponibilidadPage() {
 
   const { data: prof } = await supabase
     .from("profesionales")
-    .select("id, nombre, modalidad, disponibilidad")
+    .select("id, nombre, modalidad, disponibilidad, cal_username")
     .eq("user_id", user.id)
     .maybeSingle();
+
+  const calUser = prof?.cal_username ?? process.env.NEXT_PUBLIC_CAL_USERNAME ?? "holizenter";
 
   return (
     <div className="p-6 max-w-3xl mx-auto">
