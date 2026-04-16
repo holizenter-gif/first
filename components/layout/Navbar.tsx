@@ -7,10 +7,10 @@ import Logo from "@/components/brand/Logo";
 import BotonCarrito from "@/components/tienda/BotonCarrito";
 
 const SERVICIOS = [
-  { label: "Talleres Grupales",           href: "/servicios/talleres",       desc: "Experiencias vivenciales para equipos" },
+  { label: "Talleres Grupales",              href: "/servicios/talleres",       desc: "Experiencias vivenciales para equipos" },
   { label: "Sensibilización Alta Dirección", href: "/servicios/sensibilizacion", desc: "Sesiones ejecutivas de liderazgo consciente" },
-  { label: "Integración de Equipos",      href: "/servicios/integracion",    desc: "Team building holístico" },
-  { label: "Diagnóstico Organizacional",  href: "/servicios/diagnostico",    desc: "Evaluación profunda NOM-035" },
+  { label: "Integración de Equipos",         href: "/servicios/integracion",    desc: "Team building holístico" },
+  { label: "Diagnóstico Organizacional",     href: "/servicios/diagnostico",    desc: "Evaluación profunda NOM-035" },
 ];
 
 export default function Navbar() {
@@ -86,7 +86,7 @@ export default function Navbar() {
             href="/agendar"
             className="px-5 py-2.5 bg-brand-teal text-white text-sm font-display font-semibold rounded-full hover:bg-brand-teal-dark transition-colors shadow-sm shadow-brand-teal/20"
           >
-            Diagnóstico gratis
+            {"Diagn\u00f3stico gratis"}
           </Link>
         </div>
 
@@ -135,7 +135,7 @@ export default function Navbar() {
                   className="block w-full text-center py-3 bg-brand-teal text-white font-display font-semibold rounded-full hover:bg-brand-teal-dark transition-colors"
                   onClick={() => setMobileOpen(false)}
                 >
-                  Diagnóstico gratis
+                  {"Diagn\u00f3stico gratis"}
                 </Link>
               </div>
             </div>

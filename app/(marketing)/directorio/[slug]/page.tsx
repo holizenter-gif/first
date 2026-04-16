@@ -33,7 +33,7 @@ export default async function ProfesionalPage({ params }: Props) {
     .catch(() => {});
 
   const calUsername = p.cal_username ?? process.env.NEXT_PUBLIC_CAL_USERNAME ?? "holizenter";
-  const calSlug     = process.env.NEXT_PUBLIC_CAL_EVENT_DIAGNOSTICO ?? "diagnostico";
+  const calSlug     = process.env.NEXT_PUBLIC_CAL_EVENT_DIAGNOSTICO ?? "diagnostico-bienestar-gratis";
 
   return (
     <div className="min-h-screen" style={{ background: "#F5F2EC" }}>
