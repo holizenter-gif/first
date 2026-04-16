@@ -40,31 +40,36 @@ export default function Navbar() {
 
         {/* Desktop nav */}
         <ul className="hidden md:flex items-center gap-8 text-sm font-medium">
-          <li className="relative" onMouseEnter={() => setSubmenuOpen(true)} onMouseLeave={() => setSubmenuOpen(false)}>
+          <li className="relative">
             <button
+              onClick={() => setSubmenuOpen(!submenuOpen)}
               className={`flex items-center gap-1 font-display transition-colors ${solid ? "text-gray-700 hover:text-brand-teal" : "text-white/90 hover:text-white"}`}
             >
               Servicios <ChevronDown size={14} className={`transition-transform ${submenuOpen ? "rotate-180" : ""}`} />
             </button>
             {submenuOpen && (
-              <div className="absolute top-full left-0 mt-2 w-72 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50">
-                {SERVICIOS.map((s) => (
-                  <Link
-                    key={s.href}
-                    href={s.href}
-                    className="block px-4 py-3 hover:bg-brand-teal-50 transition-colors"
-                    onClick={() => setSubmenuOpen(false)}
-                  >
-                    <p className="font-display font-semibold text-brand-dark text-sm">{s.label}</p>
-                    <p className="text-gray-400 text-xs mt-0.5">{s.desc}</p>
-                  </Link>
-                ))}
-              </div>
+              <>
+                <div className="fixed inset-0 z-40" onClick={() => setSubmenuOpen(false)} />
+                <div className="absolute top-full left-0 mt-2 w-72 bg-white rounded-xl shadow-xl border border-gray-100 z-50">
+                  {SERVICIOS.map((s) => (
+                    <Link
+                      key={s.href}
+                      href={s.href}
+                      className="block px-4 py-3 hover:bg-brand-teal-50 transition-colors first:rounded-t-xl last:rounded-b-xl"
+                      onClick={() => setSubmenuOpen(false)}
+                    >
+                      <p className="font-display font-semibold text-brand-dark text-sm">{s.label}</p>
+                      <p className="text-gray-400 text-xs mt-0.5">{s.desc}</p>
+                    </Link>
+                  ))}
+                </div>
+              </>
             )}
           </li>
           {[
             { label: "Tienda",     href: "/tienda"     },
             { label: "Directorio", href: "/directorio" },
+            { label: "Eventos",    href: "/eventos"    },
             { label: "InsightLab", href: "/blog"       },
             { label: "Nosotros",   href: "/nosotros"   },
             { label: "NOM-035",    href: "/nom-035"    },
@@ -112,6 +117,7 @@ export default function Navbar() {
                   {[
                     { label: "Tienda",     href: "/tienda"     },
                     { label: "Directorio", href: "/directorio" },
+                    { label: "Eventos",    href: "/eventos"    },
                     { label: "InsightLab", href: "/blog"       },
                     { label: "Nosotros",   href: "/nosotros"   },
                     { label: "Contacto",   href: "/contacto"   },
