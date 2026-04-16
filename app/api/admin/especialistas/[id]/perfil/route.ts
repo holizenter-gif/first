@@ -7,6 +7,7 @@ export async function PUT(
 ) {
   const { id } = await params;
   const supabase = await createClient();
+
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
 
@@ -15,16 +16,21 @@ export async function PUT(
   const { error } = await supabase
     .from("profesionales")
     .update({
-      nombre:          body.nombre,
-      especialidad:    body.especialidad    || null,
-      bio:             body.bio             || null,
-      bio_corta:       body.bio_corta       || null,
-      whatsapp:        body.whatsapp        || null,
-      linkedin:        body.linkedin        || null,
-      sitio_web:       body.sitio_web       || null,
-      imagen_url:      body.imagen_url      || null,
-      certificaciones: body.certificaciones ?? [],
-      cal_username:    body.cal_username    || null,
+      nombre:           body.nombre           || null,
+      slug:             body.slug             || null,
+      especialidad:     body.especialidad     || null,
+      bio:              body.bio              || null,
+      bio_corta:        body.bio_corta        || null,
+      filosofia:        body.filosofia        || null,
+      foto_url:         body.foto_url         || null,
+      modalidad:        body.modalidad        || "hibrido",
+      precio_base:      Number(body.precio_base)      ?? 0,
+      experiencia_anos: Number(body.experiencia_anos) ?? 0,
+      tags:             Array.isArray(body.tags)           ? body.tags           : [],
+      certificaciones:  Array.isArray(body.certificaciones) ? body.certificaciones : [],
+      activo:           typeof body.activo === "boolean" ? body.activo : true,
+      orden:            Number(body.orden) || 99,
+      cal_username:     body.cal_username || null,
     })
     .eq("id", id);
 

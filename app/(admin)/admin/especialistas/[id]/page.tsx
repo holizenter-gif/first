@@ -23,12 +23,12 @@ export default async function DetalleEspecialistaPage({ params }: Props) {
 
   if (!sol) notFound();
 
-  // Buscar el profesional vinculado por email
-  const { data: profesional } = await supabase
-    .from("profesionales")
-    .select("id, nombre, especialidad, bio, bio_corta, whatsapp, linkedin, sitio_web, imagen_url, certificaciones, cal_username")
-    .eq("email", sol.email)
-    .maybeSingle();
+  // Buscar el profesional vinculado (primero por profesional_id si existe, luego por email)
+  const profesionalId = sol.profesional_id ?? null;
+  const { data: profesional } = await (profesionalId
+    ? supabase.from("profesionales").select("id, nombre, slug, especialidad, bio, bio_corta, filosofia, foto_url, modalidad, precio_base, experiencia_anos, tags, certificaciones, activo, orden, cal_username").eq("id", profesionalId).maybeSingle()
+    : supabase.from("profesionales").select("id, nombre, slug, especialidad, bio, bio_corta, filosofia, foto_url, modalidad, precio_base, experiencia_anos, tags, certificaciones, activo, orden, cal_username").eq("user_id", sol.user_id).maybeSingle()
+  );
 
   const ROWS = [
     { label: "Especialidad",    value: sol.especialidad              },
