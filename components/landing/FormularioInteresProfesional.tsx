@@ -17,6 +17,7 @@ export default function FormularioInteresProfesional() {
   const [bio,           setBio]           = useState("");
   const [motivacion,    setMotivacion]    = useState("");
   const [whatsapp,      setWhatsapp]      = useState("");
+  const [calUsername,   setCalUsername]   = useState("");
   const [loading,       setLoading]       = useState(false);
   const [error,         setError]         = useState("");
   const [enviado,       setEnviado]       = useState(false);
@@ -37,6 +38,7 @@ export default function FormularioInteresProfesional() {
           nombre, email, password, especialidad,
           experiencia_anos: Number(experiencia) || 0,
           certificaciones, bio, motivacion, whatsapp,
+          cal_username: calUsername,
         }),
       });
       const data = await res.json();
@@ -82,6 +84,33 @@ export default function FormularioInteresProfesional() {
             <Label className="text-xs text-gray-500 font-sans mb-1.5 block">WhatsApp</Label>
             <Input value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder="55 1234 5678" />
           </div>
+        </div>
+
+        <div>
+          <Label className="text-xs text-gray-500 font-display mb-1.5 block">
+            Username de Cal.com *
+          </Label>
+          <div className="flex items-center gap-2">
+            <span className="text-gray-500 text-sm">cal.com/</span>
+            <Input
+              value={calUsername}
+              onChange={(e) => setCalUsername(e.target.value)}
+              placeholder="tu-nombre"
+              required
+            />
+          </div>
+          <p className="text-gray-400 text-xs mt-1">
+            {"¿No tienes cuenta? "}
+            <a
+              href="https://cal.com/signup"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-brand-teal underline"
+            >
+              Créala gratis aquí
+            </a>
+            {" y vuelve a ingresar tu username."}
+          </p>
         </div>
 
         <div>

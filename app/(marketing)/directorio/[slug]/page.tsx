@@ -32,8 +32,7 @@ export default async function ProfesionalPage({ params }: Props) {
     .then((supabase) => supabase.rpc("incrementar_vistas_profesional", { profesional_id: p.id }))
     .catch(() => {});
 
-  const calUsername = p.cal_username ?? process.env.NEXT_PUBLIC_CAL_USERNAME ?? "holizenter";
-  const calSlug     = process.env.NEXT_PUBLIC_CAL_EVENT_DIAGNOSTICO ?? "diagnostico-bienestar-gratis";
+  const calSlug = process.env.NEXT_PUBLIC_CAL_EVENT_DIAGNOSTICO ?? "diagnostico-bienestar-gratis";
 
   return (
     <div className="min-h-screen" style={{ background: "#F5F2EC" }}>
@@ -197,11 +196,19 @@ export default async function ProfesionalPage({ params }: Props) {
                 </p>
               </div>
               <div className="p-4">
-                <CalEmbed
-                  calUsername={calUsername}
-                  eventSlug={calSlug}
-                  prefillNotes={`Solicitud de sesión con ${p.nombre}`}
-                />
+                {p.cal_username ? (
+                  <CalEmbed
+                    calUsername={p.cal_username}
+                    eventSlug={calSlug}
+                    prefillNotes={`Solicitud de sesión con ${p.nombre}`}
+                  />
+                ) : (
+                  <div className="p-5 text-center border border-dashed border-gray-200 rounded-2xl">
+                    <p className="text-gray-400 text-sm">
+                      Agenda disponible próximamente
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           </div>

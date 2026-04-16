@@ -60,6 +60,7 @@ export async function POST(req: NextRequest, { params }: Ctx) {
         modalidad:        "hibrido",
         activo:           true,
         user_id:          sol.user_id,
+        cal_username:     sol.cal_username ?? null,
         orden:            99,
       })
       .select()
