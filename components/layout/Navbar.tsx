@@ -40,10 +40,8 @@ export default function Navbar() {
 
         {/* Desktop nav */}
         <ul className="hidden md:flex items-center gap-8 text-sm font-medium">
-          <li className="relative">
+          <li className="relative" onMouseEnter={() => setSubmenuOpen(true)} onMouseLeave={() => setSubmenuOpen(false)}>
             <button
-              onClick={() => setSubmenuOpen(!submenuOpen)}
-              onBlur={() => setTimeout(() => setSubmenuOpen(false), 150)}
               className={`flex items-center gap-1 font-display transition-colors ${solid ? "text-gray-700 hover:text-brand-teal" : "text-white/90 hover:text-white"}`}
             >
               Servicios <ChevronDown size={14} className={`transition-transform ${submenuOpen ? "rotate-180" : ""}`} />
@@ -54,7 +52,7 @@ export default function Navbar() {
                   <Link
                     key={s.href}
                     href={s.href}
-                    className="block px-4 py-3 hover:bg-brand-teal-50 transition-colors rounded-xl"
+                    className="block px-4 py-3 hover:bg-brand-teal-50 transition-colors"
                     onClick={() => setSubmenuOpen(false)}
                   >
                     <p className="font-display font-semibold text-brand-dark text-sm">{s.label}</p>

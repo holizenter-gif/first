@@ -330,12 +330,10 @@ export default function FormacionPage() {
               <div className="space-y-3">
                 {RED_BENEFICIOS.map((b) => (
                   <div key={b} className="flex items-start gap-3">
-                    <div
-                      className="w-4 h-4 rounded-full flex-shrink-0 mt-0.5 flex items-center justify-center"
-                      style={{ background: "var(--hl-green)", minWidth: "16px" }}
-                    >
-                      <span className="text-white text-[8px] font-bold">✓</span>
-                    </div>
+                    <CheckCircle
+                      className="w-4 h-4 flex-shrink-0 mt-0.5"
+                      style={{ color: "var(--hl-green)", minWidth: "16px" }}
+                    />
                     <span className="font-sans text-sm" style={{ color: "var(--hl-text-muted)" }}>{b}</span>
                   </div>
                 ))}
