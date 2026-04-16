@@ -54,13 +54,15 @@ export async function POST(req: NextRequest) {
   }
 
   // Incrementar cupo_actual
-  await supabase.rpc("incrementar_cupo_evento", { p_evento_id: evento_id }).catch(() => {
+  try {
+    await supabase.rpc("incrementar_cupo_evento", { p_evento_id: evento_id });
+  } catch {
     // Fallback: update manual si la RPC no existe
-    supabase
+    await supabase
       .from("eventos")
       .update({ cupo_actual: (ev.cupo_actual ?? 0) + 1 })
       .eq("id", evento_id);
-  });
+  }
 
   return NextResponse.json({ success: true });
 }
