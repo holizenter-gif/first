@@ -1,8 +1,9 @@
-import { createClient }          from "@/lib/supabase/server";
-import { redirect, notFound }    from "next/navigation";
-import Link                      from "next/link";
-import { ArrowLeft }             from "lucide-react";
-import AccionesEspecialista      from "@/components/admin/AccionesEspecialista";
+import { createClient }                    from "@/lib/supabase/server";
+import { redirect, notFound }             from "next/navigation";
+import Link                               from "next/link";
+import { ArrowLeft }                      from "lucide-react";
+import AccionesEspecialista               from "@/components/admin/AccionesEspecialista";
+import AdminPerfilEspecialistaEditor      from "@/components/admin/AdminPerfilEspecialistaEditor";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -21,6 +22,13 @@ export default async function DetalleEspecialistaPage({ params }: Props) {
     .single();
 
   if (!sol) notFound();
+
+  // Buscar el profesional vinculado por email
+  const { data: profesional } = await supabase
+    .from("profesionales")
+    .select("id, nombre, especialidad, bio, bio_corta, whatsapp, linkedin, sitio_web, imagen_url, certificaciones, cal_username")
+    .eq("email", sol.email)
+    .maybeSingle();
 
   const ROWS = [
     { label: "Especialidad",    value: sol.especialidad              },
@@ -49,7 +57,7 @@ export default async function DetalleEspecialistaPage({ params }: Props) {
       </div>
 
       <div className="grid md:grid-cols-3 gap-6">
-        {/* Datos */}
+        {/* Datos de solicitud */}
         <div className="md:col-span-2 space-y-4">
           {ROWS.map((row) => (
             <div
@@ -84,6 +92,22 @@ export default async function DetalleEspecialistaPage({ params }: Props) {
               </p>
               <p className="text-sm leading-relaxed" style={{ color: "var(--hl-text)" }}>
                 {sol.motivacion}
+              </p>
+            </div>
+          )}
+
+          {/* Editor de perfil si el profesional ya existe en la plataforma */}
+          {profesional ? (
+            <AdminPerfilEspecialistaEditor profesional={profesional} />
+          ) : (
+            <div
+              className="rounded-xl p-4 border text-sm text-gray-500"
+              style={{ borderColor: "var(--hl-divider)", background: "#FAFAFA" }}
+            >
+              <p className="font-sans font-semibold text-gray-600 mb-1">Perfil de plataforma</p>
+              <p className="text-xs">
+                Este especialista aún no tiene un perfil activo en la plataforma.
+                Aprueba la solicitud primero para crear su cuenta.
               </p>
             </div>
           )}

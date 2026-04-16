@@ -1,7 +1,14 @@
 import Link from "next/link";
-import { ArrowRight, Clock, Users } from "lucide-react";
+import { ArrowRight, Clock, Users, Target, Heart, Handshake, BarChart2, type LucideIcon } from "lucide-react";
 import { SERVICIOS, formatPrecio } from "@/lib/data/servicios";
 import QuizCTA from "@/components/quiz/QuizCTA";
+
+const EMOJI_ICON: Record<string, LucideIcon> = {
+  "🎯": Target,
+  "🧘": Heart,
+  "🤝": Handshake,
+  "📊": BarChart2,
+};
 
 export const metadata = {
   title: "Servicios de Bienestar Corporativo | Holizenter",
@@ -44,7 +51,7 @@ export default function ServiciosPage() {
             >
               {/* Card top */}
               <div className="bg-brand-beige p-6 flex items-center gap-4">
-                <span className="text-4xl">{s.emoji}</span>
+                {(() => { const Icon = EMOJI_ICON[s.emoji] ?? Target; return <Icon className="w-9 h-9" style={{ color: "#5CB996" }} />; })()}
                 <div>
                   <p className="text-xs text-gray-400 font-display uppercase tracking-wider mb-1">
                     {s.audiencia}

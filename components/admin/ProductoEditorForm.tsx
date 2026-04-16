@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef }  from "react";
+import { useState, useRef, useCallback, memo }  from "react";
 import { useRouter }          from "next/navigation";
 import Image                  from "next/image";
 import ImagenUploader         from "@/components/admin/ImagenUploader";
@@ -34,6 +34,40 @@ const SECCIONES = [
   { id: "variantes",  label: "Variantes",           icon: Package   },
   { id: "seo",        label: "SEO",                 icon: Tag       },
 ] as const;
+
+// ── SeccionCard fuera del componente para evitar unmount/remount en cada render ──
+const SeccionCard = memo(function SeccionCard({
+  id,
+  seccionAbierta,
+  onToggle,
+  children,
+}: {
+  id:             string;
+  seccionAbierta: string;
+  onToggle:       (id: string) => void;
+  children:       React.ReactNode;
+}) {
+  const sec    = SECCIONES.find((s) => s.id === id)!;
+  const abierta = seccionAbierta === id;
+  const Icon   = sec.icon;
+  return (
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden mb-4">
+      <button
+        onClick={() => onToggle(id)}
+        className="w-full flex items-center justify-between px-5 py-4 hover:bg-gray-50 transition-colors"
+      >
+        <div className="flex items-center gap-3">
+          <Icon className="w-4 h-4 text-brand-teal" />
+          <span className="font-display font-semibold text-brand-dark text-sm">{sec.label}</span>
+        </div>
+        {abierta ? <ChevronUp className="w-4 h-4 text-gray-400" /> : <ChevronDown className="w-4 h-4 text-gray-400" />}
+      </button>
+      {abierta && (
+        <div className="px-5 pb-5 border-t border-gray-100 pt-4 space-y-4">{children}</div>
+      )}
+    </div>
+  );
+});
 
 interface ProductoEditorFormProps {
   producto?: Partial<Producto>;
@@ -83,10 +117,15 @@ export default function ProductoEditorForm({ producto, modo }: ProductoEditorFor
   const [error,          setError]          = useState("");
   const [seccionAbierta, setSeccionAbierta] = useState<string>("basico");
 
-  const generarSlug = (t: string) =>
+  const generarSlug = useCallback((t: string) =>
     t.toLowerCase()
       .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-      .replace(/[^a-z0-9\s-]/g, "").trim().replace(/\s+/g, "-");
+      .replace(/[^a-z0-9\s-]/g, "").trim().replace(/\s+/g, "-")
+  , []);
+
+  const toggleSeccion = useCallback((id: string) => {
+    setSeccionAbierta((prev) => prev === id ? "" : id);
+  }, []);
 
   const handleUpload = async (file: File) => {
     setUploading(true);
@@ -109,14 +148,17 @@ export default function ProductoEditorForm({ producto, modo }: ProductoEditorFor
     }
   };
 
-  const agregarVariante = () =>
-    setVariantes([...variantes, { id: crypto.randomUUID(), nombre: "", precio_extra: 0, stock: 99 }]);
+  const agregarVariante = useCallback(() =>
+    setVariantes((prev) => [...prev, { id: crypto.randomUUID(), nombre: "", precio_extra: 0, stock: 99 }])
+  , []);
 
-  const actualizarVariante = (id: string, campo: keyof Variante, valor: string | number) =>
-    setVariantes(variantes.map((v) => v.id === id ? { ...v, [campo]: valor } : v));
+  const actualizarVariante = useCallback((id: string, campo: keyof Variante, valor: string | number) =>
+    setVariantes((prev) => prev.map((v) => v.id === id ? { ...v, [campo]: valor } : v))
+  , []);
 
-  const eliminarVariante = (id: string) =>
-    setVariantes(variantes.filter((v) => v.id !== id));
+  const eliminarVariante = useCallback((id: string) =>
+    setVariantes((prev) => prev.filter((v) => v.id !== id))
+  , []);
 
   const handleGuardar = async () => {
     if (!nombre.trim() || !slug.trim()) { setError("El nombre y el slug son obligatorios."); return; }
@@ -164,29 +206,6 @@ export default function ProductoEditorForm({ producto, modo }: ProductoEditorFor
     }
   };
 
-  const SeccionCard = ({ id, children }: { id: string; children: React.ReactNode }) => {
-    const sec    = SECCIONES.find((s) => s.id === id)!;
-    const abierta = seccionAbierta === id;
-    const Icon   = sec.icon;
-    return (
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden mb-4">
-        <button
-          onClick={() => setSeccionAbierta(abierta ? "" : id)}
-          className="w-full flex items-center justify-between px-5 py-4 hover:bg-gray-50 transition-colors"
-        >
-          <div className="flex items-center gap-3">
-            <Icon className="w-4 h-4 text-brand-teal" />
-            <span className="font-display font-semibold text-brand-dark text-sm">{sec.label}</span>
-          </div>
-          {abierta ? <ChevronUp className="w-4 h-4 text-gray-400" /> : <ChevronDown className="w-4 h-4 text-gray-400" />}
-        </button>
-        {abierta && (
-          <div className="px-5 pb-5 border-t border-gray-100 pt-4 space-y-4">{children}</div>
-        )}
-      </div>
-    );
-  };
-
   const inputClass = "w-full text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-brand-teal bg-white";
   const labelClass = "text-xs text-gray-500 font-display mb-1.5 block";
 
@@ -196,7 +215,7 @@ export default function ProductoEditorForm({ producto, modo }: ProductoEditorFor
     <div className="grid lg:grid-cols-3 gap-8">
       <div className="lg:col-span-2">
 
-        <SeccionCard id="basico">
+        <SeccionCard id="basico" seccionAbierta={seccionAbierta} onToggle={toggleSeccion}>
           <div>
             <label className={labelClass}>Nombre del producto *</label>
             <input value={nombre} onChange={(e) => { setNombre(e.target.value); if (modo === "crear") setSlug(generarSlug(e.target.value)); }} placeholder="Nombre del producto" className={inputClass} />
@@ -290,7 +309,7 @@ export default function ProductoEditorForm({ producto, modo }: ProductoEditorFor
           </div>
         </SeccionCard>
 
-        <SeccionCard id="precio">
+        <SeccionCard id="precio" seccionAbierta={seccionAbierta} onToggle={toggleSeccion}>
           <div>
             <label className={labelClass}>Tipo de precio</label>
             <div className="grid grid-cols-3 gap-2">
@@ -343,7 +362,7 @@ export default function ProductoEditorForm({ producto, modo }: ProductoEditorFor
           )}
         </SeccionCard>
 
-        <SeccionCard id="inventario">
+        <SeccionCard id="inventario" seccionAbierta={seccionAbierta} onToggle={toggleSeccion}>
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className={labelClass}>Stock disponible</label>
@@ -370,7 +389,7 @@ export default function ProductoEditorForm({ producto, modo }: ProductoEditorFor
         </SeccionCard>
 
         {!digital && (
-          <SeccionCard id="envio">
+          <SeccionCard id="envio" seccionAbierta={seccionAbierta} onToggle={toggleSeccion}>
             <div className="flex gap-4 mb-2">
               {[
                 { checked: requiereEnvio, set: setRequiereEnvio, label: "Requiere envío" },
@@ -402,7 +421,7 @@ export default function ProductoEditorForm({ producto, modo }: ProductoEditorFor
         )}
 
         {digital && (
-          <SeccionCard id="digital">
+          <SeccionCard id="digital" seccionAbierta={seccionAbierta} onToggle={toggleSeccion}>
             <div
               className="border-2 border-dashed rounded-xl p-6 text-center cursor-pointer hover:border-brand-teal hover:bg-brand-teal-50 transition-all"
               style={{ borderColor: archivoUrl ? "#5CB996" : "#E5E7EB" }}
@@ -453,7 +472,7 @@ export default function ProductoEditorForm({ producto, modo }: ProductoEditorFor
           </SeccionCard>
         )}
 
-        <SeccionCard id="variantes">
+        <SeccionCard id="variantes" seccionAbierta={seccionAbierta} onToggle={toggleSeccion}>
           <p className="text-gray-500 text-xs mb-3">Variantes para productos con talla, color o formato. Cada una puede tener precio adicional y stock propio.</p>
           {variantes.map((v) => (
             <div key={v.id} className="grid grid-cols-12 gap-2 items-center mb-2">
@@ -481,7 +500,7 @@ export default function ProductoEditorForm({ producto, modo }: ProductoEditorFor
           </button>
         </SeccionCard>
 
-        <SeccionCard id="seo">
+        <SeccionCard id="seo" seccionAbierta={seccionAbierta} onToggle={toggleSeccion}>
           <div>
             <label className={labelClass}>Meta título (Google)</label>
             <input value={metaTitulo} onChange={(e) => setMetaTitulo(e.target.value)} placeholder={`${nombre || "Producto"} | Holizenter`} className={inputClass} />
