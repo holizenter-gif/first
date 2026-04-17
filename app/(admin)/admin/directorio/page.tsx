@@ -35,62 +35,55 @@ export default async function AdminDirectorioPage() {
       </div>
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {lista.map((p) => {
-          const initials = (p.nombre as string).split(" ").map((n: string) => n[0]).join("").slice(0, 2);
-          return (
-            <div
-              key={p.id}
-              className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm"
-            >
-              {/* Foto */}
-              <div className="relative h-40" style={{ background: "#EBF8F2" }}>
-                <ProfessionalAvatar
-                  src={p.foto_url}
-                  nombre={p.nombre}
-                  fill
-                  className="object-cover object-top"
-                />
-                <div className="absolute top-2 right-2">
-                  {p.activo ? (
-                    <span
-                      className="bg-white/90 text-xs px-2 py-0.5 rounded-full flex items-center gap-1 font-sans"
-                      style={{ color: "#5CB996" }}
-                    >
-                      <CheckCircle className="w-3 h-3" /> Activo
-                    </span>
-                  ) : (
-                    <span
-                      className="bg-white/90 text-xs px-2 py-0.5 rounded-full flex items-center gap-1 font-sans"
-                      style={{ color: "#9CA3AF" }}
-                    >
-                      <XCircle className="w-3 h-3" /> Inactivo
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              <div className="p-4">
-                <h3 className="font-sans font-bold mb-0.5" style={{ color: "var(--hl-text)" }}>
-                  {p.nombre}
-                </h3>
-                <p className="font-sans text-xs font-semibold mb-1" style={{ color: "#5CB996" }}>
-                  {p.especialidad}
-                </p>
-                <p className="font-sans text-xs mb-3" style={{ color: "var(--hl-text-muted)" }}>
-                  {p.experiencia_anos} años · {p.modalidad}
-                </p>
-                <Link
-                  href={`/directorio/${p.slug}`}
-                  target="_blank"
-                  className="font-sans text-xs hover:underline"
-                  style={{ color: "#5CB996" }}
-                >
-                  Ver perfil público →
-                </Link>
+        {lista.map((p) => (
+          <Link
+            key={p.id}
+            href={`/admin/directorio/${p.id}`}
+            className="group bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-md hover:border-[#5CB996]/30 transition-all"
+          >
+            {/* Foto */}
+            <div className="relative h-40" style={{ background: "#EBF8F2" }}>
+              <ProfessionalAvatar
+                src={p.foto_url}
+                nombre={p.nombre}
+                fill
+                className="object-cover object-top"
+              />
+              <div className="absolute top-2 right-2">
+                {p.activo ? (
+                  <span
+                    className="bg-white/90 text-xs px-2 py-0.5 rounded-full flex items-center gap-1 font-sans"
+                    style={{ color: "#5CB996" }}
+                  >
+                    <CheckCircle className="w-3 h-3" /> Activo
+                  </span>
+                ) : (
+                  <span
+                    className="bg-white/90 text-xs px-2 py-0.5 rounded-full flex items-center gap-1 font-sans"
+                    style={{ color: "#9CA3AF" }}
+                  >
+                    <XCircle className="w-3 h-3" /> Inactivo
+                  </span>
+                )}
               </div>
             </div>
-          );
-        })}
+
+            <div className="p-4">
+              <h3 className="font-sans font-bold mb-0.5 group-hover:text-[#5CB996] transition-colors" style={{ color: "var(--hl-text)" }}>
+                {p.nombre}
+              </h3>
+              <p className="font-sans text-xs font-semibold mb-1" style={{ color: "#5CB996" }}>
+                {p.especialidad}
+              </p>
+              <p className="font-sans text-xs mb-3" style={{ color: "var(--hl-text-muted)" }}>
+                {p.experiencia_anos} años · {p.modalidad}
+              </p>
+              <span className="font-sans text-xs font-medium" style={{ color: "#5CB996" }}>
+                Editar perfil →
+              </span>
+            </div>
+          </Link>
+        ))}
 
         {/* Placeholder agregar */}
         <div
