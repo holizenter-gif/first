@@ -2,7 +2,8 @@ import type { Metadata }    from "next";
 import { getProfesionales } from "@/lib/data/profesionales-helpers";
 import DirectorioClient     from "@/components/directorio/DirectorioClient";
 
-export const dynamic = "force-dynamic";
+export const dynamic   = "force-dynamic";
+export const revalidate = 0;
 
 export const metadata: Metadata = {
   title: "Directorio de Especialistas en Bienestar | Holizenter",

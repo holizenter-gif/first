@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { revalidatePath }            from "next/cache";
 import { createClient }              from "@/lib/supabase/server";
 
-export async function PUT(
-  req:     NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+interface Props { params: Promise<{ id: string }> }
+
+export async function PUT(req: NextRequest, { params }: Props) {
   const { id } = await params;
   const supabase = await createClient();
 
@@ -14,7 +12,7 @@ export async function PUT(
 
   const body = await req.json();
 
-  const { data: updated, error } = await supabase
+  const { data, error } = await supabase
     .from("profesionales")
     .update({
       nombre:           body.nombre           || null,
@@ -34,16 +32,8 @@ export async function PUT(
       cal_username:     body.cal_username || null,
     })
     .eq("id", id)
-    .select("slug");
+    .select();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-
-  // Invalidar caché del directorio completo y del perfil específico
-  revalidatePath("/directorio", "layout");
-  const slug = updated?.[0]?.slug ?? body.slug;
-  if (slug) {
-    revalidatePath(`/directorio/${slug}`);
-  }
-
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ profesional: data });
 }
