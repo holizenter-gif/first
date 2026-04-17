@@ -54,7 +54,7 @@ export default async function AdminEspecialistasPage() {
 
       <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
-          <table className="w-full">
+          <table className="w-full min-w-[640px]">
             <thead>
               <tr style={{ background: "var(--hl-beige)", borderBottom: "1px solid var(--hl-divider)" }}>
                 {["Especialista", "Especialidad", "Experiencia", "Fecha", "Estado", "Acciones"].map((h) => (

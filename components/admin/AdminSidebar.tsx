@@ -114,7 +114,7 @@ export default function AdminSidebar() {
     <>
       {/* Desktop sidebar */}
       <aside
-        className="hidden md:flex flex-col w-52 min-h-screen sticky top-0"
+        className="hidden lg:flex flex-col w-60 min-h-screen sticky top-0 flex-shrink-0"
         style={{
           background:   "#fff",
           borderRight:  "1px solid var(--hl-divider)",
@@ -125,7 +125,7 @@ export default function AdminSidebar() {
 
       {/* Mobile header */}
       <div
-        className="md:hidden flex items-center justify-between px-4 py-3 sticky top-0 z-40"
+        className="lg:hidden flex items-center justify-between px-4 py-3 sticky top-0 z-40"
         style={{
           background:   "#fff",
           borderBottom: "1px solid var(--hl-divider)",
@@ -142,7 +142,7 @@ export default function AdminSidebar() {
       {/* Mobile drawer */}
       {open && (
         <div
-          className="md:hidden fixed inset-0 z-30"
+          className="lg:hidden fixed inset-0 z-30"
           onClick={() => setOpen(false)}
           style={{ background: "rgba(0,0,0,0.3)" }}
         >

@@ -46,7 +46,8 @@ export default async function AdminEventosPage() {
 
       {/* Tabla */}
       <div className="bg-white rounded-xl border overflow-hidden" style={{ borderColor: "var(--hl-divider)" }}>
-        <table className="w-full text-sm">
+        <div className="overflow-x-auto">
+        <table className="w-full min-w-[640px] text-sm">
           <thead>
             <tr style={{ background: "var(--hl-bg)", borderBottom: "1px solid var(--hl-divider)" }}>
               <th className="text-left px-4 py-3 font-sans font-semibold text-xs uppercase tracking-wider" style={{ color: "var(--hl-text-muted)" }}>
@@ -168,6 +169,7 @@ export default async function AdminEventosPage() {
             )}
           </tbody>
         </table>
+        </div>
       </div>
 
       {/* SQL hint */}

@@ -88,7 +88,7 @@ export default async function AdminCitasPage() {
           boxShadow: "0 2px 16px rgba(0,0,0,0.06)",
         }}
       >
-        <table className="w-full font-sans" style={{ fontSize: "13px" }}>
+        <table className="w-full min-w-[640px] font-sans" style={{ fontSize: "13px" }}>
           <thead>
             <tr style={{ borderBottom: "1px solid var(--hl-divider)" }}>
               {["Cliente", "Tipo", "Fecha", "Modalidad", "Estado", "Registrado"].map((h) => (

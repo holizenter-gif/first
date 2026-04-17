@@ -220,7 +220,7 @@ export default function ProductoEditorForm({ producto, modo }: ProductoEditorFor
             <label className={labelClass}>Nombre del producto *</label>
             <input value={nombre} onChange={(e) => { setNombre(e.target.value); if (modo === "crear") setSlug(generarSlug(e.target.value)); }} placeholder="Nombre del producto" className={inputClass} />
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className={labelClass}>Slug (URL) *</label>
               <div className="flex items-center gap-1">
@@ -241,7 +241,7 @@ export default function ProductoEditorForm({ producto, modo }: ProductoEditorFor
             <label className={labelClass}>Descripción completa</label>
             <textarea value={descripcion} onChange={(e) => setDescripcion(e.target.value)} rows={5} className={`${inputClass} resize-y`} placeholder="Descripción detallada..." />
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className={labelClass}>Categoría</label>
               <select value={categoria} onChange={(e) => setCategoria(e.target.value)} className={inputClass}>
@@ -283,7 +283,7 @@ export default function ProductoEditorForm({ producto, modo }: ProductoEditorFor
             <label className="text-xs text-gray-500 font-display mb-2 block">
               Galería adicional (máx. 5 imágenes)
             </label>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               {galeria.map((url, i) => (
                 <div key={i} className="relative aspect-square rounded-xl overflow-hidden border border-gray-200">
                   <Image src={url} alt={`Foto ${i + 1}`} fill className="object-cover" />
@@ -312,7 +312,7 @@ export default function ProductoEditorForm({ producto, modo }: ProductoEditorFor
         <SeccionCard id="precio" seccionAbierta={seccionAbierta} onToggle={toggleSeccion}>
           <div>
             <label className={labelClass}>Tipo de precio</label>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
               {TIPOS_PRECIO.map((t) => (
                 <button key={t.value} onClick={() => setTipoPrecio(t.value as typeof tipoPrecio)}
                   className={`p-3 rounded-xl border-2 text-left transition-all ${tipoPrecio === t.value ? "border-brand-teal bg-brand-teal-50" : "border-gray-200 hover:border-brand-teal/50"}`}>
@@ -322,7 +322,7 @@ export default function ProductoEditorForm({ producto, modo }: ProductoEditorFor
               ))}
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className={labelClass}>Precio MXN *</label>
               <div className="relative">
@@ -348,7 +348,7 @@ export default function ProductoEditorForm({ producto, modo }: ProductoEditorFor
                   <input type="number" value={precioOferta} onChange={(e) => setPrecioOferta(e.target.value)} className={`${inputClass} pl-7`} placeholder="Precio con descuento" />
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className={labelClass}>Inicio de oferta</label>
                   <input type="datetime-local" value={fechaInicio} onChange={(e) => setFechaInicio(e.target.value)} className={`${inputClass} text-xs`} />
@@ -363,7 +363,7 @@ export default function ProductoEditorForm({ producto, modo }: ProductoEditorFor
         </SeccionCard>
 
         <SeccionCard id="inventario" seccionAbierta={seccionAbierta} onToggle={toggleSeccion}>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className={labelClass}>Stock disponible</label>
               <input type="number" value={stock} onChange={(e) => setStock(Number(e.target.value))} className={inputClass} placeholder="999 = ilimitado" />
@@ -403,7 +403,7 @@ export default function ProductoEditorForm({ producto, modo }: ProductoEditorFor
             </div>
             <div className="bg-brand-beige rounded-xl p-4">
               <p className="font-display font-semibold text-brand-dark text-xs mb-3">Dimensiones para envío</p>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {[
                   { label: "Peso (g)", val: pesoGramos, set: setPesoGramos },
                   { label: "Largo (cm)", val: largoCm,  set: setLargoCm   },
@@ -457,7 +457,7 @@ export default function ProductoEditorForm({ producto, modo }: ProductoEditorFor
                 </div>
               )}
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className={labelClass}>Máx. descargas por compra</label>
                 <input type="number" value={maxDescargas} onChange={(e) => setMaxDescargas(Number(e.target.value))} min={1} max={99} className={inputClass} />

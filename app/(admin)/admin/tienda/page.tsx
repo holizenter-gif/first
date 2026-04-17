@@ -57,7 +57,7 @@ export default async function AdminTiendaPage() {
             {configEnvio?.envio_gratis_activo ? "Envío gratis activo" : "Envío gratis desactivado"}
           </span>
         </div>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="bg-brand-beige rounded-xl p-4 text-center">
             <p className="text-gray-500 text-xs mb-1">Costo estándar</p>
             <p className="font-display font-bold text-brand-dark text-2xl">

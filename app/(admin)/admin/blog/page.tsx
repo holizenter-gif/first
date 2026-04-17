@@ -42,7 +42,7 @@ export default async function AdminBlogPage() {
       {/* Tabla de artículos */}
       <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
-          <table className="w-full">
+          <table className="w-full min-w-[640px]">
             <thead>
               <tr className="bg-gray-50 border-b border-gray-100">
                 {["Título", "Categoría", "Autor", "Quiz", "Vistas", "Estado", "Acciones"].map((h) => (

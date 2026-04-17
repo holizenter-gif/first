@@ -111,7 +111,7 @@ export default async function AdminPagosPage() {
           boxShadow: "0 2px 16px rgba(0,0,0,0.06)",
         }}
       >
-        <table className="w-full font-sans" style={{ fontSize: "13px" }}>
+        <table className="w-full min-w-[720px] font-sans" style={{ fontSize: "13px" }}>
           <thead>
             <tr style={{ borderBottom: "1px solid var(--hl-divider)" }}>
               {["Cliente", "Servicio", "Monto total", "Anticipo (30%)", "Estado", "MP ID", "Fecha"].map((h) => (
