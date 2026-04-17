@@ -34,15 +34,15 @@ export async function PUT(
       cal_username:     body.cal_username || null,
     })
     .eq("id", id)
-    .select("slug")
-    .single();
+    .select("slug");
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
   // Invalidar caché del directorio completo y del perfil específico
   revalidatePath("/directorio", "layout");
-  if (updated?.slug) {
-    revalidatePath(`/directorio/${updated.slug}`);
+  const slug = updated?.[0]?.slug ?? body.slug;
+  if (slug) {
+    revalidatePath(`/directorio/${slug}`);
   }
 
   return NextResponse.json({ ok: true });
