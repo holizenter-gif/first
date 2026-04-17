@@ -6,7 +6,6 @@ import MetodologiaMBSR     from "@/components/landing/MetodologiaMBSR";
 import EquipoEspecialistas from "@/components/landing/EquipoEspecialistas";
 import PodcastSection      from "@/components/landing/PodcastSection";
 import TresPilaresGeneral  from "@/components/landing/TresPilaresGeneral";
-import PruebaSocial        from "@/components/landing/PruebaSocial";
 import CTAFinal            from "@/components/landing/CTAFinal";
 import QuizCTA             from "@/components/quiz/QuizCTA";
 
@@ -43,7 +42,6 @@ export default function HomePage() {
       <EquipoEspecialistas />
       <PodcastSection />
       <TresPilaresGeneral />
-      <PruebaSocial />
       <CTAFinal />
     </>
   );

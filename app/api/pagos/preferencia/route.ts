@@ -6,13 +6,31 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const {
-      servicio, personas, modalidad, monto,
-      nombre, empresa, email, whatsapp,
+      // Flujo servicios (cotización)
+      servicio, personas, modalidad,
+      // Flujo eventos
+      evento_id, registro_id, evento_slug, nombre_evento,
+      // Campos comunes
+      monto, nombre, empresa, email, whatsapp,
     } = body;
 
     if (!monto || !nombre || !email) {
       return NextResponse.json({ error: "Faltan campos requeridos" }, { status: 400 });
     }
+
+    const esEvento = Boolean(evento_id && registro_id);
+
+    const concepto = esEvento
+      ? `evento:${evento_id}:reg:${registro_id}`
+      : `${servicio} · ${personas} personas · ${modalidad}`;
+
+    const tituloMP = esEvento
+      ? `Holizenter · ${nombre_evento ?? "Evento"}`
+      : `Holizenter · ${servicio}`;
+
+    const descripcionMP = esEvento
+      ? `${nombre_evento} — ${nombre}${empresa ? ` · ${empresa}` : ""}`
+      : `${servicio} para ${personas} personas · ${modalidad} · ${empresa}`;
 
     const supabase = await createClient();
 
@@ -24,10 +42,10 @@ export async function POST(req: NextRequest) {
         moneda:          "MXN",
         metodo:          "mercado_pago",
         status:          "pendiente",
-        concepto:        `${servicio} · ${personas} personas · ${modalidad}`,
+        concepto,
         nombre_cliente:  nombre,
         email_cliente:   email,
-        empresa_cliente: empresa,
+        empresa_cliente: empresa ?? null,
       })
       .select()
       .single();
@@ -37,14 +55,21 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Error creando registro de pago" }, { status: 500 });
     }
 
+    const base = process.env.NEXT_PUBLIC_APP_URL ?? "https://holizenter.com";
+
     // 2. Crear preferencia en Mercado Pago
     const preferencia = await crearPreferencia({
-      titulo:        `Holizenter · ${servicio}`,
-      descripcion:   `${servicio} para ${personas} personas · ${modalidad} · ${empresa}`,
+      titulo:        tituloMP,
+      descripcion:   descripcionMP,
       monto:         Math.round(monto),
       externalRef:   pago.id,
       nombreCliente: nombre,
       emailCliente:  email,
+      backUrls: esEvento ? {
+        success: `${base}/eventos/${evento_slug}?registro=ok`,
+        failure: `${base}/eventos/${evento_slug}?registro=error`,
+        pending: `${base}/eventos/${evento_slug}?registro=pendiente`,
+      } : undefined,
     });
 
     // 3. Guardar preference_id

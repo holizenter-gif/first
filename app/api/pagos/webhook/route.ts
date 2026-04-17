@@ -42,8 +42,46 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (nuevoStatus === "aprobado" && pago) {
-      if (pago.email_cliente) {
-        generarDescargas(supabase, pago.id, pago.email_cliente).catch(console.error);
+      const concepto: string = pago.concepto ?? "";
+
+      if (concepto.startsWith("evento:")) {
+        // Formato: "evento:{evento_id}:reg:{registro_id}"
+        const partes      = concepto.split(":");
+        const registroId  = partes[3] ?? null;
+
+        if (registroId) {
+          // 1. Confirmar el registro del evento
+          await supabase
+            .from("registros_eventos")
+            .update({ status: "confirmado" })
+            .eq("id", registroId);
+
+          // 2. Incrementar cupo_actual del evento
+          const eventoId = partes[1] ?? null;
+          if (eventoId) {
+            const { data: ev } = await supabase
+              .from("eventos")
+              .select("cupo_actual")
+              .eq("id", eventoId)
+              .single();
+
+            try {
+              await supabase.rpc("incrementar_cupo_evento", { p_evento_id: eventoId });
+            } catch {
+              if (ev) {
+                await supabase
+                  .from("eventos")
+                  .update({ cupo_actual: (ev.cupo_actual ?? 0) + 1 })
+                  .eq("id", eventoId);
+              }
+            }
+          }
+        }
+      } else {
+        // Flujo normal de tienda/servicios — generar descargas
+        if (pago.email_cliente) {
+          generarDescargas(supabase, pago.id, pago.email_cliente).catch(console.error);
+        }
       }
 
       Promise.allSettled([
@@ -53,12 +91,12 @@ export async function POST(req: NextRequest) {
               nombre:   pago.nombre_cliente,
               empresa:  pago.empresa_cliente ?? "",
               monto:    pago.monto,
-              concepto: pago.concepto ?? "",
+              concepto,
             })
           : Promise.resolve(),
         sendWhatsAppNotification({
           to:      process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "",
-          message: `💳 Pago aprobado: ${pago.nombre_cliente} de ${pago.empresa_cliente} — $${pago.monto} MXN — ${pago.concepto}`,
+          message: `💳 Pago aprobado: ${pago.nombre_cliente} de ${pago.empresa_cliente} — $${pago.monto} MXN — ${concepto}`,
         }),
       ]).catch(console.error);
     }

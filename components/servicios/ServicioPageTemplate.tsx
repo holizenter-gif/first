@@ -10,10 +10,9 @@ export default function ServicioPageTemplate({ servicio }: { servicio: Servicio 
       {/* Hero */}
       <section className="bg-brand-dark pt-8 pb-16 px-4">
         <div className="max-w-5xl mx-auto text-center">
-          <div className="text-5xl mb-4">{servicio.emoji}</div>
-          <div className="inline-block bg-white/10 text-white/60 text-xs font-display px-4 py-1.5 rounded-full mb-4">
-            {servicio.audiencia}
-          </div>
+          {servicio.emoji && (
+            <div className="text-5xl mb-4">{servicio.emoji}</div>
+          )}
           <h1 className="font-display text-4xl md:text-5xl font-bold text-white mb-4 leading-tight">
             {servicio.titulo}
           </h1>

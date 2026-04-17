@@ -188,6 +188,7 @@ export default async function EventoPage({ params }: Props) {
                   <FormularioRegistroEvento
                     eventoId={ev.id}
                     eventoTitulo={ev.titulo}
+                    eventoSlug={ev.slug}
                     precio={ev.precio ?? 0}
                   />
                 ) : (

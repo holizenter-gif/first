@@ -35,6 +35,13 @@ export default async function AdminEventosPage() {
             {eventos?.length ?? 0} eventos registrados
           </p>
         </div>
+        <Link
+          href="/admin/eventos/nuevo"
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-sans font-semibold text-sm text-white"
+          style={{ background: "#5CB996" }}
+        >
+          + Nuevo evento
+        </Link>
       </div>
 
       {/* Tabla */}
@@ -127,14 +134,22 @@ export default async function AdminEventosPage() {
                     </div>
                   </td>
                   <td className="px-4 py-3 text-right">
-                    <Link
-                      href={`/eventos/${ev.slug}`}
-                      target="_blank"
-                      className="font-sans text-xs font-medium hover:underline"
-                      style={{ color: "#5CB996" }}
-                    >
-                      Ver →
-                    </Link>
+                    <div className="flex items-center justify-end gap-3">
+                      <Link
+                        href={`/admin/eventos/${ev.id}/editar`}
+                        className="font-sans text-xs font-medium hover:underline"
+                        style={{ color: "#5CB996" }}
+                      >
+                        Editar
+                      </Link>
+                      <Link
+                        href={`/eventos/${ev.slug}`}
+                        target="_blank"
+                        className="font-sans text-xs font-medium text-gray-400 hover:text-gray-600"
+                      >
+                        Ver →
+                      </Link>
+                    </div>
                   </td>
                 </tr>
               );

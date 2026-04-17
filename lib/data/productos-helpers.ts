@@ -56,13 +56,6 @@ export const CATEGORIA_LABELS: Record<string, string> = {
   membresia:         "Membresía",
 };
 
-export const CATEGORIA_EMOJIS: Record<string, string> = {
-  cursos:            "🎓",
-  materiales:        "📄",
-  merchandising:     "🎁",
-  talleres_grabados: "🎥",
-  membresia:         "⭐",
-};
 
 export function getPrecioEfectivo(p: Producto): number {
   if (p.tipo_precio === "oferta" && p.precio_oferta) {
@@ -97,14 +90,14 @@ export function calcularDescuento(precio: number, precioOriginal?: number | null
 
 export function getLabelTipo(tipo: string): string {
   const labels: Record<string, string> = {
-    curso_digital:      "🎓 Curso Digital",
-    material_fisico:    "📚 Material",
-    merchandising:      "🌿 Producto Físico",
-    taller_grabado:     "🎥 Taller Grabado",
-    membresia:          "⭐ Membresía",
-    cursos:             "🎓 Cursos Online",
-    materiales:         "📄 Materiales",
-    talleres_grabados:  "🎥 Talleres Grabados",
+    curso_digital:      "Curso Digital",
+    material_fisico:    "Material",
+    merchandising:      "Producto Físico",
+    taller_grabado:     "Taller Grabado",
+    membresia:          "Membresía",
+    cursos:             "Cursos Online",
+    materiales:         "Materiales",
+    talleres_grabados:  "Talleres Grabados",
   };
   return labels[tipo] ?? tipo;
 }
