@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath }            from "next/cache";
 import { createClient }              from "@/lib/supabase/server";
 
 export async function PUT(
@@ -13,7 +14,7 @@ export async function PUT(
 
   const body = await req.json();
 
-  const { error } = await supabase
+  const { data: updated, error } = await supabase
     .from("profesionales")
     .update({
       nombre:           body.nombre           || null,
@@ -24,16 +25,25 @@ export async function PUT(
       filosofia:        body.filosofia        || null,
       foto_url:         body.foto_url         || null,
       modalidad:        body.modalidad        || "hibrido",
-      precio_base:      Number(body.precio_base)      ?? 0,
-      experiencia_anos: Number(body.experiencia_anos) ?? 0,
-      tags:             Array.isArray(body.tags)           ? body.tags           : [],
+      precio_base:      Number(body.precio_base)       ?? 0,
+      experiencia_anos: Number(body.experiencia_anos)  ?? 0,
+      tags:             Array.isArray(body.tags)            ? body.tags            : [],
       certificaciones:  Array.isArray(body.certificaciones) ? body.certificaciones : [],
       activo:           typeof body.activo === "boolean" ? body.activo : true,
       orden:            Number(body.orden) || 99,
       cal_username:     body.cal_username || null,
     })
-    .eq("id", id);
+    .eq("id", id)
+    .select("slug")
+    .single();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+  // Invalidar caché del directorio completo y del perfil específico
+  revalidatePath("/directorio", "layout");
+  if (updated?.slug) {
+    revalidatePath(`/directorio/${updated.slug}`);
+  }
+
   return NextResponse.json({ ok: true });
 }
