@@ -114,7 +114,7 @@ export default function AdminSidebar() {
     <>
       {/* Desktop sidebar */}
       <aside
-        className="hidden lg:flex flex-col w-60 min-h-screen sticky top-0 flex-shrink-0"
+        className="hidden lg:flex flex-col w-60 lg:min-h-screen lg:sticky lg:top-0 flex-shrink-0"
         style={{
           background:   "#fff",
           borderRight:  "1px solid var(--hl-divider)",
