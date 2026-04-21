@@ -11,6 +11,7 @@ const SERVICIOS = [
   { label: "Sensibilización Alta Dirección", href: "/servicios/sensibilizacion", desc: "Sesiones ejecutivas de liderazgo consciente" },
   { label: "Integración de Equipos",         href: "/servicios/integracion",    desc: "Team building holístico" },
   { label: "Diagnóstico Organizacional",     href: "/servicios/diagnostico",    desc: "Evaluación profunda NOM-035" },
+  { label: "NOM-035",                        href: "/nom-035",                  desc: "Cumplimiento normativo laboral" },
 ];
 
 export default function Navbar() {
@@ -72,7 +73,6 @@ export default function Navbar() {
             { label: "Eventos",    href: "/eventos"    },
             { label: "InsightLab", href: "/blog"       },
             { label: "Nosotros",   href: "/nosotros"   },
-            { label: "NOM-035",    href: "/nom-035"    },
           ].map((item) => (
             <li key={item.href}>
               <Link href={item.href} className={`font-display transition-colors ${solid ? "text-gray-700 hover:text-brand-teal" : "text-white/90 hover:text-white"}`}>
@@ -86,10 +86,16 @@ export default function Navbar() {
         <div className="hidden md:flex items-center gap-3">
           <BotonCarrito solid={solid} />
           <Link
+            href="/auth/login"
+            className={`px-4 py-2 text-sm font-display font-semibold rounded-full border transition-colors ${solid ? "border-brand-teal text-brand-teal hover:bg-brand-teal hover:text-white" : "border-white/70 text-white/90 hover:border-white hover:text-white"}`}
+          >
+            Iniciar sesión
+          </Link>
+          <Link
             href="/agendar"
             className="px-5 py-2.5 bg-brand-teal text-white text-sm font-display font-semibold rounded-full hover:bg-brand-teal-dark transition-colors shadow-sm shadow-brand-teal/20"
           >
-            {"Diagn\u00f3stico gratis"}
+            Diagnóstico gratis
           </Link>
         </div>
 
@@ -132,14 +138,17 @@ export default function Navbar() {
                 </div>
               </nav>
               <div className="p-6 border-t border-gray-100 space-y-3">
-                <div className="flex justify-center">
-                  <BotonCarrito solid />
-                </div>
+                <Link href="/auth/login"
+                  className="block w-full text-center py-2.5 border border-brand-teal text-brand-teal font-display font-semibold rounded-full hover:bg-brand-teal hover:text-white transition-colors text-sm"
+                  onClick={() => setMobileOpen(false)}
+                >
+                  Iniciar sesión
+                </Link>
                 <Link href="/agendar"
                   className="block w-full text-center py-3 bg-brand-teal text-white font-display font-semibold rounded-full hover:bg-brand-teal-dark transition-colors"
                   onClick={() => setMobileOpen(false)}
                 >
-                  {"Diagn\u00f3stico gratis"}
+                  Diagnóstico gratis
                 </Link>
               </div>
             </div>
