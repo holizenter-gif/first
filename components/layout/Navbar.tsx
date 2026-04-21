@@ -1,10 +1,14 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Menu, X, ChevronDown } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import Logo from "@/components/brand/Logo";
 import BotonCarrito from "@/components/tienda/BotonCarrito";
+import NavUserMenu from "@/components/layout/NavUserMenu";
+import { createClient } from "@/lib/supabase/client";
+import type { User } from "@supabase/supabase-js";
 
 const SERVICIOS = [
   { label: "Talleres Grupales",              href: "/servicios/talleres",       desc: "Experiencias vivenciales para equipos" },
@@ -18,12 +22,33 @@ export default function Navbar() {
   const [scrolled,     setScrolled]     = useState(false);
   const [submenuOpen,  setSubmenuOpen]  = useState(false);
   const [mobileOpen,   setMobileOpen]   = useState(false);
+  const [user,         setUser]         = useState<User | null | undefined>(undefined);
+  const [logoutLoading, setLogoutLoading] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data }) => setUser(data.user ?? null));
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
+      setUser(session?.user ?? null);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleLogout = async () => {
+    setLogoutLoading(true);
+    await fetch("/api/auth/logout", { method: "POST" });
+    setMobileOpen(false);
+    router.push("/");
+    router.refresh();
+    setLogoutLoading(false);
+  };
 
   const solid = scrolled || mobileOpen;
 
@@ -85,18 +110,41 @@ export default function Navbar() {
         {/* Desktop CTA */}
         <div className="hidden md:flex items-center gap-3">
           <BotonCarrito solid={solid} />
-          <Link
-            href="/auth/login"
-            className={`px-4 py-2 text-sm font-display font-semibold rounded-full border transition-colors ${solid ? "border-brand-teal text-brand-teal hover:bg-brand-teal hover:text-white" : "border-white/70 text-white/90 hover:border-white hover:text-white"}`}
-          >
-            Iniciar sesión
-          </Link>
-          <Link
-            href="/agendar"
-            className="px-5 py-2.5 bg-brand-teal text-white text-sm font-display font-semibold rounded-full hover:bg-brand-teal-dark transition-colors shadow-sm shadow-brand-teal/20"
-          >
-            Diagnóstico gratis
-          </Link>
+          {/* Auth-aware buttons */}
+          {user === undefined ? (
+            <div className="w-28 h-8" />
+          ) : user ? (
+            <>
+              <Link
+                href="/mi-perfil"
+                className={`px-4 py-2 text-sm font-display font-semibold rounded-full border transition-colors ${solid ? "border-brand-teal text-brand-teal hover:bg-brand-teal hover:text-white" : "border-white/70 text-white/90 hover:border-white hover:text-white"}`}
+              >
+                Mi perfil
+              </Link>
+              <button
+                onClick={handleLogout}
+                disabled={logoutLoading}
+                className="px-5 py-2.5 bg-brand-teal text-white text-sm font-display font-semibold rounded-full hover:bg-brand-teal-dark transition-colors shadow-sm shadow-brand-teal/20 disabled:opacity-60"
+              >
+                {logoutLoading ? "..." : "Cerrar sesión"}
+              </button>
+            </>
+          ) : (
+            <>
+              <Link
+                href="/auth/login"
+                className={`px-4 py-2 text-sm font-display font-semibold rounded-full border transition-colors ${solid ? "border-brand-teal text-brand-teal hover:bg-brand-teal hover:text-white" : "border-white/70 text-white/90 hover:border-white hover:text-white"}`}
+              >
+                Iniciar sesión
+              </Link>
+              <Link
+                href="/agendar"
+                className="px-5 py-2.5 bg-brand-teal text-white text-sm font-display font-semibold rounded-full hover:bg-brand-teal-dark transition-colors shadow-sm shadow-brand-teal/20"
+              >
+                Diagnóstico gratis
+              </Link>
+            </>
+          )}
         </div>
 
         {/* Mobile */}
@@ -137,19 +185,41 @@ export default function Navbar() {
                   ))}
                 </div>
               </nav>
+
+              {/* Mobile bottom — auth-aware */}
               <div className="p-6 border-t border-gray-100 space-y-3">
-                <Link href="/auth/login"
-                  className="block w-full text-center py-2.5 border border-brand-teal text-brand-teal font-display font-semibold rounded-full hover:bg-brand-teal hover:text-white transition-colors text-sm"
-                  onClick={() => setMobileOpen(false)}
-                >
-                  Iniciar sesión
-                </Link>
-                <Link href="/agendar"
-                  className="block w-full text-center py-3 bg-brand-teal text-white font-display font-semibold rounded-full hover:bg-brand-teal-dark transition-colors"
-                  onClick={() => setMobileOpen(false)}
-                >
-                  Diagnóstico gratis
-                </Link>
+                {user ? (
+                  <>
+                    <Link href="/mi-perfil"
+                      className="block w-full text-center py-2.5 border border-brand-teal text-brand-teal font-display font-semibold rounded-full hover:bg-brand-teal hover:text-white transition-colors text-sm"
+                      onClick={() => setMobileOpen(false)}
+                    >
+                      Mi perfil
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      disabled={logoutLoading}
+                      className="block w-full text-center py-3 bg-brand-teal text-white font-display font-semibold rounded-full hover:bg-brand-teal-dark transition-colors disabled:opacity-60"
+                    >
+                      {logoutLoading ? "Cerrando sesión..." : "Cerrar sesión"}
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link href="/auth/login"
+                      className="block w-full text-center py-2.5 border border-brand-teal text-brand-teal font-display font-semibold rounded-full hover:bg-brand-teal hover:text-white transition-colors text-sm"
+                      onClick={() => setMobileOpen(false)}
+                    >
+                      Iniciar sesión
+                    </Link>
+                    <Link href="/agendar"
+                      className="block w-full text-center py-3 bg-brand-teal text-white font-display font-semibold rounded-full hover:bg-brand-teal-dark transition-colors"
+                      onClick={() => setMobileOpen(false)}
+                    >
+                      Diagnóstico gratis
+                    </Link>
+                  </>
+                )}
               </div>
             </div>
           </SheetContent>
