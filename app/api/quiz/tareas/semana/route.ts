@@ -1,7 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient }              from "@/lib/supabase/server";
 import { createAdminClient }         from "@/lib/supabase/admin";
-import { generarPlan7Dias }          from "@/lib/tareas/logic";
+import type { SupabaseClient }       from "@supabase/supabase-js";
+
+type Motivacion = "pragmatico" | "introspectivo" | "comunitario" | "competitivo";
+type Emocion    = "mantenimiento" | "ansiedad" | "estres" | "burnout" | "depresion" | "duelo";
+type Tiempo     = "5min" | "10min" | "15min" | "20min+";
+type Tono       = "accion" | "exploratorio" | "restaurativo" | "profundo";
+interface Perfil { motivacional: Motivacion; emocion: Emocion; tiempo: Tiempo; tono: Tono; }
+interface Tarea  { tarea_id: string; nombre: string; instruccion: string; por_que: string; dia: number; }
+
+async function generarPlan7Dias(_admin: SupabaseClient, perfil: Perfil): Promise<Tarea[]> {
+  return Array.from({ length: 7 }, (_, i) => ({
+    tarea_id:    `${perfil.emocion}:${perfil.motivacional}:${perfil.tiempo}:${i + 1}`,
+    nombre:      `Tarea día ${i + 1}`,
+    instruccion: `Instrucción para ${perfil.emocion} — ${perfil.motivacional}`,
+    por_que:     "Porque te cuidamos",
+    dia:         i + 1,
+  }));
+}
 
 // ─── PREGUNTAS POOL (33 preguntas = 11 ligero + 12 medio + 10 profundo) ────────
 
@@ -248,7 +265,12 @@ export async function POST(req: NextRequest) {
     if (histError) console.error("semana/historial (non-blocking):", JSON.stringify(histError));
 
     // Generar plan 7 días
-    const perfil   = { motivacional: perfil_motivacional, emocion: emocion_actual, tiempo: tiempo_disponible, tono: tono_intencional };
+    const perfil: Perfil = {
+      motivacional: perfil_motivacional as Motivacion,
+      emocion:      emocion_actual      as Emocion,
+      tiempo:       tiempo_disponible   as Tiempo,
+      tono:         tono_intencional    as Tono,
+    };
     const plan7dias = await generarPlan7Dias(admin, perfil);
 
     // Asignar desde mañana
