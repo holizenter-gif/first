@@ -100,9 +100,8 @@ export default function MisEventosPage() {
   return (
     <div className="space-y-4">
       {eventos.map((reg) => {
-        const MIcon  = MODALIDAD_ICON[reg.evento.modalidad] ?? MapPin;
-        const status = STATUS_STYLE[reg.evento.status ?? reg.status] ?? STATUS_STYLE.pendiente;
-        const st     = STATUS_STYLE[reg.status] ?? STATUS_STYLE.pendiente;
+        const MIcon = MODALIDAD_ICON[reg.evento.modalidad] ?? MapPin;
+        const st    = STATUS_STYLE[reg.status] ?? STATUS_STYLE.pendiente;
         const pasado = new Date(reg.evento.fecha_inicio) < new Date();
 
         return (
