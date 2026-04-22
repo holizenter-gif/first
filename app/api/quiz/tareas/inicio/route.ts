@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
         step:   paso,
         detail: upsertError.message,
         code:   upsertError.code,
-        hint:   (upsertError as Record<string, unknown>).hint ?? null,
+        hint:   null,
       }, { status: 500 });
     }
     console.log(`[${paso}] OK`);
