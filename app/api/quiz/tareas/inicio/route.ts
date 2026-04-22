@@ -110,9 +110,10 @@ export async function POST(req: NextRequest) {
     const tono_intencional  = MAP_TONO[respuesta_p6]  ?? respuesta_p6;
     console.log(`[${paso}]`, JSON.stringify({ perfil_motivacional, emocion_actual, tiempo_disponible, tono_intencional }));
 
-    // P4 — Upsert user_quiz_preferences (sin preguntas_usadas)
+    // P4 — Upsert user_quiz_preferences (admin bypasa RLS)
     paso = "P4:upsert_preferences";
-    const { error: upsertError } = await supabase
+    const admin = createAdminClient();
+    const { error: upsertError } = await admin
       .from("user_quiz_preferences")
       .upsert({
         user_id,
@@ -129,9 +130,8 @@ export async function POST(req: NextRequest) {
     }
     console.log(`[${paso}] OK`);
 
-    // P5 — Historial de preguntas (admin para saltarse RLS)
+    // P5 — Historial de preguntas
     paso = "P5:historial";
-    const admin = createAdminClient();
     const hoy = new Date().toISOString().split("T")[0];
     const historial = [
       { user_id, pregunta_id: "onboarding_p1", respuesta: respuesta_p1, tipo_quiz: "onboarding", fecha: hoy },
