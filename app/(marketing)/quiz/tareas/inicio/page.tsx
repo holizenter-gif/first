@@ -26,10 +26,22 @@ export default function QuizTareasInicioPage() {
     setSubmitting(true);
     setError("");
     try {
+      // ob_q5,ob_q6 = motivacional → p1,p2
+      // ob_q1,ob_q2 = emocion → p3,p4
+      // ob_q3 = tiempo → p5
+      // ob_q4 = tono → p6
+      const payload = {
+        respuesta_p1: respuestas.ob_q5,
+        respuesta_p2: respuestas.ob_q6,
+        respuesta_p3: respuestas.ob_q1,
+        respuesta_p4: respuestas.ob_q2,
+        respuesta_p5: respuestas.ob_q3,
+        respuesta_p6: respuestas.ob_q4,
+      };
       const res  = await fetch("/api/quiz/tareas/inicio", {
         method:  "POST",
         headers: { "Content-Type": "application/json" },
-        body:    JSON.stringify(respuestas),
+        body:    JSON.stringify(payload),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Error procesando quiz");
@@ -44,13 +56,13 @@ export default function QuizTareasInicioPage() {
 
   const EMOCIONES: Record<string, string> = {
     burnout:       "Agotamiento profundo (Burnout)",
-    estrés:        "Estrés acumulado",
+    estres:        "Estrés acumulado",
     ansiedad:      "Ansiedad",
     mantenimiento: "Equilibrio y mantenimiento",
   };
 
   const PERFILES: Record<string, string> = {
-    pragmático:    "Pragmático — orientado a resultados",
+    pragmatico:    "Pragmático — orientado a resultados",
     introspectivo: "Introspectivo — orientado al autoconocimiento",
     comunitario:   "Comunitario — orientado a la conexión",
     competitivo:   "Competitivo — orientado al desafío",
