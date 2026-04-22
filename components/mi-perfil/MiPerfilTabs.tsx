@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { User, MapPin, ShoppingBag, Download, CalendarDays } from "lucide-react";
+import { User, MapPin, ShoppingBag, Download, CalendarDays, Flame } from "lucide-react";
 
 const TABS = [
   { href: "/mi-perfil/datos",       label: "Mis datos",    Icon: User          },
@@ -10,6 +10,7 @@ const TABS = [
   { href: "/mi-perfil/compras",     label: "Compras",      Icon: ShoppingBag   },
   { href: "/mi-perfil/descargas",   label: "Descargas",    Icon: Download      },
   { href: "/mi-perfil/eventos",     label: "Mis eventos",  Icon: CalendarDays  },
+  { href: "/mi-perfil/tareas",      label: "Tareas",       Icon: Flame         },
 ];
 
 export default function MiPerfilTabs({ children }: { children: React.ReactNode }) {
