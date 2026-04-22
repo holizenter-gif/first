@@ -134,14 +134,15 @@ export async function POST(req: NextRequest) {
       plan_7dias:          plan7dias,
     });
 
-  } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : String(err);
-    const stack = err instanceof Error ? err.stack : undefined;
-    console.error(`[${paso}] CAUGHT EXCEPTION:`, msg, stack);
-    return NextResponse.json({
-      error:  "Error interno",
-      step:   paso,
-      detail: msg,
-    }, { status: 500 });
+  } catch (error) {
+    console.error('QUIZ_ERROR:', error);
+    return Response.json(
+      {
+        error:  error instanceof Error ? error.message : 'Unknown error',
+        step:   paso,
+        detail: JSON.stringify(error),
+      },
+      { status: 500 }
+    );
   }
 }
