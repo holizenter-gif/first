@@ -2,15 +2,17 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { User, MapPin, ShoppingBag, Download, CalendarDays, Flame } from "lucide-react";
+import { User, MapPin, ShoppingBag, Download, CalendarDays, Flame, Moon, Shield } from "lucide-react";
 
 const TABS = [
-  { href: "/mi-perfil/datos",       label: "Mis datos",    Icon: User          },
-  { href: "/mi-perfil/direcciones", label: "Direcciones",  Icon: MapPin        },
-  { href: "/mi-perfil/compras",     label: "Compras",      Icon: ShoppingBag   },
-  { href: "/mi-perfil/descargas",   label: "Descargas",    Icon: Download      },
-  { href: "/mi-perfil/eventos",     label: "Mis eventos",  Icon: CalendarDays  },
-  { href: "/mi-perfil/tareas",      label: "Tareas",       Icon: Flame         },
+  { href: "/mi-perfil/datos",        label: "Mis datos",    Icon: User          },
+  { href: "/mi-perfil/direcciones",  label: "Direcciones",  Icon: MapPin        },
+  { href: "/mi-perfil/compras",      label: "Compras",      Icon: ShoppingBag   },
+  { href: "/mi-perfil/descargas",    label: "Descargas",    Icon: Download      },
+  { href: "/mi-perfil/eventos",      label: "Mis eventos",  Icon: CalendarDays  },
+  { href: "/mi-perfil/tareas",       label: "Tareas",       Icon: Flame         },
+  { href: "/mi-perfil/sueno",        label: "Sueño",        Icon: Moon          },
+  { href: "/mi-perfil/resiliencia",  label: "Resiliencia",  Icon: Shield        },
 ];
 
 export default function MiPerfilTabs({ children }: { children: React.ReactNode }) {
