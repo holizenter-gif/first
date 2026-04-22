@@ -6,7 +6,6 @@ import { Menu, X, ChevronDown } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import Logo from "@/components/brand/Logo";
 import BotonCarrito from "@/components/tienda/BotonCarrito";
-import NavUserMenu from "@/components/layout/NavUserMenu";
 import { createClient } from "@/lib/supabase/client";
 import type { User } from "@supabase/supabase-js";
 
