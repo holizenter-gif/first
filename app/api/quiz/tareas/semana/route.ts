@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient }              from "@/lib/supabase/server";
-import { createAdminClient }         from "@/lib/supabase/admin";
 import type { SupabaseClient }       from "@supabase/supabase-js";
 
 type Motivacion = "pragmatico" | "introspectivo" | "comunitario" | "competitivo";
@@ -10,7 +9,7 @@ type Tono       = "accion" | "exploratorio" | "restaurativo" | "profundo";
 interface Perfil { motivacional: Motivacion; emocion: Emocion; tiempo: Tiempo; tono: Tono; }
 interface Tarea  { tarea_id: string; nombre: string; instruccion: string; por_que: string; dia: number; }
 
-async function generarPlan7Dias(_admin: SupabaseClient, perfil: Perfil): Promise<Tarea[]> {
+async function generarPlan7Dias(_supabase: SupabaseClient, perfil: Perfil): Promise<Tarea[]> {
   return Array.from({ length: 7 }, (_, i) => ({
     tarea_id:    `${perfil.emocion}:${perfil.motivacional}:${perfil.tiempo}:${i + 1}`,
     nombre:      `Tarea día ${i + 1}`,
@@ -176,10 +175,9 @@ export async function GET() {
       }
     }
 
-    // Preguntas usadas en las últimas 2 semanas (vía admin para sortear RLS)
-    const admin = createAdminClient();
+    // Preguntas usadas en las últimas 2 semanas
     const hace14 = new Date(Date.now() - 14 * 86_400_000).toISOString().split("T")[0];
-    const { data: recientes } = await admin
+    const { data: recientes } = await supabase
       .from("user_preguntas_historial")
       .select("pregunta_id")
       .eq("user_id", user.id)
@@ -251,8 +249,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Error actualizando perfil", detail: updateError.message }, { status: 500 });
     }
 
-    // Guardar historial vía admin
-    const admin = createAdminClient();
+    // Guardar historial
     const hoy   = new Date().toISOString().split("T")[0];
     const historial = body.respuestas.map((r) => ({
       user_id:     user.id,
@@ -261,8 +258,8 @@ export async function POST(req: NextRequest) {
       tipo_quiz:   "semanal",
       fecha:       hoy,
     }));
-    const { error: histError } = await admin.from("user_preguntas_historial").insert(historial);
-    if (histError) console.error("semana/historial (non-blocking):", JSON.stringify(histError));
+    const { error: histError } = await supabase.from("user_preguntas_historial").insert(historial);
+    if (histError) console.error("semana/historial:", JSON.stringify(histError));
 
     // Generar plan 7 días
     const perfil: Perfil = {
@@ -271,7 +268,7 @@ export async function POST(req: NextRequest) {
       tiempo:       tiempo_disponible   as Tiempo,
       tono:         tono_intencional    as Tono,
     };
-    const plan7dias = await generarPlan7Dias(admin, perfil);
+    const plan7dias = await generarPlan7Dias(supabase, perfil);
 
     // Asignar desde mañana
     const manana = new Date();
@@ -282,7 +279,7 @@ export async function POST(req: NextRequest) {
       return { user_id: user.id, tarea_id: t.tarea_id, fecha_asignada: f.toISOString().split("T")[0] };
     });
     if (asignaciones.length > 0) {
-      const { error: asigError } = await admin
+      const { error: asigError } = await supabase
         .from("user_tareas_asignadas")
         .upsert(asignaciones, { onConflict: "user_id,fecha_asignada", ignoreDuplicates: true });
       if (asigError) console.error("semana/asignar:", JSON.stringify(asigError));

@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient }              from "@/lib/supabase/server";
-import { createAdminClient }         from "@/lib/supabase/admin";
 import type { SupabaseClient }       from "@supabase/supabase-js";
 
 // TIPOS GLOBALES
@@ -25,7 +24,7 @@ interface Tarea {
 }
 
 async function generarPlan7Dias(
-  _admin: SupabaseClient,
+  _supabase: SupabaseClient,
   perfil: Perfil
 ): Promise<Tarea[]> {
   const plan: Tarea[] = [];
@@ -110,10 +109,9 @@ export async function POST(req: NextRequest) {
     const tono_intencional  = MAP_TONO[respuesta_p6]  ?? respuesta_p6;
     console.log(`[${paso}]`, JSON.stringify({ perfil_motivacional, emocion_actual, tiempo_disponible, tono_intencional }));
 
-    // P4 — Upsert user_quiz_preferences (admin bypasa RLS)
+    // P4 — Upsert user_quiz_preferences
     paso = "P4:upsert_preferences";
-    const admin = createAdminClient();
-    const { error: upsertError } = await admin
+    const { error: upsertError } = await supabase
       .from("user_quiz_preferences")
       .upsert({
         user_id,
@@ -141,7 +139,7 @@ export async function POST(req: NextRequest) {
       { user_id, pregunta_id: "onboarding_p5", respuesta: respuesta_p5, tipo_quiz: "onboarding", fecha: hoy },
       { user_id, pregunta_id: "onboarding_p6", respuesta: respuesta_p6, tipo_quiz: "onboarding", fecha: hoy },
     ];
-    const { error: histError } = await admin.from("user_preguntas_historial").insert(historial);
+    const { error: histError } = await supabase.from("user_preguntas_historial").insert(historial);
     if (histError) {
       // No bloqueante — el perfil ya se guardó
       console.error(`[${paso}] (non-blocking)`, JSON.stringify(histError));
@@ -151,7 +149,7 @@ export async function POST(req: NextRequest) {
 
     // P6 — Init gamificación
     paso = "P6:gamificacion";
-    const { error: gamifError } = await admin
+    const { error: gamifError } = await supabase
       .from("user_gamification")
       .upsert({ user_id }, { onConflict: "user_id", ignoreDuplicates: true });
     if (gamifError) console.error(`[${paso}]`, JSON.stringify(gamifError));
@@ -165,7 +163,7 @@ export async function POST(req: NextRequest) {
       tiempo:       tiempo_disponible   as Tiempo,
       tono:         tono_intencional    as Tono,
     };
-    const plan7dias = await generarPlan7Dias(admin, perfil);
+    const plan7dias = await generarPlan7Dias(supabase, perfil);
     console.log(`[${paso}] length=${plan7dias.length}`, plan7dias.map((t) => t.tarea_id).join(","));
 
     if (plan7dias.length === 0) {
@@ -180,7 +178,7 @@ export async function POST(req: NextRequest) {
       f.setDate(base.getDate() + i);
       return { user_id, tarea_id: t.tarea_id, fecha_asignada: f.toISOString().split("T")[0] };
     });
-    const { error: asigError } = await admin
+    const { error: asigError } = await supabase
       .from("user_tareas_asignadas")
       .upsert(asignaciones, { onConflict: "user_id,fecha_asignada", ignoreDuplicates: true });
     if (asigError) {
