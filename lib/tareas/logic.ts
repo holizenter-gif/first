@@ -2,10 +2,10 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { PREGUNTAS_ONBOARDING, PREGUNTAS_SEMANA, type Letra } from "./preguntas";
 import type { Pregunta } from "./preguntas";
 
-export type Emocion     = 'burnout' | 'estrés' | 'ansiedad' | 'mantenimiento';
-export type Motivacion  = 'pragmático' | 'introspectivo' | 'comunitario' | 'competitivo';
+export type Emocion     = 'burnout' | 'estres' | 'ansiedad' | 'mantenimiento' | 'depresion' | 'duelo';
+export type Motivacion  = 'pragmatico' | 'introspectivo' | 'comunitario' | 'competitivo';
 export type Tiempo      = '5min' | '10min' | '15min' | '20min+';
-export type Tono        = 'acción' | 'exploratorio' | 'restaurativo' | 'profundo';
+export type Tono        = 'accion' | 'exploratorio' | 'restaurativo' | 'profundo';
 export type Pool        = 'ligero' | 'medio' | 'profundo';
 
 export interface Perfil {
@@ -27,8 +27,8 @@ export interface TareaDelDia {
 // ─── Determinar pool según emoción anterior ────────────────────────────────
 
 export function determinarPool(emocion: Emocion): Pool {
-  if (emocion === 'mantenimiento')                       return 'ligero';
-  if (emocion === 'ansiedad' || emocion === 'estrés')    return 'medio';
+  if (emocion === 'mantenimiento')                        return 'ligero';
+  if (emocion === 'ansiedad' || emocion === 'estres')     return 'medio';
   return 'profundo';
 }
 
@@ -58,8 +58,8 @@ export function scoringOnboarding(respuestas: Record<string, Letra>): Perfil {
   return {
     emocion:      (ganador(votos.emocion)      || 'mantenimiento') as Emocion,
     tiempo:       (ganador(votos.tiempo)       || '10min')         as Tiempo,
-    tono:         (ganador(votos.tono)         || 'acción')        as Tono,
-    motivacional: (ganador(votos.motivacional) || 'pragmático')    as Motivacion,
+    tono:         (ganador(votos.tono)         || 'accion')        as Tono,
+    motivacional: (ganador(votos.motivacional) || 'pragmatico')    as Motivacion,
   };
 }
 
@@ -90,8 +90,8 @@ export function scoringSemana(
   return {
     emocion:      (ganador(votos.emocion)      || 'mantenimiento') as Emocion,
     tiempo:       (ganador(votos.tiempo)       || '10min')         as Tiempo,
-    tono:         (ganador(votos.tono)         || 'acción')        as Tono,
-    motivacional: (ganador(votos.motivacional) || 'pragmático')    as Motivacion,
+    tono:         (ganador(votos.tono)         || 'accion')        as Tono,
+    motivacional: (ganador(votos.motivacional) || 'pragmatico')    as Motivacion,
   };
 }
 
@@ -111,24 +111,25 @@ export async function generarPlan7Dias(
     .eq('tono',             perfil.tono)
     .order('dia_semana');
 
-  // Intento 2: relaxar motivacion
+  // Intento 2: solo emocion (relaxar motivacion y tiempo)
   if (!tareas || tareas.length < 7) {
     const { data: t2 } = await supabase
       .from('tareas_pool')
       .select('*')
       .eq('emocion_target', perfil.emocion)
-      .eq('tiempo_min',     perfil.tiempo)
       .order('dia_semana');
     tareas = merge7(tareas ?? [], t2 ?? []);
   }
 
-  // Intento 3: relaxar emocion también (emociones "vecinas")
+  // Intento 3: emociones vecinas
   if (tareas.length < 7) {
     const emocionesVecinas: Record<Emocion, Emocion[]> = {
-      burnout:       ['estrés'],
-      estrés:        ['burnout', 'ansiedad'],
-      ansiedad:      ['estrés', 'mantenimiento'],
+      burnout:       ['estres', 'depresion'],
+      estres:        ['burnout', 'ansiedad'],
+      ansiedad:      ['estres', 'mantenimiento'],
       mantenimiento: ['ansiedad'],
+      depresion:     ['burnout', 'duelo'],
+      duelo:         ['depresion'],
     };
     for (const vecina of emocionesVecinas[perfil.emocion] ?? []) {
       const { data: t3 } = await supabase

@@ -18,28 +18,28 @@ export const BADGES = [
 export const XP_COMPLETAR_BASE = 50;
 export const XP_DELTA_POSITIVO  = 50; // bonus si emocion_despues > emocion_antes
 
-type Perfil = 'pragmático' | 'introspectivo' | 'comunitario' | 'competitivo';
+type Perfil = 'pragmatico' | 'introspectivo' | 'comunitario' | 'competitivo';
 type Nivel  = 'positivo' | 'neutro' | 'negativo';
 
 const VALIDACIONES: Record<Perfil, Record<Nivel, string>> = {
-  'pragmático': {
-    positivo: 'Tu sistema nervioso registró el cambio. Eso es evidencia, no intuición.',
-    neutro:   'Completaste. Eso construye el hábito aunque hoy no se sienta diferente.',
-    negativo: 'Está bien. La práctica funciona en el largo plazo, no en cada sesión.',
+  pragmatico: {
+    positivo: 'Hiciste algo difícil hoy. No fue perfecto, pero fue real. Eso es lo que importa.',
+    neutro:   'Hoy no viste avance. Pero registraste. La consistencia es el cambio.',
+    negativo: 'No fue tu mejor día. Pero apareciste. Eso también construye.',
   },
-  'introspectivo': {
-    positivo: 'Notaste el cambio adentro. Eso es lo más real que existe.',
-    neutro:   'Hoy no hubo gran revelación. Pero estuviste contigo. Eso siempre cuenta.',
-    negativo: 'Algunos días la práctica es simplemente mostarte. Eso ya es suficiente.',
+  introspectivo: {
+    positivo: 'Nombraste qué pasó hoy. Eso es conciencia. Te conoces un poco más.',
+    neutro:   'Hoy tu mente no paró. Está bien. Viniste igual. Eso es suficiente.',
+    negativo: 'Algunos días la práctica es simplemente mostrarte. Ya lo hiciste.',
   },
-  'comunitario': {
-    positivo: 'Te diste lo que le darías a alguien que quieres. Eso importa.',
-    neutro:   'Hoy te conectaste contigo mismo/a. La conexión con otros empieza aquí.',
-    negativo: 'No fue el mejor día, pero no estuviste solo/a en esto. Aquí estamos.',
+  comunitario: {
+    positivo: 'Te cuidaste hoy. Como lo harías con alguien que amas. No estás solo/a en esto.',
+    neutro:   'Viniste aunque fuera difícil. Eso cuenta. Estamos contigo.',
+    negativo: 'No fue el mejor día, pero no lo enfrentaste solo/a. Aquí seguimos.',
   },
-  'competitivo': {
-    positivo: 'Resultado real. Streak activo. Vas en la dirección correcta.',
-    neutro:   'Completaste sin sentir mucho. Eso es disciplina, no falta de progreso.',
+  competitivo: {
+    positivo: 'Resultado real. Streak activo. Vas en la dirección correcta. Mantén el momentum.',
+    neutro:   'No fue la mejor, pero completaste. Eso es consistencia, no debilidad.',
     negativo: 'No fue tu mejor día, pero apareciste. La consistencia gana al talento.',
   },
 };
@@ -49,8 +49,8 @@ export function generarValidacion(
   perfilTipo: string,
   streakActual: number
 ): string {
-  const perfil = perfilTipo as Perfil;
-  const mapa   = VALIDACIONES[perfil] ?? VALIDACIONES['pragmático'];
+  const perfil = (perfilTipo as Perfil) in VALIDACIONES ? (perfilTipo as Perfil) : 'pragmatico';
+  const mapa   = VALIDACIONES[perfil];
   const nivel: Nivel = deltaEmocional > 1 ? 'positivo' : deltaEmocional < 0 ? 'negativo' : 'neutro';
   let msg = mapa[nivel];
   if (perfil === 'competitivo' && nivel === 'positivo') {

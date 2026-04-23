@@ -1,23 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
-import { createClient }              from "@/lib/supabase/server";
-import type { SupabaseClient }       from "@supabase/supabase-js";
-
-type Motivacion = "pragmatico" | "introspectivo" | "comunitario" | "competitivo";
-type Emocion    = "mantenimiento" | "ansiedad" | "estres" | "burnout" | "depresion" | "duelo";
-type Tiempo     = "5min" | "10min" | "15min" | "20min+";
-type Tono       = "accion" | "exploratorio" | "restaurativo" | "profundo";
-interface Perfil { motivacional: Motivacion; emocion: Emocion; tiempo: Tiempo; tono: Tono; }
-interface Tarea  { tarea_id: string; nombre: string; instruccion: string; por_que: string; dia: number; }
-
-async function generarPlan7Dias(_supabase: SupabaseClient, perfil: Perfil): Promise<Tarea[]> {
-  return Array.from({ length: 7 }, (_, i) => ({
-    tarea_id:    `${perfil.emocion}:${perfil.motivacional}:${perfil.tiempo}:${i + 1}`,
-    nombre:      `Tarea día ${i + 1}`,
-    instruccion: `Instrucción para ${perfil.emocion} — ${perfil.motivacional}`,
-    por_que:     "Porque te cuidamos",
-    dia:         i + 1,
-  }));
-}
+import { NextRequest, NextResponse }    from "next/server";
+import { createClient }                 from "@/lib/supabase/server";
+import { generarPlan7Dias, type Perfil } from "@/lib/tareas/logic";
 
 // ─── PREGUNTAS POOL (33 preguntas = 11 ligero + 12 medio + 10 profundo) ────────
 
@@ -263,10 +246,10 @@ export async function POST(req: NextRequest) {
 
     // Generar plan 7 días
     const perfil: Perfil = {
-      motivacional: perfil_motivacional as Motivacion,
-      emocion:      emocion_actual      as Emocion,
-      tiempo:       tiempo_disponible   as Tiempo,
-      tono:         tono_intencional    as Tono,
+      motivacional: perfil_motivacional as Perfil['motivacional'],
+      emocion:      emocion_actual      as Perfil['emocion'],
+      tiempo:       tiempo_disponible   as Perfil['tiempo'],
+      tono:         tono_intencional    as Perfil['tono'],
     };
     const plan7dias = await generarPlan7Dias(supabase, perfil);
 

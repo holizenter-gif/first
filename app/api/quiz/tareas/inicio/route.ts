@@ -1,44 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
-import { createClient }              from "@/lib/supabase/server";
-import type { SupabaseClient }       from "@supabase/supabase-js";
-
-// TIPOS GLOBALES
-type Motivacion = "pragmatico" | "introspectivo" | "comunitario" | "competitivo";
-type Emocion    = "mantenimiento" | "ansiedad" | "estres" | "burnout" | "depresion" | "duelo";
-type Tiempo     = "5min" | "10min" | "15min" | "20min+";
-type Tono       = "accion" | "exploratorio" | "restaurativo" | "profundo";
-
-interface Perfil {
-  motivacional: Motivacion;
-  emocion:      Emocion;
-  tiempo:       Tiempo;
-  tono:         Tono;
-}
-
-interface Tarea {
-  tarea_id:    string;
-  nombre:      string;
-  instruccion: string;
-  por_que:     string;
-  dia:         number;
-}
-
-async function generarPlan7Dias(
-  _supabase: SupabaseClient,
-  perfil: Perfil
-): Promise<Tarea[]> {
-  const plan: Tarea[] = [];
-  for (let dia = 1; dia <= 7; dia++) {
-    plan.push({
-      tarea_id:    `${perfil.emocion}:${perfil.motivacional}:${perfil.tiempo}:${dia}`,
-      nombre:      `Tarea día ${dia}`,
-      instruccion: `Instrucción para ${perfil.emocion} — ${perfil.motivacional}`,
-      por_que:     "Porque te cuidamos",
-      dia,
-    });
-  }
-  return plan;
-}
+import { NextRequest, NextResponse }          from "next/server";
+import { createClient }                        from "@/lib/supabase/server";
+import { generarPlan7Dias, type Perfil }       from "@/lib/tareas/logic";
 
 // A-D → valor final para cada variable
 const MAP_MOTIVACION: Record<string, string> = {
@@ -158,10 +120,10 @@ export async function POST(req: NextRequest) {
     // P7 — Generar plan 7 días
     paso = "P7:generarPlan";
     const perfil: Perfil = {
-      motivacional: perfil_motivacional as Motivacion,
-      emocion:      emocion_actual      as Emocion,
-      tiempo:       tiempo_disponible   as Tiempo,
-      tono:         tono_intencional    as Tono,
+      motivacional: perfil_motivacional as Perfil['motivacional'],
+      emocion:      emocion_actual      as Perfil['emocion'],
+      tiempo:       tiempo_disponible   as Perfil['tiempo'],
+      tono:         tono_intencional    as Perfil['tono'],
     };
     const plan7dias = await generarPlan7Dias(supabase, perfil);
     console.log(`[${paso}] length=${plan7dias.length}`, plan7dias.map((t) => t.tarea_id).join(","));
