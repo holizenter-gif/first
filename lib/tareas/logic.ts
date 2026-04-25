@@ -259,7 +259,13 @@ export async function generarPlan7DiasConNivel(
     tareas = merge7Bib(tareas, (data ?? []).filter((t: { id: string }) => !excluidas.includes(t.id)));
   }
 
-  // Intento 3: emociones vecinas con nivel
+  // Si después de intentos 1 y 2 sigue en 0, la emoción no tiene contenido en biblioteca.
+  // Ir directo al legacy (tareas_pool) sin contaminar con emociones vecinas.
+  if (tareas.length === 0) {
+    return generarPlan7DiasLegacy(supabase, perfil);
+  }
+
+  // Intento 3: emociones vecinas — solo para rellenar huecos cuando SÍ hay contenido parcial
   if (tareas.length < 7) {
     for (const vecina of EMOCIONES_VECINAS_BIB[perfil.emocion] ?? []) {
       const vecinaBib = mapEmocionBib(vecina);
