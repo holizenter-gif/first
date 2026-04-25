@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient }              from "@/lib/supabase/server";
+import { detectarRequiereRespuesta } from "@/lib/tareas/logic";
 import { REWARDS, BADGES, XP_COMPLETAR_BASE, XP_DELTA_POSITIVO, generarValidacion } from "@/lib/tareas/constants";
 
 export async function POST(req: NextRequest) {
@@ -8,9 +9,10 @@ export async function POST(req: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
 
-    const { tarea_id, emocion_antes, emocion_despues, notas, tipo } = await req.json();
+    const body = await req.json();
+    const { tarea_id, emocion_antes, emocion_despues, notas, tipo, respuesta_usuario } = body;
 
-    // ── Tipo semanal ────────────────────────────────────────────────────────
+    // ── Tipo semanal ─────────────────────────────────────────────────────────
     if (tipo === "semanal") {
       const semana = getSemanaKey();
       const { data: gamifActual } = await supabase
@@ -34,7 +36,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: true, tipo: "semanal", completadas: completadasEstaSemana.length });
     }
 
-    // ── Tipo diaria (default) ────────────────────────────────────────────────
+    // ── Tipo diaria ──────────────────────────────────────────────────────────
     if (!tarea_id || emocion_antes == null || emocion_despues == null) {
       return NextResponse.json({ error: "Faltan campos requeridos" }, { status: 400 });
     }
@@ -59,25 +61,63 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "La tarea ya fue completada hoy" }, { status: 409 });
     }
 
-    // Marcar completada
+    // ── Detectar si requiere respuesta ───────────────────────────────────────
+    // Busca primero en tareas_biblioteca, luego en tareas_pool
+    let instruccion: string | null = null;
+    const { data: tb } = await supabase
+      .from("tareas_biblioteca").select("instruccion").eq("id", tarea_id).single();
+    instruccion = tb?.instruccion ?? null;
+
+    if (!instruccion) {
+      const { data: tp } = await supabase
+        .from("tareas_pool").select("instruccion").eq("id", tarea_id).single();
+      instruccion = tp?.instruccion ?? null;
+    }
+
+    const requiere_respuesta = instruccion ? detectarRequiereRespuesta(instruccion) : false;
+
+    if (requiere_respuesta && !respuesta_usuario?.trim()) {
+      return NextResponse.json({ error: "Esta tarea requiere una respuesta escrita" }, { status: 400 });
+    }
+
+    // ── Marcar completada (con completada_en y respuesta_usuario) ────────────
+    const ahora = new Date().toISOString();
     await supabase
       .from("user_tareas_asignadas")
-      .update({ completada: true, emocion_antes, emocion_despues, notas: notas ?? null })
+      .update({
+        completada:        true,
+        completada_en:     ahora,
+        emocion_antes,
+        emocion_despues,
+        notas:             notas ?? null,
+        respuesta_usuario: requiere_respuesta ? (respuesta_usuario ?? null) : null,
+      })
       .eq("id", asignacion.id);
 
-    // Leer gamificación actual
+    // ── Gamificación ─────────────────────────────────────────────────────────
     const { data: gamif } = await supabase
       .from("user_gamification")
       .select("xp_total, streak_actual, streak_maximo, ultima_tarea_fecha, badges_collected, rewards_redeemed")
       .eq("user_id", user.id)
       .single();
 
+    // Streak: si la tarea era de más de 24h atrás → reinicia a 0 (pero XP se mantiene)
+    const fechaAsignada = new Date(asignacion.fecha_asignada + "T00:00:00");
+    const diffHoras     = (Date.now() - fechaAsignada.getTime()) / 3_600_000;
+    const tardeComplecion = diffHoras > 24;
+
     const ayer      = new Date(); ayer.setDate(ayer.getDate() - 1);
     const ayerStr   = ayer.toISOString().split("T")[0];
     const streakAnt = gamif?.streak_actual ?? 0;
-    const nuevoStreak = gamif?.ultima_tarea_fecha === ayerStr ? streakAnt + 1
-                      : gamif?.ultima_tarea_fecha === hoy      ? streakAnt
-                      : 1;
+
+    let nuevoStreak: number;
+    if (tardeComplecion) {
+      nuevoStreak = 0;
+    } else {
+      nuevoStreak = gamif?.ultima_tarea_fecha === ayerStr ? streakAnt + 1
+                  : gamif?.ultima_tarea_fecha === hoy      ? streakAnt
+                  : 1;
+    }
 
     const delta    = emocion_despues - emocion_antes;
     const xpEarned = XP_COMPLETAR_BASE + (delta > 0 ? XP_DELTA_POSITIVO : 0);
@@ -100,7 +140,7 @@ export async function POST(req: NextRequest) {
         streak_maximo:      Math.max(nuevoStreak, gamif?.streak_maximo ?? 0),
         ultima_tarea_fecha: hoy,
         badges_collected:   [...badgesActuales, ...badgesNuevos],
-        updated_at:         new Date().toISOString(),
+        updated_at:         ahora,
       }, { onConflict: "user_id" });
 
     const rewardsDisponibles = REWARDS
@@ -115,15 +155,17 @@ export async function POST(req: NextRequest) {
       .eq("user_id", user.id)
       .single();
 
-    const validacion = generarValidacion(delta, prefs?.perfil_motivacional ?? 'pragmatico', nuevoStreak);
+    const validacion = generarValidacion(delta, prefs?.perfil_motivacional ?? "pragmatico", nuevoStreak);
 
     return NextResponse.json({
       success:              true,
+      requiere_respuesta,
       xp_earned:            xpEarned,
       xp_total:             xpTotal,
       delta_emocional:      delta,
       badges_unlocked:      badgesNuevos,
       streak_actual:        nuevoStreak,
+      streak_tarde:         tardeComplecion,
       validacion_emocional: validacion,
       rewards_disponibles:  rewardsDisponibles,
       siguiente_reward:     siguienteReward
@@ -140,5 +182,5 @@ function getSemanaKey(): string {
   const now  = new Date();
   const jan1 = new Date(now.getFullYear(), 0, 1);
   const week = Math.ceil(((now.getTime() - jan1.getTime()) / 86400000 + jan1.getDay() + 1) / 7);
-  return `${now.getFullYear()}-W${String(week).padStart(2, '0')}`;
+  return `${now.getFullYear()}-W${String(week).padStart(2, "0")}`;
 }

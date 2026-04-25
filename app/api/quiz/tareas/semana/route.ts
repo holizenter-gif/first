@@ -1,6 +1,18 @@
 import { NextRequest, NextResponse }    from "next/server";
 import { createClient }                 from "@/lib/supabase/server";
-import { generarPlan7Dias, type Perfil } from "@/lib/tareas/logic";
+import {
+  generarPlan7DiasConNivel,
+  generarPlan7DiasLegacy,
+  calcularAdherencia,
+  obtenerTareasCompletadas28Dias,
+  determinarNivelDinamico,
+  promediarPerfiles,
+  type Perfil,
+  type Motivacion,
+  type Emocion,
+  type Tiempo,
+  type Tono,
+} from "@/lib/tareas/logic";
 
 // ─── PREGUNTAS POOL (33 preguntas = 11 ligero + 12 medio + 10 profundo) ────────
 
@@ -198,7 +210,33 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Se requieren exactamente 4 respuestas" }, { status: 400 });
     }
 
-    // Mapear respuestas a valores usando metadata de la pregunta
+    // ── Leer estado PREVIO antes de actualizar ──────────────────────────────
+    const { data: prefsActuales } = await supabase
+      .from("user_quiz_preferences")
+      .select("tono_intencional, perfil_inicial, emocion_actual, perfil_motivacional, tiempo_disponible")
+      .eq("user_id", user.id)
+      .single();
+
+    const { data: gamifActual } = await supabase
+      .from("user_gamification")
+      .select("nivel_actual")
+      .eq("user_id", user.id)
+      .single();
+
+    const nivel_anterior = gamifActual?.nivel_actual ?? 1;
+    const emocion_anterior = prefsActuales?.emocion_actual ?? "mantenimiento";
+
+    // Reconstruir perfil_inicial (del onboarding, nunca sobreescrito)
+    const perfil_inicial: Perfil = prefsActuales?.perfil_inicial
+      ? (prefsActuales.perfil_inicial as Perfil)
+      : {
+          motivacional: (prefsActuales?.perfil_motivacional ?? "pragmatico") as Motivacion,
+          emocion:      (prefsActuales?.emocion_actual      ?? "mantenimiento") as Emocion,
+          tiempo:       (prefsActuales?.tiempo_disponible   ?? "10min") as Tiempo,
+          tono:         (prefsActuales?.tono_intencional    ?? "accion") as Tono,
+        };
+
+    // ── Mapear respuestas ────────────────────────────────────────────────────
     const valores: { motivacional: string[]; emocion: string[]; tiempo: string[] } = {
       motivacional: [], emocion: [], tiempo: [],
     };
@@ -210,18 +248,12 @@ export async function POST(req: NextRequest) {
       valores[pregunta.variable].push(opcion.valor);
     }
 
-    const { data: prefsActuales } = await supabase
-      .from("user_quiz_preferences")
-      .select("tono_intencional")
-      .eq("user_id", user.id)
-      .single();
-
     const perfil_motivacional = valores.motivacional.length > 0 ? votar(valores.motivacional) : "pragmatico";
     const emocion_actual      = valores.emocion.length      > 0 ? votar(valores.emocion)      : "mantenimiento";
     const tiempo_disponible   = valores.tiempo.length       > 0 ? valores.tiempo[0]           : "10min";
-    const tono_intencional    = prefsActuales?.tono_intencional ?? "accion"; // preservar del onboarding
+    const tono_intencional    = prefsActuales?.tono_intencional ?? "accion"; // tono se preserva del onboarding
 
-    // Actualizar perfil (sin preguntas_usadas)
+    // ── Actualizar perfil en DB ──────────────────────────────────────────────
     const { error: updateError } = await supabase
       .from("user_quiz_preferences")
       .update({ perfil_motivacional, emocion_actual, tiempo_disponible, updated_at: new Date().toISOString() })
@@ -232,8 +264,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Error actualizando perfil", detail: updateError.message }, { status: 500 });
     }
 
-    // Guardar historial
-    const hoy   = new Date().toISOString().split("T")[0];
+    // ── Historial ────────────────────────────────────────────────────────────
+    const hoy = new Date().toISOString().split("T")[0];
     const historial = body.respuestas.map((r) => ({
       user_id:     user.id,
       pregunta_id: r.pregunta_id,
@@ -244,16 +276,40 @@ export async function POST(req: NextRequest) {
     const { error: histError } = await supabase.from("user_preguntas_historial").insert(historial);
     if (histError) console.error("semana/historial:", JSON.stringify(histError));
 
-    // Generar plan 7 días
-    const perfil: Perfil = {
-      motivacional: perfil_motivacional as Perfil['motivacional'],
-      emocion:      emocion_actual      as Perfil['emocion'],
-      tiempo:       tiempo_disponible   as Perfil['tiempo'],
-      tono:         tono_intencional    as Perfil['tono'],
-    };
-    const plan7dias = await generarPlan7Dias(supabase, perfil);
+    // ── Calcular adherencia semana pasada ────────────────────────────────────
+    const hace7 = new Date(Date.now() - 7 * 24 * 3600 * 1000).toISOString().split("T")[0];
+    const { data: tareasCompletadas } = await supabase
+      .from("user_tareas_asignadas")
+      .select("id")
+      .eq("user_id", user.id)
+      .eq("completada", true)
+      .gte("fecha_asignada", hace7)
+      .lte("fecha_asignada", hoy);
 
-    // Asignar desde mañana
+    const adherencia = calcularAdherencia(tareasCompletadas?.length ?? 0, 7);
+
+    // ── Nivel nuevo ──────────────────────────────────────────────────────────
+    const nivel_nuevo = determinarNivelDinamico(adherencia, nivel_anterior);
+
+    await supabase
+      .from("user_gamification")
+      .update({ nivel_actual: nivel_nuevo })
+      .eq("user_id", user.id);
+
+    // ── Promediar perfiles ───────────────────────────────────────────────────
+    const perfil_semanal: Perfil = {
+      motivacional: perfil_motivacional as Motivacion,
+      emocion:      emocion_actual      as Emocion,
+      tiempo:       tiempo_disponible   as Tiempo,
+      tono:         tono_intencional    as Tono,
+    };
+    const perfil_promediado = promediarPerfiles(perfil_inicial, perfil_semanal);
+
+    // ── Generar plan con nivel y perfil promediado ───────────────────────────
+    let plan7dias = await generarPlan7DiasConNivel(supabase, perfil_promediado, nivel_nuevo, user.id);
+    if (plan7dias.length < 7) plan7dias = await generarPlan7DiasLegacy(supabase, perfil_promediado);
+
+    // ── Asignar desde mañana ─────────────────────────────────────────────────
     const manana = new Date();
     manana.setDate(manana.getDate() + 1);
     const asignaciones = plan7dias.map((t, i) => {
@@ -268,14 +324,41 @@ export async function POST(req: NextRequest) {
       if (asigError) console.error("semana/asignar:", JSON.stringify(asigError));
     }
 
+    // ── Feedback personalizado ───────────────────────────────────────────────
+    const NOMBRES_EMOCION: Record<string, string> = {
+      burnout:       "agotamiento profundo",
+      estres:        "estrés acumulado",
+      ansiedad:      "ansiedad",
+      mantenimiento: "equilibrio y mantenimiento",
+      depresion:     "energía en pausa",
+      duelo:         "duelo y pérdida",
+    };
+    const MENSAJES_TAREAS: Record<string, string> = {
+      pragmatico:    "Próxima semana: tareas que te permiten actuar y ver resultados concretos.",
+      introspectivo: "Próxima semana: momentos para reflexionar sobre lo que sientes y quién quieres ser.",
+      comunitario:   "Próxima semana: espacios para conectar contigo y con quienes te rodean.",
+      competitivo:   "Próxima semana: desafíos que te ayuden a crecer y superar lo de la semana pasada.",
+    };
+
+    const problema_actual  = NOMBRES_EMOCION[perfil_promediado.emocion] ?? perfil_promediado.emocion;
+    const mensaje_nivel    = nivel_nuevo > nivel_anterior
+      ? `¡Excelente! Avanzaste al nivel ${nivel_nuevo}. Las tareas de la próxima semana serán más desafiantes.`
+      : `Entendemos que fue difícil. Nos enfocamos más en ${problema_actual}. Las tareas se ajustan a eso.`;
+    const mensaje_problema = perfil_promediado.emocion !== emocion_anterior
+      ? `Detectamos cambio. Ahora trabajamos en ${problema_actual}.`
+      : `Continuamos con ${problema_actual}. Vamos bien.`;
+    const mensaje_tareas   = MENSAJES_TAREAS[perfil_promediado.motivacional] ??
+      "Próxima semana: tareas diseñadas para tu estado y motivación actuales.";
+
     return NextResponse.json({
-      success:            true,
-      perfil_motivacional,
-      emocion_actual,
-      tiempo_disponible,
-      tono_intencional,
-      pool_asignado:      determinarPool(emocion_actual),
-      plan_7dias:         plan7dias,
+      success:         true,
+      adherencia,
+      nivel_anterior,
+      nivel_nuevo,
+      problema_actual,
+      feedback_messages: { mensaje_nivel, mensaje_problema, mensaje_tareas },
+      perfil_promediado,
+      plan_7dias:      plan7dias,
     });
   } catch (err) {
     console.error("Error en POST quiz/tareas/semana:", err);
