@@ -175,9 +175,9 @@ const EMOCIONES_VECINAS_BIB: Record<Emocion, Emocion[]> = {
   duelo:         ['depresion'],
 };
 
-// tareas_biblioteca usa 'estrés' con acento — las rutas usan 'estres' sin acento
+// DB confirmada: tareas_biblioteca usa valores sin acento igual que las rutas
 function mapEmocionBib(emocion: Emocion): string {
-  return emocion === 'estres' ? 'estrés' : emocion;
+  return emocion;
 }
 
 function tiempoAMinutos(tiempo: string): number {
