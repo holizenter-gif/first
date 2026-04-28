@@ -159,13 +159,16 @@ export async function GET() {
       return NextResponse.json({ error: "Completa primero el quiz inicial" }, { status: 400 });
     }
 
-    // Cooldown 7 días
+    // Cooldown por semana ISO (lunes-domingo) — se resetea cada lunes
     if (prefs.updated_at) {
-      const diffDias = (Date.now() - new Date(prefs.updated_at).getTime()) / 86_400_000;
-      if (diffDias < 7) {
+      const hecho = new Date(prefs.updated_at);
+      if (mismaSemanaISO(hecho, new Date())) {
+        const proximoLunes = new Date();
+        proximoLunes.setDate(proximoLunes.getDate() + (8 - proximoLunes.getDay()) % 7 || 7);
+        proximoLunes.setHours(0, 0, 0, 0);
         return NextResponse.json({
           error:         "Ya hiciste tu check-in esta semana",
-          proxima_fecha: new Date(new Date(prefs.updated_at).getTime() + 7 * 86_400_000).toISOString(),
+          proxima_fecha: proximoLunes.toISOString(),
         }, { status: 429 });
       }
     }
@@ -367,4 +370,16 @@ export async function POST(req: NextRequest) {
       { status: 500 }
     );
   }
+}
+
+// Devuelve true si dos fechas caen en la misma semana ISO (lunes-domingo)
+function mismaSemanaISO(a: Date, b: Date): boolean {
+  const lunes = (d: Date) => {
+    const t = new Date(d);
+    const dia = t.getDay();
+    t.setDate(t.getDate() - (dia === 0 ? 6 : dia - 1));
+    t.setHours(0, 0, 0, 0);
+    return t.getTime();
+  };
+  return lunes(a) === lunes(b);
 }

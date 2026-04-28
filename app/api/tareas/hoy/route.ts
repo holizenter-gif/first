@@ -118,11 +118,29 @@ export async function GET() {
     }
 
     // Gamificación + semanales completadas esta semana
-    const { data: gamif } = await supabase
-      .from("user_gamification")
-      .select("xp_total, streak_actual, streak_sueno, semanales_semana, nivel_actual")
-      .eq("user_id", user.id)
-      .single();
+    const [gamifResult, prefsResult] = await Promise.all([
+      supabase.from("user_gamification")
+        .select("xp_total, streak_actual, streak_sueno, semanales_semana, nivel_actual")
+        .eq("user_id", user.id)
+        .single(),
+      supabase.from("user_quiz_preferences")
+        .select("updated_at")
+        .eq("user_id", user.id)
+        .single(),
+    ]);
+    const gamif = gamifResult.data;
+
+    // Check-in pendiente: si no hizo check-in esta semana ISO
+    const checkin_semanal_pendiente = (() => {
+      const upd = prefsResult.data?.updated_at;
+      if (!upd) return false;
+      const lunes = (d: Date) => {
+        const t = new Date(d); const dia = t.getDay();
+        t.setDate(t.getDate() - (dia === 0 ? 6 : dia - 1)); t.setHours(0, 0, 0, 0);
+        return t.getTime();
+      };
+      return lunes(new Date(upd)) !== lunes(new Date());
+    })();
 
     const semanaKey      = getSemanaKey();
     const completadasIds = ((gamif?.semanales_semana as Record<string, string[]>) ?? {})[semanaKey] ?? [];
@@ -137,6 +155,7 @@ export async function GET() {
       tarea_diaria,
       tareas_semanales,
       tareas_semanales_completadas: completadasIds.length,
+      checkin_semanal_pendiente,
       nivel_actual: gamif?.nivel_actual ?? 1,
       streaks: {
         tareas: gamif?.streak_actual ?? 0,

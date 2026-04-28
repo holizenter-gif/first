@@ -14,6 +14,7 @@ export default function LoginPage() {
       <LoginModal
         isOpen={true}
         onClose={() => router.push("/")}
+        onLoginSuccess={() => router.push("/mi-perfil/tareas")}
         onSignupClick={() => router.push("/auth/signup")}
         onResetClick={() => setShowReset(true)}
       />

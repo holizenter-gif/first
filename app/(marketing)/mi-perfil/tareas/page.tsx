@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Loader2, CheckCircle2, Star, Flame, Trophy, Clock, Square, CheckSquare } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Loader2, CheckCircle2, Star, Flame, Trophy, Clock, Square, CheckSquare, RefreshCw } from "lucide-react";
 
 interface TareaDetalle {
   nombre:      string;
@@ -43,11 +44,13 @@ interface ResultadoCompletada {
 type Fase = 'cargando' | 'sin_plan' | 'tarea' | 'slider' | 'completando' | 'resultado';
 
 export default function TareaHoyPage() {
-  const [fase,           setFase]           = useState<Fase>('cargando');
-  const [tareaDiaria,    setTareaDiaria]    = useState<TareaDiaria | null>(null);
-  const [tareasSemanales, setTareasSemanales] = useState<TareaSemanal[]>([]);
-  const [xpTotal,        setXpTotal]        = useState(0);
-  const [streak,         setStreak]         = useState(0);
+  const router = useRouter();
+  const [fase,              setFase]              = useState<Fase>('cargando');
+  const [tareaDiaria,       setTareaDiaria]       = useState<TareaDiaria | null>(null);
+  const [tareasSemanales,   setTareasSemanales]   = useState<TareaSemanal[]>([]);
+  const [xpTotal,           setXpTotal]           = useState(0);
+  const [streak,            setStreak]            = useState(0);
+  const [checkinPendiente,  setCheckinPendiente]  = useState(false);
   const [emocionAntes,   setEmocionAntes]   = useState(5);
   const [emocionDespues, setEmocionDespues] = useState(5);
   const [notas,          setNotas]          = useState("");
@@ -59,13 +62,14 @@ export default function TareaHoyPage() {
     fetch("/api/tareas/hoy")
       .then((r) => r.json())
       .then((d) => {
-        if (!d.tarea_diaria) {
+        setCheckinPendiente(d.checkin_semanal_pendiente ?? false);
+        setTareasSemanales(d.tareas_semanales ?? []);
+        setXpTotal(d.xp_total ?? 0);
+        setStreak(d.streaks?.tareas ?? 0);
+        if (!d.tarea_diaria || !d.tarea_diaria.tarea) {
           setFase("sin_plan");
         } else {
           setTareaDiaria(d.tarea_diaria);
-          setTareasSemanales(d.tareas_semanales ?? []);
-          setXpTotal(d.xp_total ?? 0);
-          setStreak(d.streaks?.tareas ?? 0);
           setFase(d.tarea_diaria.completada ? "resultado" : "tarea");
         }
       })
@@ -140,21 +144,29 @@ export default function TareaHoyPage() {
   // ── SIN PLAN ──────────────────────────────────────────────────────────────
   if (fase === 'sin_plan') {
     return (
-      <div className="bg-white rounded-2xl p-10 text-center shadow-sm border border-gray-100">
-        <Star className="w-10 h-10 mx-auto mb-3" style={{ color: "#D1D5DB" }} />
-        <p className="font-display font-bold text-lg mb-2" style={{ color: "#0D1A0F" }}>
-          Aún no tienes un plan activo
-        </p>
-        <p className="font-sans text-sm mb-6" style={{ color: "#6B7280" }}>
-          Completa el quiz de bienvenida para recibir tu plan de 7 días personalizado.
-        </p>
-        <Link
-          href="/quiz/tareas/inicio"
-          className="inline-block px-6 py-3 rounded-full font-display font-semibold text-white"
-          style={{ background: "#5CB996" }}
-        >
-          Empezar quiz
-        </Link>
+      <div className="space-y-4">
+        {checkinPendiente && <BannerCheckin onIr={() => router.push("/quiz/tareas/semana")} />}
+        <div className="bg-white rounded-2xl p-10 text-center shadow-sm border border-gray-100">
+          <Star className="w-10 h-10 mx-auto mb-3" style={{ color: "#D1D5DB" }} />
+          <p className="font-display font-bold text-lg mb-2" style={{ color: "#0D1A0F" }}>
+            No hay tarea asignada para hoy
+          </p>
+          <p className="font-sans text-sm mb-6" style={{ color: "#6B7280" }}>
+            Tu plan de 7 días puede haberse completado. Haz el check-in semanal para recibir uno nuevo.
+          </p>
+          <Link
+            href="/quiz/tareas/inicio"
+            className="inline-block px-6 py-3 rounded-full font-display font-semibold text-white"
+            style={{ background: "#5CB996" }}
+          >
+            Nuevo plan
+          </Link>
+        </div>
+        <TareasSemanalesSection
+          tareas={tareasSemanales}
+          onCompletar={handleCompletarSemanal}
+          completando={completandoSemanal}
+        />
       </div>
     );
   }
@@ -164,6 +176,7 @@ export default function TareaHoyPage() {
     const hoyLabel = new Date().toLocaleDateString("es-MX", { weekday: "long", day: "numeric", month: "long" });
     return (
       <div className="space-y-6">
+        {checkinPendiente && <BannerCheckin onIr={() => router.push("/quiz/tareas/semana")} />}
         <StatsBar />
 
         {/* Tarea diaria */}
@@ -272,6 +285,7 @@ export default function TareaHoyPage() {
   if (fase === 'resultado') {
     return (
       <div className="space-y-4">
+        {checkinPendiente && <BannerCheckin onIr={() => router.push("/quiz/tareas/semana")} />}
         <StatsBar />
 
         {resultado ? (
@@ -352,6 +366,35 @@ export default function TareaHoyPage() {
 }
 
 // ── Subcomponentes ─────────────────────────────────────────────────────────
+
+function BannerCheckin({ onIr }: { onIr: () => void }) {
+  return (
+    <div
+      className="rounded-2xl px-5 py-4 flex items-center gap-4"
+      style={{ background: "linear-gradient(135deg, #2D7A5F 0%, #0D1A0F 100%)" }}
+    >
+      <div className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0"
+        style={{ background: "rgba(92,185,150,0.25)" }}>
+        <RefreshCw className="w-4 h-4" style={{ color: "#5CB996" }} />
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="font-display font-bold text-sm text-white leading-tight">
+          Check-in semanal disponible
+        </p>
+        <p className="font-sans text-xs mt-0.5" style={{ color: "rgba(255,255,255,0.55)" }}>
+          Actualiza tu perfil y recibe un nuevo plan adaptado a esta semana
+        </p>
+      </div>
+      <button
+        onClick={onIr}
+        className="flex-shrink-0 px-4 py-2 rounded-full font-sans font-semibold text-xs whitespace-nowrap"
+        style={{ background: "#5CB996", color: "#FFFFFF" }}
+      >
+        Hacer ahora
+      </button>
+    </div>
+  );
+}
 
 function SliderEmocion({ label, value, onChange }: { label: string; value: number; onChange: (v: number) => void }) {
   return (

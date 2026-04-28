@@ -6,13 +6,14 @@ import { useAuth }          from "@/hooks/useAuth";
 import { validateEmail, validatePassword } from "@/lib/auth-validation";
 
 interface Props {
-  isOpen:         boolean;
-  onClose:        () => void;
-  onSignupClick:  () => void;
-  onResetClick:   () => void;
+  isOpen:          boolean;
+  onClose:         () => void;
+  onSignupClick:   () => void;
+  onResetClick:    () => void;
+  onLoginSuccess?: () => void;
 }
 
-export default function LoginModal({ isOpen, onClose, onSignupClick, onResetClick }: Props) {
+export default function LoginModal({ isOpen, onClose, onSignupClick, onResetClick, onLoginSuccess }: Props) {
   const { login, isLoading, error, setError } = useAuth();
   const [email,    setEmail]    = useState("");
   const [password, setPassword] = useState("");
@@ -38,7 +39,7 @@ export default function LoginModal({ isOpen, onClose, onSignupClick, onResetClic
     const ok = await login(email, password);
     if (ok) {
       setSuccess(true);
-      setTimeout(onClose, 800);
+      setTimeout(() => { if (onLoginSuccess) onLoginSuccess(); else onClose(); }, 800);
     }
   };
 
