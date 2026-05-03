@@ -1,45 +1,7 @@
-import { NextResponse }            from "next/server";
-import { createClient }            from "@/lib/supabase/server";
-import { detectarRequiereRespuesta } from "@/lib/tareas/logic";
-
-const TAREAS_SEMANALES = [
-  {
-    id:           "semanal_behavioral",
-    nombre:       "Activación Conductual",
-    instruccion:  "Sal a caminar o haz cualquier movimiento durante 30 minutos. No tiene que ser intenso. El cuerpo en movimiento cambia el estado mental.",
-    por_que:      "La activación conductual es la intervención con más evidencia científica para mantener el estado de ánimo estable. El movimiento es la mejor medicina.",
-    protocolo:    "Behavioral Activation — Martell, Addis",
-    duracion_min: 30,
-    dia_nombre:   "Lunes",
-  },
-  {
-    id:           "semanal_journaling",
-    nombre:       "Journaling de la Semana",
-    instruccion:  "Escribe libremente durante 20 minutos sobre tu semana: qué pasó, cómo te sentiste, qué aprendiste. Sin editar, solo fluir.",
-    por_que:      "La escritura expresiva reduce el estrés y mejora la claridad mental. Pennebaker demostró que 20 minutos semanales tiene efectos medibles en bienestar.",
-    protocolo:    "Expressive Writing — Pennebaker",
-    duracion_min: 20,
-    dia_nombre:   "Miércoles",
-  },
-  {
-    id:           "semanal_movimiento",
-    nombre:       "Movimiento Estructurado",
-    instruccion:  "25 minutos de yoga, pilates, o ejercicio de tu elección. Busca un video guiado si necesitas estructura. Lo importante es moverte con intención.",
-    por_que:      "El ejercicio estructurado semanal refuerza los beneficios del movimiento diario y construye capacidad de recuperación ante el estrés.",
-    protocolo:    "Exercise as Medicine — Ratey",
-    duracion_min: 25,
-    dia_nombre:   "Viernes",
-  },
-  {
-    id:           "semanal_reflexion",
-    nombre:       "Reflexión Semanal",
-    instruccion:  "Siéntate en un lugar tranquilo y responde por escrito: ¿Qué aprendí esta semana? ¿Qué quiero llevar a la próxima? ¿Qué suelto?",
-    por_que:      "La reflexión intencional al cierre de semana consolida el aprendizaje y genera sentido. Es el puente entre la experiencia y el crecimiento real.",
-    protocolo:    "Reflective Practice — Schön",
-    duracion_min: 15,
-    dia_nombre:   "Domingo",
-  },
-];
+import { NextResponse }               from "next/server";
+import { createClient }               from "@/lib/supabase/server";
+import { detectarRequiereRespuesta, generarTareasSemanales } from "@/lib/tareas/logic";
+import type { Perfil, Emocion, Motivacion, Tiempo, Tono } from "@/lib/tareas/logic";
 
 function getSemanaKey(): string {
   const now  = new Date();
@@ -50,6 +12,15 @@ function getSemanaKey(): string {
 
 function tiempoAMinutos(tiempo: string): number {
   return ({ "5min": 5, "10min": 10, "15min": 15, "20min+": 25 } as Record<string, number>)[tiempo] ?? 10;
+}
+
+function mismaSemanaISO(a: Date, b: Date): boolean {
+  const lunes = (d: Date) => {
+    const t = new Date(d); const dia = t.getDay();
+    t.setDate(t.getDate() - (dia === 0 ? 6 : dia - 1)); t.setHours(0, 0, 0, 0);
+    return t.getTime();
+  };
+  return lunes(a) === lunes(b);
 }
 
 export async function GET() {
@@ -70,7 +41,6 @@ export async function GET() {
 
     let tarea_diaria = null;
     if (asignacion) {
-      // Buscar detalles: tareas_biblioteca primero, luego tareas_pool
       let tareaDetalle = null;
       let requiere_respuesta = false;
 
@@ -83,12 +53,12 @@ export async function GET() {
       if (tb) {
         requiere_respuesta = detectarRequiereRespuesta(tb.instruccion);
         tareaDetalle = {
-          nombre:            tb.nombre,
-          instruccion:       tb.instruccion,
-          por_que:           tb.por_que,
-          ciencia_breve:     tb.ciencia_breve ?? null,
-          protocolo:         tb.protocolo ?? null,
-          duracion_min:      tiempoAMinutos(tb.tiempo_min),
+          nombre:        tb.nombre,
+          instruccion:   tb.instruccion,
+          por_que:       tb.por_que,
+          ciencia_breve: tb.ciencia_breve ?? null,
+          protocolo:     tb.protocolo ?? null,
+          duracion_min:  tiempoAMinutos(tb.tiempo_min),
         };
       } else {
         const { data: tp } = await supabase
@@ -110,51 +80,59 @@ export async function GET() {
         }
       }
 
-      tarea_diaria = {
-        ...asignacion,
-        tarea:             tareaDetalle,
-        requiere_respuesta,
-      };
+      tarea_diaria = { ...asignacion, tarea: tareaDetalle, requiere_respuesta };
     }
 
-    // Gamificación + semanales completadas esta semana
-    const [gamifResult, prefsResult] = await Promise.all([
+    // Gamificación + perfil del usuario
+    const [gamifRes, prefsRes] = await Promise.all([
       supabase.from("user_gamification")
         .select("xp_total, streak_actual, streak_sueno, semanales_semana, nivel_actual")
         .eq("user_id", user.id)
         .single(),
       supabase.from("user_quiz_preferences")
-        .select("updated_at")
+        .select("emocion_actual, perfil_motivacional, tiempo_disponible, tono_intencional, updated_at")
         .eq("user_id", user.id)
         .single(),
     ]);
-    const gamif = gamifResult.data;
 
-    // Check-in pendiente: si no hizo check-in esta semana ISO
+    const gamif = gamifRes.data;
+    const prefs = prefsRes.data;
+
+    // Usuario nuevo: no tiene perfil → onboarding obligatorio
+    const requiere_onboarding = !prefs;
+
+    // Check-in pendiente esta semana ISO
     const checkin_semanal_pendiente = (() => {
-      const upd = prefsResult.data?.updated_at;
-      if (!upd) return false;
-      const lunes = (d: Date) => {
-        const t = new Date(d); const dia = t.getDay();
-        t.setDate(t.getDate() - (dia === 0 ? 6 : dia - 1)); t.setHours(0, 0, 0, 0);
-        return t.getTime();
-      };
-      return lunes(new Date(upd)) !== lunes(new Date());
+      if (!prefs?.updated_at) return false;
+      return !mismaSemanaISO(new Date(prefs.updated_at), new Date());
     })();
 
+    // Tareas semanales personalizadas (3 desde tareas_biblioteca, fallback a genéricas)
     const semanaKey      = getSemanaKey();
     const completadasIds = ((gamif?.semanales_semana as Record<string, string[]>) ?? {})[semanaKey] ?? [];
 
-    const tareas_semanales = TAREAS_SEMANALES.map((t) => ({
-      ...t,
-      completada:         completadasIds.includes(t.id),
-      requiere_respuesta: detectarRequiereRespuesta(t.instruccion),
-    }));
+    let tareas_semanales: Array<object> = [];
+    if (prefs) {
+      const perfil: Perfil = {
+        emocion:      (prefs.emocion_actual      ?? "mantenimiento") as Emocion,
+        motivacional: (prefs.perfil_motivacional ?? "pragmatico")    as Motivacion,
+        tiempo:       (prefs.tiempo_disponible   ?? "10min")         as Tiempo,
+        tono:         (prefs.tono_intencional    ?? "accion")        as Tono,
+      };
+      const nivel = gamif?.nivel_actual ?? 1;
+      const semanales = await generarTareasSemanales(supabase, perfil, nivel, user.id);
+      tareas_semanales = semanales.map((t) => ({
+        ...t,
+        completada:         completadasIds.includes(t.tarea_id),
+        requiere_respuesta: detectarRequiereRespuesta(t.instruccion),
+      }));
+    }
 
     return NextResponse.json({
       tarea_diaria,
       tareas_semanales,
       tareas_semanales_completadas: completadasIds.length,
+      requiere_onboarding,
       checkin_semanal_pendiente,
       nivel_actual: gamif?.nivel_actual ?? 1,
       streaks: {

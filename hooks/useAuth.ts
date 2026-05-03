@@ -43,7 +43,19 @@ export function useAuth() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Error al crear cuenta");
-      router.push("/mi-perfil");
+
+      // Auto-login: crear sesión inmediatamente para no perder al usuario en el flujo
+      const loginRes = await fetch("/api/auth/login", {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ email: payload.email, password: payload.password }),
+      });
+      if (loginRes.ok) {
+        router.push("/mi-perfil/tareas");
+      } else {
+        // Si el auto-login falla, enviar al login con email pre-cargado via query
+        router.push(`/auth/login?email=${encodeURIComponent(payload.email)}`);
+      }
       router.refresh();
       return true;
     } catch (e) {

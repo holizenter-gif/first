@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
 
 export default function MiPerfilRootPage() {
-  redirect("/mi-perfil/datos");
+  redirect("/mi-perfil/tareas");
 }

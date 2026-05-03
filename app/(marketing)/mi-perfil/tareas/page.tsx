@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Loader2, CheckCircle2, Star, Flame, Trophy, Clock, Square, CheckSquare, RefreshCw } from "lucide-react";
+import { Loader2, CheckCircle2, Star, Flame, Trophy, Clock, Square, CheckSquare, RefreshCw, Leaf } from "lucide-react";
 
 interface TareaDetalle {
   nombre:      string;
@@ -50,7 +50,8 @@ export default function TareaHoyPage() {
   const [tareasSemanales,   setTareasSemanales]   = useState<TareaSemanal[]>([]);
   const [xpTotal,           setXpTotal]           = useState(0);
   const [streak,            setStreak]            = useState(0);
-  const [checkinPendiente,  setCheckinPendiente]  = useState(false);
+  const [checkinPendiente,   setCheckinPendiente]  = useState(false);
+  const [requiereOnboarding, setRequiereOnboarding] = useState(false);
   const [emocionAntes,   setEmocionAntes]   = useState(5);
   const [emocionDespues, setEmocionDespues] = useState(5);
   const [notas,          setNotas]          = useState("");
@@ -62,6 +63,7 @@ export default function TareaHoyPage() {
     fetch("/api/tareas/hoy")
       .then((r) => r.json())
       .then((d) => {
+        setRequiereOnboarding(d.requiere_onboarding ?? false);
         setCheckinPendiente(d.checkin_semanal_pendiente ?? false);
         setTareasSemanales(d.tareas_semanales ?? []);
         setXpTotal(d.xp_total ?? 0);
@@ -131,6 +133,35 @@ export default function TareaHoyPage() {
       </div>
     </div>
   );
+
+  // ── MODAL ONBOARDING (no-dismissible) ────────────────────────────────────
+  if (requiereOnboarding && fase !== 'cargando') {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-6"
+        style={{ background: "rgba(13,26,15,0.85)" }}>
+        <div className="bg-white rounded-2xl p-8 max-w-sm w-full text-center shadow-2xl">
+          <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-5"
+            style={{ background: "#EBF8F2" }}>
+            <Leaf className="w-7 h-7" style={{ color: "#5CB996" }} />
+          </div>
+          <h2 className="font-display font-bold text-2xl mb-3" style={{ color: "#0D1A0F" }}>
+            ¡Bienvenido/a!
+          </h2>
+          <p className="font-sans text-sm leading-relaxed mb-7" style={{ color: "#6B7280" }}>
+            Necesitamos entender tu estado actual para personalizar tu plan de bienestar.
+            Esto te tomará 5 minutos.
+          </p>
+          <button
+            onClick={() => router.push("/quiz/tareas/inicio")}
+            className="w-full py-4 rounded-full font-display font-bold text-white text-lg"
+            style={{ background: "#5CB996" }}
+          >
+            Comenzar diagnóstico
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   // ── CARGANDO ──────────────────────────────────────────────────────────────
   if (fase === 'cargando') {

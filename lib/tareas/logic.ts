@@ -289,6 +289,84 @@ export async function generarPlan7DiasConNivel(
   return construirPlanBib(tareas);
 }
 
+// ─── NUEVA: generarTareasSemanales ───────────────────────────────────────
+// 3 tareas semanales personalizadas desde tareas_biblioteca (tipo='semanal').
+// Misma lógica de filtrado y exclusión que las diarias.
+// Fallback a 3 genéricas si biblioteca no tiene contenido semanal.
+
+const SEMANALES_FALLBACK: TareaDelDia[] = [
+  { dia: 2, tarea_id: 'semanal_movimiento',  nombre: 'Activación Conductual',   instruccion: 'Sal a caminar o haz cualquier movimiento durante 30 minutos sin teléfono.',    por_que: 'El movimiento es la intervención con más evidencia para el estado de ánimo.',  duracion_min: 30 },
+  { dia: 4, tarea_id: 'semanal_journaling',  nombre: 'Journaling de la Semana', instruccion: 'Escribe libremente durante 20 minutos: qué pasó, cómo te sentiste, qué aprendiste.',  por_que: 'La escritura expresiva reduce el estrés y mejora la claridad mental.',           duracion_min: 20 },
+  { dia: 6, tarea_id: 'semanal_reflexion',   nombre: 'Reflexión Semanal',       instruccion: 'Responde por escrito: ¿Qué aprendí esta semana? ¿Qué quiero llevar a la próxima?', por_que: 'La reflexión intencional consolida el aprendizaje y genera sentido.',             duracion_min: 15 },
+];
+
+export async function generarTareasSemanales(
+  supabase: SupabaseClient,
+  perfil:   Perfil,
+  nivel:    number,
+  user_id:  string
+): Promise<TareaDelDia[]> {
+  const excluidas = await obtenerTareasCompletadas28Dias(supabase, user_id);
+
+  // Intento 1: emocion + motivacion + nivel
+  const { data: t1 } = await supabase
+    .from('tareas_biblioteca')
+    .select('*')
+    .eq('tipo',             'semanal')
+    .eq('emocion_target',   perfil.emocion)
+    .eq('motivacion_ideal', perfil.motivacional)
+    .eq('nivel',            nivel)
+    .eq('activa',           true);
+
+  let tareas = (t1 ?? []).filter((t: { id: string }) => !excluidas.includes(t.id));
+  if (tareas.length < 3) tareas = t1 ?? [];
+
+  // Intento 2: relaja motivacion
+  if (tareas.length < 3) {
+    const { data: t2 } = await supabase
+      .from('tareas_biblioteca')
+      .select('*')
+      .eq('tipo',           'semanal')
+      .eq('emocion_target', perfil.emocion)
+      .eq('nivel',          nivel)
+      .eq('activa',         true);
+    const ids = new Set(tareas.map((t: { id: string }) => t.id));
+    for (const t of (t2 ?? [])) {
+      if (!ids.has(t.id)) { tareas.push(t); ids.add(t.id); }
+      if (tareas.length >= 3) break;
+    }
+  }
+
+  // Intento 3: nivel 1 si nivel > 1
+  if (tareas.length < 3 && nivel > 1) {
+    const { data: t3 } = await supabase
+      .from('tareas_biblioteca')
+      .select('*')
+      .eq('tipo',           'semanal')
+      .eq('emocion_target', perfil.emocion)
+      .eq('activa',         true)
+      .limit(3);
+    const ids = new Set(tareas.map((t: { id: string }) => t.id));
+    for (const t of (t3 ?? [])) {
+      if (!ids.has(t.id)) { tareas.push(t); ids.add(t.id); }
+      if (tareas.length >= 3) break;
+    }
+  }
+
+  // Fallback a genéricas si la biblioteca no tiene contenido semanal aún
+  if (tareas.length === 0) return SEMANALES_FALLBACK;
+
+  const diasSemana = [2, 4, 6];
+  return tareas.slice(0, 3).map((t: { id: string; nombre: string; instruccion: string; por_que?: string; tiempo_min?: string }, i: number) => ({
+    dia:          diasSemana[i] ?? i + 2,
+    tarea_id:     t.id,
+    nombre:       t.nombre,
+    instruccion:  t.instruccion,
+    por_que:      t.por_que ?? '',
+    duracion_min: tiempoAMinutos(t.tiempo_min ?? '15min'),
+  }));
+}
+
 // ─── generarPlan7DiasLegacy (antes: generarPlan7Dias) ───────────────────
 // Busca en tareas_pool. Fallback del sistema.
 
